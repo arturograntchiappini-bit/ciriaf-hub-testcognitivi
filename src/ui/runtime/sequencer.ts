@@ -16,6 +16,8 @@ export interface TrialSpec {
   stimulusLabel: string;
   /** ISI (ms) che segue questo trial; se assente si usa il default di config. */
   isiMs?: number;
+  /** Payload tipizzato dello stimolo, usato da renderStimulus/evaluate della vista. */
+  data?: unknown;
 }
 
 export type SequencerPhase =

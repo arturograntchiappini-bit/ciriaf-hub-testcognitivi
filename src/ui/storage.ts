@@ -15,7 +15,10 @@ function mergeWithDefaults(stored: unknown): AllParams {
   for (const key of Object.keys(DEFAULTS) as (keyof AllParams)[]) {
     const testStored = s[key];
     if (typeof testStored === 'object' && testStored !== null) {
-      result[key] = { ...result[key], ...(testStored as object) } as AllParams[typeof key];
+      (result as unknown as Record<string, unknown>)[key] = {
+        ...(result[key] as object),
+        ...(testStored as object),
+      };
     }
   }
   return result;
