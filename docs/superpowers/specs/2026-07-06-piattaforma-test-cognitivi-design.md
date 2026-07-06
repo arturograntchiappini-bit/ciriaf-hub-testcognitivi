@@ -1,5 +1,6 @@
-# Piattaforma Web di Test Cognitivi — Design
+# CIRIAF — COLAB/NEXTROOM Cognitive Testing Hub — Design
 
+**Nome piattaforma:** CIRIAF - COLAB/NEXTROOM COGNITIVE TESTING HUB
 **Data:** 2026-07-06
 **Stato:** Approvato in brainstorming
 **Contesto:** Progetto ufficiale per sperimentazione in laboratorio (CIRIAF)
@@ -20,7 +21,8 @@ sono variabili), il soggetto sceglie dal menu il test indicato dallo sperimentat
   da parte dello sperimentatore) + export CSV/JSON con i dati grezzi trial-per-trial.
 - **Deployment**: build statica pubblicata online (Netlify o equivalente). I test
   girano interamente nel browser; la rete serve solo al caricamento iniziale.
-- **Lingua UI**: italiano.
+- **Lingua UI**: italiano. **Anche tutta la documentazione (inclusi i docs di
+  spiegazione del codice e i documenti scientifici) è in italiano.**
 
 ### Test implementati
 
@@ -80,9 +82,41 @@ src/
   successiva al commit), le risposte via listener `keydown`/`pointerdown` globali
   con `performance.now()`.
 
+### Design visivo (identità UI)
+
+Estetica **universitaria, estremamente pulita e professionale**: sobria, silenziosa,
+senza elementi decorativi che distraggano dal compito cognitivo (requisito
+sperimentale, non solo estetico — durante i trial lo schermo è quasi vuoto).
+
+- **Palette**:
+  - sfondo **bianco** (`#FFFFFF`);
+  - testo **nero** (`#111111` per il corpo, nero pieno per gli stimoli);
+  - accenti **azzurrini** (`#4A90D9` primario, `#EAF2FB` per superfici tenui)
+    usati solo per rifiniture: bordi attivi, hover, focus ring, header, pulsante
+    primario. Mai come sfondo di ampie aree.
+  - Colori funzionali riservati ai soli stimoli/feedback dei test (verde/rosso
+    Go-No-Go, colori Stroop), tenuti fuori dalla palette di UI per non confondersi
+    con gli stimoli.
+- **Tipografia**: un solo carattere sans-serif pulito e istituzionale (Inter, o
+  system-ui come fallback), gerarchia tramite peso e dimensione, ampio spazio
+  bianco, testo allineato a sinistra e ben leggibile.
+- **Layout**: griglia centrata con larghezza massima contenuta, molto respiro,
+  bordi sottili e angoli lievemente arrotondati, ombre appena percettibili.
+  Niente gradienti vistosi, niente animazioni gratuite (le uniche transizioni
+  sono i cambi di stimolo richiesti dai test).
+- **Header**: barra superiore sobria con il nome
+  **"CIRIAF — COLAB/NEXTROOM COGNITIVE TESTING HUB"** e, se disponibile, il logo
+  istituzionale. Durante i trial l'header sparisce (schermo dedicato allo stimolo).
+- **Accessibilità**: contrasto AA garantito dalla palette nero-su-bianco, focus
+  ring azzurrino sempre visibile, rispetto di `prefers-reduced-motion`.
+- I **token di colore/tipografia** sono centralizzati (Tailwind theme + variabili
+  CSS) così che un eventuale adeguamento al brand ufficiale CIRIAF sia un'unica
+  modifica.
+
 ### Flusso utente
 
-1. **Home**: 6 card (una per test) + icona ingranaggio per Impostazioni.
+1. **Home**: intestazione con il nome della piattaforma, 6 card (una per test) +
+   icona ingranaggio per Impostazioni.
 2. Click test → **Istruzioni** (testo + schema visivo dei tasti) → **Pratica**
    con feedback "Corretto/Errato" ben visibile, **skippabile** con pulsante sempre
    presente → countdown 3-2-1 → **Test** (fullscreen richiesto all'avvio).
@@ -97,7 +131,10 @@ I dati di pratica sono sempre esclusi dai risultati (ma presenti nell'export con
 ## 3. Documentazione ufficiale e ancoraggio scientifico
 
 Il progetto è un lavoro ufficiale: ogni scelta parametrica dev'essere tracciabile
-a una fonte, e la documentazione evolve col codice.
+a una fonte, e la documentazione evolve col codice. **Tutta la documentazione è
+redatta in italiano** — sia i documenti scientifici sia i docs di spiegazione del
+codice e dell'architettura; le sole citazioni bibliografiche restano nella lingua
+originale della fonte.
 
 ### Struttura documentale
 
