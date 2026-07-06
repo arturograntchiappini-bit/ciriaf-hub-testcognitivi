@@ -6,3 +6,7 @@ dist-ssr
 coverage
 .vite
 *.log
+
+# artefatti di test/verifica
+.playwright-mcp/
+*.png
