@@ -8,15 +8,18 @@ import { Header } from '../components/Header';
 import { Button } from '../components/Button';
 import { DEFAULTS, type AllParams } from '../../config/defaults';
 import { PARAM_SECTIONS } from '../params/paramFields';
+import type { Preferences } from '../preferences';
 
 interface SettingsProps {
   settings: AllParams;
-  onSave: (next: AllParams) => void;
+  prefs: Preferences;
+  onSave: (next: AllParams, nextPrefs: Preferences) => void;
   onBack: () => void;
 }
 
-export function Settings({ settings, onSave, onBack }: SettingsProps): JSX.Element {
+export function Settings({ settings, prefs, onSave, onBack }: SettingsProps): JSX.Element {
   const [draft, setDraft] = useState<AllParams>(() => JSON.parse(JSON.stringify(settings)) as AllParams);
+  const [draftPrefs, setDraftPrefs] = useState<Preferences>(() => ({ ...prefs }));
 
   function setField(testKey: keyof AllParams, field: string, value: number): void {
     setDraft((prev) => ({
@@ -48,7 +51,30 @@ export function Settings({ settings, onSave, onBack }: SettingsProps): JSX.Eleme
           esportato, così i risultati restano interpretabili nel tempo.
         </p>
 
-        <div className="mt-8 space-y-6">
+        {/* Preferenze di presentazione (non scientifiche) */}
+        <section className="mt-8 rounded-card border border-line p-5">
+          <h2 className="text-base font-semibold text-ink">Presentazione</h2>
+          <label className="mt-3 flex items-start gap-3">
+            <input
+              type="checkbox"
+              checked={draftPrefs.feedbackDuringTest}
+              onChange={(e) => setDraftPrefs((p) => ({ ...p, feedbackDuringTest: e.target.checked }))}
+              className="mt-0.5 h-4 w-4"
+            />
+            <span>
+              <span className="block text-sm text-ink">
+                Mostra «Corretto / Errato» durante i test a tempo di reazione
+              </span>
+              <span className="block text-xs text-muted">
+                Stroop, Go/No-Go e N-Back mostrano un breve feedback dopo ogni risposta (come in
+                pratica). Corsi e WCST lo mostrano sempre. Disattivato di default: il feedback può
+                influenzare i tempi di risposta.
+              </span>
+            </span>
+          </label>
+        </section>
+
+        <div className="mt-6 space-y-6">
           {PARAM_SECTIONS.map((section) => {
             const testParams = draft[section.testKey] as unknown as Record<string, number>;
             const defaults = DEFAULTS[section.testKey] as unknown as Record<string, number>;
@@ -91,7 +117,7 @@ export function Settings({ settings, onSave, onBack }: SettingsProps): JSX.Eleme
         </div>
 
         <div className="mt-8 flex items-center gap-3">
-          <Button onClick={() => onSave(draft)}>Salva</Button>
+          <Button onClick={() => onSave(draft, draftPrefs)}>Salva</Button>
           <Button variant="ghost" onClick={onBack}>
             Annulla
           </Button>

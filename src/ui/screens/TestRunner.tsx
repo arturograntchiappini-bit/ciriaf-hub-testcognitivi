@@ -13,6 +13,7 @@ import type { TestId, TestResult } from '../../engine/types';
 interface TestRunnerProps {
   testId: TestId;
   settings: AllParams;
+  feedbackDuringTest?: boolean;
   onComplete: (result: TestResult) => void;
   onBack: () => void;
 }
@@ -25,7 +26,7 @@ function requestFullscreen(): void {
   }
 }
 
-export function TestRunner({ testId, settings, onComplete, onBack }: TestRunnerProps): JSX.Element {
+export function TestRunner({ testId, settings, feedbackDuringTest, onComplete, onBack }: TestRunnerProps): JSX.Element {
   const [started, setStarted] = useState(false);
   const sessionId = useMemo(() => makeSessionId(new Date()), []);
   const startedAt = useMemo(() => new Date().toISOString(), []);
@@ -51,6 +52,7 @@ export function TestRunner({ testId, settings, onComplete, onBack }: TestRunnerP
       sessionId={sessionId}
       startedAt={startedAt}
       seed={seed}
+      feedbackDuringTest={feedbackDuringTest}
       onComplete={onComplete}
       onAbort={onBack}
     />

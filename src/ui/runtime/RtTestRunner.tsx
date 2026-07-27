@@ -41,6 +41,8 @@ interface RtTestRunnerProps {
   startedAt: string;
   /** Se false, salta la fase di pratica (usato in modalità Sessione). Default true. */
   practice?: boolean;
+  /** Se true, mostra "Corretto"/"Errato" anche durante il test (non solo in pratica). */
+  feedbackDuringTest?: boolean;
   onComplete: (result: TestResult) => void;
   onAbort: () => void;
 }
@@ -48,8 +50,17 @@ interface RtTestRunnerProps {
 type Stage = 'practice' | 'countdown' | 'test' | 'paused';
 
 const KEY_SPACE = ' ';
+/** Durata del feedback opzionale durante il test (più breve di quello di pratica). */
+const TEST_FEEDBACK_MS = 450;
 
-export function RtTestRunner({ plan, startedAt, practice = true, onComplete, onAbort }: RtTestRunnerProps): JSX.Element {
+export function RtTestRunner({
+  plan,
+  startedAt,
+  practice = true,
+  feedbackDuringTest = false,
+  onComplete,
+  onAbort,
+}: RtTestRunnerProps): JSX.Element {
   const [stage, setStage] = useState<Stage>(
     practice && plan.practiceTrials.length > 0 ? 'practice' : 'countdown',
   );
@@ -95,7 +106,12 @@ export function RtTestRunner({ plan, startedAt, practice = true, onComplete, onA
         responseWindowMs: plan.timing.responseWindowMs,
         isiMs: plan.timing.isiMs,
         endOnResponse: plan.timing.endOnResponse,
-        feedbackMs: phase === 'practice' ? plan.timing.practiceFeedbackMs : 0,
+        feedbackMs:
+          phase === 'practice'
+            ? plan.timing.practiceFeedbackMs
+            : feedbackDuringTest
+              ? TEST_FEEDBACK_MS
+              : 0,
         responseKeys: plan.responseKeys,
         expectsResponse: plan.expectsResponse,
         evaluate: plan.evaluate,
@@ -119,7 +135,7 @@ export function RtTestRunner({ plan, startedAt, practice = true, onComplete, onA
       seqRef.current = seq;
       seq.start();
     },
-    [plan, finishTest],
+    [plan, finishTest, feedbackDuringTest],
   );
 
   // Gestione delle transizioni di stage.

@@ -8,10 +8,7 @@ export function Header({ onOpenSettings }: HeaderProps): JSX.Element {
     <header className="border-b border-line bg-paper">
       <div className="mx-auto flex max-w-content items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
-          <span
-            aria-hidden
-            className="inline-block h-6 w-6 rounded-md border border-accent bg-accent-soft"
-          />
+          <img src="/favicon.svg" alt="" aria-hidden className="h-7 w-7 shrink-0" />
           <span className="text-sm font-semibold tracking-tight text-ink">
             CIRIAF — COLAB/NEXTROOM COGNITIVE TESTING HUB
           </span>

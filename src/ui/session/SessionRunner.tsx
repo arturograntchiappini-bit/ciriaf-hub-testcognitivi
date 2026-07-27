@@ -24,6 +24,7 @@ import type { TestResult } from '../../engine/types';
 
 interface SessionRunnerProps {
   initialRun: SessionRun;
+  feedbackDuringTest?: boolean;
   onExit: () => void;
 }
 
@@ -39,7 +40,7 @@ function now(): number {
   return Date.now();
 }
 
-export function SessionRunner({ initialRun, onExit }: SessionRunnerProps): JSX.Element {
+export function SessionRunner({ initialRun, feedbackDuringTest, onExit }: SessionRunnerProps): JSX.Element {
   const [run, setRun] = useState<SessionRun>(initialRun);
   const [mode, setMode] = useState<Mode>(initialRun.finished ? 'done' : 'wait');
   const [, setTick] = useState(0);
@@ -192,6 +193,7 @@ export function SessionRunner({ initialRun, onExit }: SessionRunnerProps): JSX.E
         startedAt={testStartedAtRef.current}
         seed={testSeedRef.current}
         practice={item.practice}
+        feedbackDuringTest={feedbackDuringTest}
         onComplete={onTestComplete}
         onAbort={() => setMode('wait')}
       />

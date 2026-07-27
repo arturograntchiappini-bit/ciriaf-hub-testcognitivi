@@ -1,6 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect x="1" y="1" width="30" height="30" rx="7" fill="#EAF2FB" stroke="#4A90D9" stroke-width="2"/>
-  <circle cx="11" cy="12" r="3" fill="#4A90D9"/>
-  <circle cx="21" cy="12" r="3" fill="#111111"/>
-  <rect x="8" y="20" width="16" height="3" rx="1.5" fill="#111111"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="CIRIAF Cognitive Testing Hub">
+  <rect x="1" y="1" width="30" height="30" rx="8" fill="#4A90D9"/>
+  <g stroke="#FFFFFF" stroke-width="1.9" stroke-linecap="round" stroke-opacity="0.9">
+    <line x1="10" y1="11.5" x2="22" y2="10.5"/>
+    <line x1="10" y1="11.5" x2="16" y2="22"/>
+    <line x1="22" y1="10.5" x2="16" y2="22"/>
+  </g>
+  <g fill="#FFFFFF">
+    <circle cx="10" cy="11.5" r="3.3"/>
+    <circle cx="22" cy="10.5" r="3.3"/>
+    <circle cx="16" cy="22" r="3.3"/>
+  </g>
 </svg>

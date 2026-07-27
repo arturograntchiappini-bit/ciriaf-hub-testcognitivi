@@ -11,6 +11,7 @@ import { SessionMenu } from './ui/session/SessionMenu';
 import { SessionBuilder } from './ui/session/SessionBuilder';
 import { SessionRunner } from './ui/session/SessionRunner';
 import { loadSettings, saveSettings } from './ui/storage';
+import { loadPreferences, savePreferences, type Preferences } from './ui/preferences';
 import {
   loadTemplates,
   saveTemplate,
@@ -26,14 +27,17 @@ import type { TestId, TestResult } from './engine/types';
 export function App(): JSX.Element {
   const [route, setRoute] = useState<Route>({ name: 'home' });
   const [settings, setSettings] = useState<AllParams>(() => loadSettings());
+  const [prefs, setPrefs] = useState<Preferences>(() => loadPreferences());
   const [templates, setTemplates] = useState<SessionTemplate[]>(() => loadTemplates());
 
   function goHome(): void {
     setRoute({ name: 'home' });
   }
-  function persistSettings(next: AllParams): void {
+  function persistSettings(next: AllParams, nextPrefs: Preferences): void {
     saveSettings(next);
+    savePreferences(nextPrefs);
     setSettings(next);
+    setPrefs(nextPrefs);
     goHome();
   }
 
@@ -79,6 +83,7 @@ export function App(): JSX.Element {
           key={route.testId}
           testId={route.testId}
           settings={settings}
+          feedbackDuringTest={prefs.feedbackDuringTest}
           onComplete={(result: TestResult) => setRoute({ name: 'results', result })}
           onBack={goHome}
         />
@@ -86,7 +91,7 @@ export function App(): JSX.Element {
     case 'results':
       return <Results result={route.result} onHome={goHome} />;
     case 'settings':
-      return <Settings settings={settings} onSave={persistSettings} onBack={goHome} />;
+      return <Settings settings={settings} prefs={prefs} onSave={persistSettings} onBack={goHome} />;
     case 'sessionMenu':
       return (
         <SessionMenu
@@ -112,6 +117,12 @@ export function App(): JSX.Element {
         />
       );
     case 'sessionRun':
-      return <SessionRunner initialRun={route.run} onExit={() => setRoute({ name: 'sessionMenu' })} />;
+      return (
+        <SessionRunner
+          initialRun={route.run}
+          feedbackDuringTest={prefs.feedbackDuringTest}
+          onExit={() => setRoute({ name: 'sessionMenu' })}
+        />
+      );
   }
 }

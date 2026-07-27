@@ -20,6 +20,7 @@ interface GoNoGoViewProps {
   startedAt: string;
   seed: number;
   practice?: boolean;
+  feedbackDuringTest?: boolean;
   onComplete: (result: TestResult) => void;
   onAbort: () => void;
 }
@@ -67,6 +68,7 @@ export function GoNoGoView(props: GoNoGoViewProps): JSX.Element {
       plan={plan}
       startedAt={startedAt}
       practice={props.practice}
+      feedbackDuringTest={props.feedbackDuringTest}
       onComplete={props.onComplete}
       onAbort={props.onAbort}
     />
