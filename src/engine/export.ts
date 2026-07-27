@@ -6,7 +6,7 @@
  */
 import type { TestResult, TrialResult } from './types';
 
-const CSV_SEPARATOR = ';';
+export const CSV_SEPARATOR = ';';
 
 const CSV_HEADER = [
   'test',
@@ -23,7 +23,7 @@ const CSV_HEADER = [
 ].join(CSV_SEPARATOR);
 
 /** Mette tra virgolette e raddoppia le virgolette se il campo contiene separatore/newline/virgolette. */
-function csvField(value: string | number | boolean | null): string {
+export function csvField(value: string | number | boolean | null): string {
   if (value === null) return '';
   const s = String(value);
   if (s.includes(CSV_SEPARATOR) || s.includes('"') || s.includes('\n')) {
@@ -32,9 +32,13 @@ function csvField(value: string | number | boolean | null): string {
   return s;
 }
 
-function trialToCsvRow(t: TrialResult): string {
+/**
+ * Colonne di un trial SENZA il testId (che nell'export di sessione è una colonna
+ * di contesto). Ordine: session_id, trial_index, fase, condizione, stimolo,
+ * risposta, corretto, rt_ms, flag_validazione, timestamp_onset.
+ */
+export function trialCsvValues(t: TrialResult): (string | number | null)[] {
   return [
-    t.testId,
     t.sessionId,
     t.trialIndex,
     t.phase,
@@ -45,9 +49,11 @@ function trialToCsvRow(t: TrialResult): string {
     t.rtMs === null ? '' : Math.round(t.rtMs),
     t.flag,
     Math.round(t.onsetTimestamp),
-  ]
-    .map(csvField)
-    .join(CSV_SEPARATOR);
+  ];
+}
+
+function trialToCsvRow(t: TrialResult): string {
+  return [t.testId, ...trialCsvValues(t)].map(csvField).join(CSV_SEPARATOR);
 }
 
 /** Serializza un risultato in CSV con header fisso. */
