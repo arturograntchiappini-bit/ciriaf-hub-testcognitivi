@@ -27,6 +27,17 @@ npm test          # esegue la suite di test (Vitest)
 
 Requisiti: Node.js ≥ 20.
 
+## Modalità Sessione
+
+Oltre alla somministrazione dei singoli test, la piattaforma offre la **modalità
+Sessione**: un protocollo cronometrico in cui si sceglie la durata totale, si
+divide la sessione in fasi nominate (ciascuna con una durata) e si collocano dei
+pin temporali "t" — visualizzati su una linea temporale — in cui somministrare una
+batteria di test selezionati e configurati. Fuori dai "t" il soggetto vede solo un
+conto alla rovescia (con avviso sonoro allo scadere). La sessione è ripristinabile
+se il browser si chiude e a fine protocollo esporta un file JSON di sessione e un
+CSV combinato (una riga per trial, con colonne di contesto fase / t / test).
+
 ## Come si somministra un test
 
 1. Dalla **home**, il soggetto seleziona il test indicato dallo sperimentatore.

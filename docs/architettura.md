@@ -186,3 +186,50 @@ Non sono compiti a tempo di reazione: hanno logica dedicata.
   trial. I nomi file: `{test}_{sessionId}_{data-ora}.{csv|json}`.
 - I parametri effettivi sono scritti **dentro** ogni file: un risultato resta
   interpretabile anche se le impostazioni cambiano nel tempo.
+
+---
+
+## 9. Modalità Sessione
+
+Un protocollo cronometrico: si sceglie **prima la durata totale**, poi le **fasi**
+(ciascuna con una durata: tassellano la timeline in ordine), poi i **pin "t"**
+dentro le fasi. A ogni "t" si somministra una **batteria** di test selezionati,
+con impostazioni congelate per quella "t". Il tutto è visualizzato su una **linea
+temporale**.
+
+### Motore (puro, testato) — `src/engine/session/`
+
+- `model.ts` — tipi (`SessionTemplate` con `totalMs`, `SessionPhase` con
+  `durationMs`, `TimePin` con `offsetMs` assoluto, `BatteryItem`, `SessionRun`,
+  `SessionTestResult`) e funzioni pure:
+  - `phaseSpans` / `phaseAtElapsed`: intervalli delle fasi e fase del tempo trascorso;
+  - `flattenPins` / `sessionTotalMs`;
+  - `computeSessionState(template, elapsedMs, completedPinIds)`: stato derivato
+    (fase corrente dal tempo trascorso, prossimo pin, countdown, sforo, fine);
+  - `makeRunId` (`S-XXXX-HHMM`).
+- `export.ts` — `toSessionJson` (protocollo + tutti i risultati con contesto) e
+  `toSessionCsv` (una riga per trial di qualsiasi test, con colonne di contesto
+  `fase; t_offset_ms; test; indice_batteria; run_id; …`). Riusa `engine/export.ts`.
+
+### Runtime (UI) — `src/ui/session/`
+
+- Il timing **di sessione** usa l'**orologio reale** (`Date.now()`): `elapsed =
+  now − startedAtEpoch`. Il tempo a browser chiuso conta (protocollo ancorato al
+  tempo); alla riapertura, un pin già scaduto e non eseguito è "dovuto" e parte
+  subito l'alert. Il timing **dentro un test** resta invariato (`performance.now`).
+- `SessionRunner` orchestra attesa → batteria → fine, persistendo il run a ogni
+  passo (ripresa possibile). `WaitScreen` mostra fase, avanzamento e countdown;
+  allo scadere alert visivo + sonoro (`alert.ts`). `BatteryReady` precede ogni
+  test; `TestHost` monta la vista giusta (riusata anche da `TestRunner`).
+- `SessionBuilder` + `SessionTimeline`: costruttore (totale → fasi → pin) con
+  anteprima grafica; validazione (durate, pin dentro la fascia della fase).
+  `storage.ts` persiste modelli e run e importa/esporta il protocollo JSON.
+- I pin hanno `offsetMs` **assoluto** dall'inizio sessione; il builder li vincola
+  alla fascia temporale della loro fase.
+
+### Riuso dei test
+
+Le viste dei 6 test sono usate senza modifiche, tramite `TestHost`; l'unica
+aggiunta è la prop `practice?` per saltare la pratica in sessione. Ogni
+`TestResult` viene etichettato con il contesto (fase, t, indice) in un
+`SessionTestResult`.
