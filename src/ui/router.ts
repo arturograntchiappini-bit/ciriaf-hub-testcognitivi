@@ -3,12 +3,16 @@
  * @see docs/architettura.md — sezione "Navigazione"
  */
 import type { TestId, TestResult } from '../engine/types';
+import type { SessionTemplate, SessionRun } from '../engine/session/model';
 
 export type Route =
   | { name: 'home' }
   | { name: 'run'; testId: TestId }
   | { name: 'results'; result: TestResult }
-  | { name: 'settings' };
+  | { name: 'settings' }
+  | { name: 'sessionMenu' }
+  | { name: 'sessionBuilder'; template: SessionTemplate | null }
+  | { name: 'sessionRun'; run: SessionRun };
 
 /** Metadati di presentazione per ciascun test, mostrati nella Home. */
 export interface TestMeta {

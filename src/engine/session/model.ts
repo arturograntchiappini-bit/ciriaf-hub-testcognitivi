@@ -82,6 +82,7 @@ export function sessionTotalMs(template: SessionTemplate): number {
 /** Stato derivato della sessione a un dato istante trascorso. */
 export interface SessionState {
   currentPhaseName: string;
+  currentPhaseId: string;
   nextPin: TimePin | null;
   upcomingTests: TestId[];
   /** Millisecondi al prossimo pin; ≤ 0 se la batteria è dovuta. */
@@ -116,6 +117,7 @@ export function computeSessionState(
     const lastPhase = template.phases[template.phases.length - 1];
     return {
       currentPhaseName: lastPhase ? lastPhase.name : '',
+      currentPhaseId: lastPhase ? lastPhase.id : '',
       nextPin: null,
       upcomingTests: [],
       countdownMs: 0,
@@ -129,6 +131,7 @@ export function computeSessionState(
   const countdownMs = next.pin.offsetMs - elapsedMs;
   return {
     currentPhaseName: next.phase.name,
+    currentPhaseId: next.phase.id,
     nextPin: next.pin,
     upcomingTests: next.pin.battery.map((b) => b.testId),
     countdownMs,
