@@ -4,6 +4,8 @@ import {
   pathLength,
   countCrossings,
   generateBalancedSequences,
+  meanPairwiseDistance,
+  targetPathLength,
   corsiSpan,
   shouldStop,
   scoreCorsi,
@@ -55,6 +57,30 @@ describe('geometria', () => {
   });
 });
 
+describe('bersaglio di difficoltà', () => {
+  it('meanPairwiseDistance è la media su tutte le coppie distinte', () => {
+    // Quadrato di lato 10: 8 lati (10) e 4 diagonali (√200) fra coppie ordinate
+    const square: Point[] = [
+      { x: 0, y: 0 },
+      { x: 10, y: 0 },
+      { x: 10, y: 10 },
+      { x: 0, y: 10 },
+    ];
+    const expected = (8 * 10 + 4 * Math.sqrt(200)) / 12;
+    expect(meanPairwiseDistance(square)).toBeCloseTo(expected, 9);
+  });
+
+  it('targetPathLength è (length − 1) passi di lunghezza media', () => {
+    const d = meanPairwiseDistance();
+    expect(targetPathLength(1)).toBe(0);
+    expect(targetPathLength(5)).toBeCloseTo(4 * d, 9);
+  });
+
+  it('non dipende dal seed: è una costante del layout', () => {
+    expect(targetPathLength(6)).toBe(targetPathLength(6));
+  });
+});
+
 describe('generateBalancedSequences', () => {
   it('genera sequenze distinte della lunghezza richiesta', () => {
     const seqs = generateBalancedSequences(5, 2, PARAMS, mulberry32(1));
@@ -64,11 +90,58 @@ describe('generateBalancedSequences', () => {
   });
 
   it('le sequenze dello stesso livello hanno stessi incroci e distanza entro tolleranza', () => {
-    const seqs = generateBalancedSequences(5, 2, PARAMS, mulberry32(42));
-    const a = seqs[0]!;
-    const b = seqs[1]!;
-    expect(a.crossings).toBe(b.crossings);
-    expect(Math.abs(a.pathLength - b.pathLength)).toBeLessThanOrEqual(PARAMS.complexityTolerance);
+    // Su molte lunghezze e seed, non su un caso fortunato: la garanzia deve
+    // valere sempre, non solo dove la banda è densa.
+    for (const length of [3, 4, 5, 6, 7, 9]) {
+      for (let seed = 1; seed <= 25; seed++) {
+        const [a, b] = generateBalancedSequences(length, 2, PARAMS, mulberry32(seed));
+        expect(a!.crossings).toBe(b!.crossings);
+        expect(Math.abs(a!.pathLength - b!.pathLength)).toBeLessThanOrEqual(
+          PARAMS.complexityTolerance,
+        );
+      }
+    }
+  });
+
+  it('nessuna sequenza del livello è il rovescio di un’altra', () => {
+    // Un rovescio ha pathLength e incroci identici: senza esclusione esplicita il
+    // criterio di somiglianza lo sceglierebbe sistematicamente.
+    for (const length of [3, 4, 5, 7]) {
+      for (let seed = 1; seed <= 30; seed++) {
+        const [a, b] = generateBalancedSequences(length, 2, PARAMS, mulberry32(seed));
+        const reversed = [...b!.indices].reverse();
+        expect(a!.indices).not.toEqual(reversed);
+      }
+    }
+  });
+
+  it('ogni run resta entro la tolleranza dal bersaglio del livello', () => {
+    for (const length of [3, 5, 7, 9]) {
+      const target = targetPathLength(length);
+      for (let seed = 1; seed <= 30; seed++) {
+        const seqs = generateBalancedSequences(length, 2, PARAMS, mulberry32(seed));
+        for (const s of seqs) {
+          expect(Math.abs(s.pathLength - target)).toBeLessThanOrEqual(PARAMS.complexityTolerance);
+        }
+      }
+    }
+  });
+
+  it('run diverse producono sequenze diverse', () => {
+    const seen = new Set<string>();
+    for (let seed = 1; seed <= 40; seed++) {
+      for (const s of generateBalancedSequences(5, 2, PARAMS, mulberry32(seed))) {
+        seen.add(s.indices.join('-'));
+      }
+    }
+    // 40 run × 2 sequenze: senza variabilità il totale distinto sarebbe minimo.
+    expect(seen.size).toBeGreaterThan(40);
+  });
+
+  it('stesso seed → sequenze identiche (riproducibilità)', () => {
+    const a = generateBalancedSequences(6, 2, PARAMS, mulberry32(7));
+    const b = generateBalancedSequences(6, 2, PARAMS, mulberry32(7));
+    expect(a.map((s) => s.indices)).toEqual(b.map((s) => s.indices));
   });
 });
 

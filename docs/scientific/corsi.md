@@ -159,3 +159,62 @@ In questo modo la variazione di prestazione tra trial dello stesso livello è at
   difficoltà più simile in assoluto), al posto di una tolleranza allargabile;
   resta invariato il vincolo di pari numero di incroci. Vedi
   `revisione-motore/corsi.md` per i dettagli implementativi.
+
+## Equivalenza fra somministrazioni (revisione successiva)
+
+Il bilanciamento descritto sopra garantisce l'equivalenza **fra i due trial dello
+stesso livello**, ma non fra somministrazioni diverse: la finestra mobile vincola
+l'ampiezza *interna* alla coppia, non la sua *posizione assoluta*. Misurato su 200
+seed, la difficoltà media del livello 5 variava fra 121,7 e 255,3 unità di
+percorso (sd 28,5): due partecipanti potevano ricevere livelli nominalmente
+uguali ma di difficoltà geometrica doppia l'uno rispetto all'altro.
+
+### Bersaglio di difficoltà del livello
+
+Si introduce un **bersaglio** costante, calcolato dal solo layout:
+
+```
+bersaglio(k) = (k − 1) · d̄        con d̄ = distanza media fra due blocchi distinti
+```
+
+Ogni passo di una permutazione casuale è una coppia di blocchi distinti estratta
+uniformemente, quindi `bersaglio(k)` è **esattamente il valore atteso di L(S)**
+per una sequenza casuale di lunghezza *k*. Non essendo campionato, è identico in
+ogni somministrazione. Per la configurazione di Kessels (§3bis): d̄ = 49,83.
+
+Il criterio di generazione diventa:
+
+```
+per ogni sequenza S al livello k:
+    | L(S) − bersaglio(k) |  ≤  tolleranza        (equivalenza FRA le run)
+per ogni coppia di trial (t₁, t₂) al livello k:
+    | L(S_t₁) − L(S_t₂) |    ≤  tolleranza        (omogeneità DENTRO il livello)
+    X(S_t₁)  =  X(S_t₂)                            (stesso numero di incroci)
+```
+
+Entro questi vincoli le sequenze sono **estratte a sorte**, così ogni
+somministrazione riceve sequenze diverse pur restando confrontabile con le altre.
+
+### Esclusione delle traiettorie invertite
+
+Una sequenza e il suo **rovescio** hanno L(S) e X(S) identici per costruzione:
+qualunque criterio di massima somiglianza li seleziona sistematicamente. Nella
+versione precedente, a lunghezza 3 la coppia di trial era un rovescio esatto in
+194 run su 200. Formalmente equivalenti, ma il secondo trial ripercorre la stessa
+traiettoria all'indietro sugli stessi blocchi, contro il requisito di sequenze
+indipendenti della somministrazione standard (Kessels et al., 2000; PEBL). I
+candidati sono ora deduplicati per traiettoria, non per ordine.
+
+### Effetto misurato (200 seed, tolleranza 8)
+
+| Indicatore | Prima | Dopo |
+|---|---|---|
+| sd della difficoltà del livello fra le run | 17,0 – 28,5 | **4,4 – 4,8** |
+| escursione min→max fra le run | 94 – 134 | **15,1 – 15,9** |
+| ampiezza dentro il livello (max) | 0,0 – 0,3 | 0,9 – 5,4 (≤ tolleranza) |
+| coppie che sono un rovescio esatto | fino a 194/200 | **0/200** |
+| sequenze distinte su 400 (lunghezza 3) | 42 | **107** |
+
+Il parametro `complexityTolerance` cambia quindi significato: da *ampiezza
+ammessa fra i due trial* a **scostamento massimo dal bersaglio del livello**,
+vincolo più forte che implica il precedente.

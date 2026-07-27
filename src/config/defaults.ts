@@ -59,7 +59,10 @@ export const DEFAULTS: AllParams = {
     maxLength: 9,
     trialsPerLevel: 2,
     presentMsPerBlock: 1000, // isi PEBL = 1000 ms
-    complexityTolerance: 8, // tolleranza sulla distanza totale (unità piano 0–100)
+    // Scostamento massimo dal BERSAGLIO di difficoltà del livello (unità piano
+    // 0–100). Vincola la difficoltà assoluta, non solo la somiglianza fra i due
+    // trial: è ciò che rende confrontabili run di partecipanti diversi.
+    complexityTolerance: 8,
   },
 
   /**

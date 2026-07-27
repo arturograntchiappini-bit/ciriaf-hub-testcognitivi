@@ -5,6 +5,11 @@
  * Layout fisso e asimmetrico di 9 blocchi. Ad ogni livello, 2 trial con sequenze
  * diverse ma di pari "indice di complessità" (stessa distanza percorsa e stesso
  * numero di incroci geometrici). Regola di arresto: fallimento di entrambi i trial.
+ *
+ * La generazione garantisce due proprietà distinte: le sequenze sono equivalenti
+ * DENTRO il livello (confronto fra i 2 trial dello stesso partecipante) e sono
+ * ancorate a un bersaglio costante FRA le run (confronto fra partecipanti, o fra
+ * sessioni dello stesso partecipante), pur restando diverse ad ogni seed.
  */
 import type { SummaryMetric, TrialResult } from '../types';
 import { shuffle } from '../rng';
@@ -94,68 +99,104 @@ function complexityOf(indices: number[], blocks: readonly Point[]): CorsiSequenc
   return { indices, pathLength: pathLength(indices, blocks), crossings: countCrossings(indices, blocks) };
 }
 
-function keyOf(indices: number[]): string {
-  return indices.join('-');
-}
-
-/** Ampiezza di distanza di una finestra ordinata (ultimo − primo pathLength). */
-function windowSpread(window: readonly CorsiSequence[]): number {
-  if (window.length < 2) return 0;
-  return (window[window.length - 1] as CorsiSequence).pathLength - (window[0] as CorsiSequence).pathLength;
+/**
+ * Forma canonica di una sequenza. Una sequenza e il suo ROVESCIO percorrono la
+ * stessa traiettoria: hanno `pathLength` e incroci identici, quindi un criterio
+ * che cerca la coppia più simile per difficoltà le sceglierebbe sempre. Sono la
+ * stessa traiettoria e vanno trattate come un unico candidato.
+ */
+function canonicalKey(indices: readonly number[]): string {
+  const forward = indices.join('-');
+  const backward = [...indices].reverse().join('-');
+  return forward < backward ? forward : backward;
 }
 
 /**
- * Finestra mobile: fra le sequenze ordinate per `pathLength`, ritorna il
- * sottoinsieme CONTIGUO di `count` elementi con la minima ampiezza di distanza —
- * cioè il gruppo di difficoltà più simile in assoluto (non "entro una soglia").
+ * Distanza media fra due blocchi distinti del layout. È una proprietà pura della
+ * tavoletta: non dipende dal seed né dalla somministrazione.
  */
-function tightestWindow(sorted: readonly CorsiSequence[], count: number): CorsiSequence[] {
-  if (sorted.length <= count) return sorted.slice();
-  let bestStart = 0;
-  let bestSpread = Infinity;
-  for (let i = 0; i + count <= sorted.length; i++) {
-    const spread = (sorted[i + count - 1] as CorsiSequence).pathLength - (sorted[i] as CorsiSequence).pathLength;
-    if (spread < bestSpread) {
-      bestSpread = spread;
-      bestStart = i;
+export function meanPairwiseDistance(blocks: readonly Point[] = CORSI_BLOCKS): number {
+  let sum = 0;
+  let pairs = 0;
+  for (let i = 0; i < blocks.length; i++) {
+    for (let j = 0; j < blocks.length; j++) {
+      if (i === j) continue;
+      sum += distance(blocks[i] as Point, blocks[j] as Point);
+      pairs++;
     }
   }
-  return sorted.slice(bestStart, bestStart + count);
+  return pairs === 0 ? 0 : sum / pairs;
 }
 
 /**
- * Nel gruppo di incroci più numeroso (per mantenere UNIFORME il numero di
- * incroci fra le sequenze di uno stesso livello), estrae la finestra mobile di
- * `count` sequenze più stretta per `pathLength`. Ritorna null se il gruppo più
- * uniforme non ha abbastanza sequenze.
+ * BERSAGLIO di difficoltà del livello: la distanza attesa di una sequenza casuale
+ * di questa lunghezza. Ogni passo di una permutazione casuale è una coppia di
+ * blocchi distinti estratta uniformemente, quindi il valore atteso del percorso è
+ * esattamente `(length − 1) × distanza media`. Essendo calcolato dal layout e non
+ * campionato, è IDENTICO in ogni somministrazione: è ciò che rende confrontabili
+ * fra loro run diverse.
  */
-function bestUniformWindow(candidates: readonly CorsiSequence[], count: number): CorsiSequence[] | null {
+export function targetPathLength(length: number, blocks: readonly Point[] = CORSI_BLOCKS): number {
+  return Math.max(0, length - 1) * meanPairwiseDistance(blocks);
+}
+
+/**
+ * Enumera tutti i gruppi ammissibili di `count` sequenze a PARI numero di incroci
+ * e con ampiezza di distanza entro `maxSpread`, poi ne estrae uno A SORTE.
+ *
+ * Le due proprietà nascono qui, da meccanismi separati:
+ * - l'ammissibilità (pari incroci + ampiezza limitata) tiene il livello omogeneo
+ *   al suo INTERNO, qualunque gruppo esca;
+ * - l'estrazione a sorte fra tutti i gruppi ammissibili rende ogni RUN diversa.
+ *
+ * I gruppi sono finestre contigue sull'ordinamento per distanza: cercare fra le
+ * combinazioni non contigue non aggiungerebbe nulla, perché una finestra contigua
+ * ha sempre ampiezza minima o uguale a parità di estremi.
+ */
+function pickUniformGroup(
+  pool: readonly CorsiSequence[],
+  count: number,
+  maxSpread: number,
+  rand: () => number,
+): CorsiSequence[] | null {
   const byCrossings = new Map<number, CorsiSequence[]>();
-  for (const c of candidates) {
+  for (const c of pool) {
     const arr = byCrossings.get(c.crossings) ?? [];
     arr.push(c);
     byCrossings.set(c.crossings, arr);
   }
-  let bestGroup: CorsiSequence[] = [];
-  for (const arr of byCrossings.values()) {
-    if (arr.length > bestGroup.length) bestGroup = arr;
+
+  const eligible: CorsiSequence[][] = [];
+  for (const group of byCrossings.values()) {
+    if (group.length < count) continue;
+    const sorted = [...group].sort((a, b) => a.pathLength - b.pathLength);
+    for (let i = 0; i + count <= sorted.length; i++) {
+      const spread =
+        (sorted[i + count - 1] as CorsiSequence).pathLength - (sorted[i] as CorsiSequence).pathLength;
+      if (spread <= maxSpread) eligible.push(sorted.slice(i, i + count));
+    }
   }
-  if (bestGroup.length < count) return null;
-  const sorted = [...bestGroup].sort((a, b) => a.pathLength - b.pathLength);
-  return tightestWindow(sorted, count);
+  if (eligible.length === 0) return null;
+  return eligible[Math.floor(rand() * eligible.length)] as CorsiSequence[];
 }
 
 /**
- * Genera `count` sequenze DISTINTE della lunghezza data, con lo STESSO numero di
- * incroci e la distanza percorsa più simile possibile.
+ * Genera `count` sequenze DISTINTE della lunghezza data, soddisfacendo due
+ * requisiti che agiscono su assi diversi:
  *
- * Strategia: campiona permutazioni uniche accumulando un pool di candidati; ogni
- * tanto prova a estrarre la finestra mobile più stretta nel gruppo di incroci più
- * numeroso e si ferma appena la sua ampiezza rientra in `complexityTolerance`
- * (campionamento adattivo: più stretta è la tolleranza richiesta, più a lungo
- * cerca). Esaurito il budget, ritorna comunque la migliore finestra uniforme
- * trovata; solo come ultima risorsa (candidati insufficienti) ripiega sul pool
- * globale ordinato per distanza.
+ * 1. **Difficoltà equivalente fra le run** — le sequenze devono cadere entro
+ *    `complexityTolerance` dal BERSAGLIO del livello (§ `targetPathLength`), che
+ *    è una costante del layout. Senza questo ancoraggio la difficoltà assoluta di
+ *    uno stesso livello varia liberamente da un partecipante all'altro.
+ * 2. **Ogni run diversa** — dentro quella banda la scelta è casuale (gruppo di
+ *    incroci e ancora), così due somministrazioni con seed diversi non ricevono
+ *    le stesse sequenze.
+ *
+ * Resta garantita l'omogeneità DENTRO il livello: stesso numero di incroci e
+ * distanze ravvicinate fra le sequenze estratte.
+ *
+ * Se la banda è troppo povera per formare un gruppo a incroci uniformi, ripiega
+ * sulle sequenze più vicine al bersaglio — mai su un campione arbitrario.
  */
 export function generateBalancedSequences(
   length: number,
@@ -167,31 +208,35 @@ export function generateBalancedSequences(
   const nBlocks = blocks.length;
   const allIndices = Array.from({ length: nBlocks }, (_, i) => i);
 
-  const HARD_CAP = 2000; // tetto ai campionamenti (evita loop infiniti su lunghezze estreme)
-  const MIN_POOL = 200; // candidati minimi prima di tentare l'estrazione
+  const SAMPLES = 2000; // tetto ai campionamenti (evita loop infiniti su lunghezze estreme)
+  const target = targetPathLength(length, blocks);
   const candidates: CorsiSequence[] = [];
   const seen = new Set<string>();
 
-  for (let i = 0; i < HARD_CAP; i++) {
+  for (let i = 0; i < SAMPLES; i++) {
     const perm = shuffle(allIndices, rand).slice(0, length);
-    const k = keyOf(perm);
-    if (!seen.has(k)) {
-      seen.add(k);
-      candidates.push(complexityOf(perm, blocks));
-    }
-    // Prova un'estrazione periodica: se già abbastanza stretta, ci fermiamo.
-    if (candidates.length >= MIN_POOL && i % 50 === 0) {
-      const w = bestUniformWindow(candidates, count);
-      if (w && windowSpread(w) <= params.complexityTolerance) return w;
-    }
+    const key = canonicalKey(perm);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    candidates.push(complexityOf(perm, blocks));
   }
 
-  // Miglior sforzo con quanto raccolto: finestra uniforme più stretta…
-  const uniform = bestUniformWindow(candidates, count);
-  if (uniform) return uniform;
-  // …oppure, se non ci sono abbastanza sequenze a incroci uniformi, pool globale.
-  const allSorted = [...candidates].sort((a, b) => a.pathLength - b.pathLength);
-  return tightestWindow(allSorted, count);
+  const tolerance = params.complexityTolerance;
+  const band = candidates.filter((c) => Math.abs(c.pathLength - target) <= tolerance);
+
+  // Scala di degradazione: si cede una garanzia per volta, mai entrambe insieme.
+  // 1. banda + ampiezza entro tolleranza — il caso normale, entrambe soddisfatte.
+  const ideal = pickUniformGroup(band, count, tolerance, rand);
+  if (ideal) return ideal;
+  // 2. banda senza vincolo di ampiezza — resta l'equivalenza FRA le run.
+  const inBand = pickUniformGroup(band, count, Infinity, rand);
+  if (inBand) return inBand;
+  // 3. fuori banda: le più vicine al bersaglio, ancora a pari incroci.
+  const nearest = [...candidates].sort(
+    (a, b) => Math.abs(a.pathLength - target) - Math.abs(b.pathLength - target),
+  );
+  const relaxed = nearest.slice(0, Math.max(count * 20, 50));
+  return pickUniformGroup(relaxed, count, Infinity, rand) ?? nearest.slice(0, count);
 }
 
 /**

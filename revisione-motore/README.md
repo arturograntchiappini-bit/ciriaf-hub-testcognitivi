@@ -45,6 +45,13 @@ engine + standalone + test):
   **Punteggio Ponderato** ancorato a `startLength`; selezione delle sequenze per
   livello con **finestra mobile** (match di difficoltà più stretto in assoluto,
   al posto della tolleranza allargabile). Dettagli e verifica in `corsi.md`.
+- **Corsi (revisione successiva)** — **equivalenza fra somministrazioni**: ogni
+  livello è ancorato a un **bersaglio** di difficoltà costante `(k−1)·d̄`,
+  proprietà del solo layout, e le sequenze sono estratte a sorte dentro la banda
+  di tolleranza. Esclusi i **rovesci** (stessa traiettoria all'indietro), che il
+  criterio di somiglianza selezionava nel 97% delle run a lunghezza 3. Risultato:
+  sd della difficoltà fra le run da 17–28,5 a 4,4–4,8, rovesci 0/200, sequenze
+  distinte in aumento. Dettagli e tabelle in `corsi.md`.
 - **Go/No-Go** — il **primo trial è sempre un Go** (instaura la risposta
   prepotente); aggiunto **CV del RT dei Go** (variabilità intra-soggetto).
 - **N-Back** — aggiunto il **criterio decisionale c** (bias di risposta SDT)

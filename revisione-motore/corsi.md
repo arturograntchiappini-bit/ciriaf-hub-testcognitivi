@@ -16,35 +16,61 @@ layout (nessun percorso ha salti più corti).
 ## 2. Generazione delle sequenze bilanciate
 
 `generateBalancedSequences(length, count, params, rand, blocks?)` produce
-`count` sequenze (default 2 trial per livello) della lunghezza data, con due
-requisiti di **pari difficoltà**:
+`count` sequenze (default 2 trial per livello) della lunghezza data,
+soddisfacendo **tre** requisiti che agiscono su assi diversi:
 
-1. **Stesso numero di incroci geometrici** (`countCrossings`) — si prende il
-   gruppo di candidati con il valore di incroci più frequente (`bestUniformWindow`).
-2. **Distanza percorsa (`pathLength`) la più simile possibile.**
+1. **Omogeneità DENTRO il livello** — stesso numero di incroci geometrici
+   (`countCrossings`) e ampiezza di `pathLength` entro `complexityTolerance`.
+2. **Equivalenza FRA le run** — tutte le sequenze cadono entro
+   `complexityTolerance` dal **bersaglio** del livello, una costante del layout.
+3. **Variabilità FRA le run** — dentro quel vincolo la scelta è casuale, quindi
+   somministrazioni con seed diversi non ricevono le stesse sequenze.
 
-### Algoritmo (rivisto)
+### Il bersaglio di difficoltà
 
-- Campiona permutazioni **uniche** dei blocchi (`shuffle` + `Set` di chiavi),
-  accumulando un pool di candidati (fino a `HARD_CAP = 2000` tentativi).
-- Periodicamente estrae, nel gruppo a incroci uniformi, la **finestra mobile**
-  (`tightestWindow`) di `count` sequenze contigue per `pathLength` con **minima
-  ampiezza** (ultimo − primo). Se l'ampiezza rientra in `complexityTolerance`,
-  si ferma subito (**campionamento adattivo**: tolleranza più stretta ⇒ ricerca
-  più lunga).
-- Esaurito il budget, ritorna comunque la migliore finestra uniforme; solo se il
-  gruppo uniforme non ha abbastanza sequenze, ripiega sul pool globale ordinato
-  per distanza.
+`targetPathLength(length) = (length − 1) × meanPairwiseDistance(blocks)`
 
-### Perché la finestra mobile
+Ogni passo di una permutazione casuale è una coppia di blocchi distinti estratta
+uniformemente: il valore atteso del percorso è quindi **esattamente**
+`(length − 1)` volte la distanza media fra i blocchi. Il bersaglio è calcolato
+dal layout — non campionato, non dipendente dal seed — ed è perciò **identico in
+ogni somministrazione**. Per la tavoletta di Kessels: distanza media 49,83 unità,
+quindi bersaglio 99,7 a lunghezza 3, 199,3 a lunghezza 5, 398,6 a lunghezza 9.
 
-La versione precedente selezionava le sequenze "entro una tolleranza dalla
-mediana", **raddoppiando la tolleranza (×2 … ×8)** finché non ne trovava
-abbastanza: così la difficoltà effettiva poteva divergere. La finestra mobile
-sceglie invece **i `count` candidati più simili in assoluto**, indipendentemente
-da una soglia. Verifica empirica (seed 99): le coppie ora coincidono a meno di
-0,1 unità di distanza (es. livello 4: `d=107.3` vs `d=107.3`; livello 6:
-`d=255.4` vs `d=255.4`).
+### Algoritmo
+
+- Campiona 2000 permutazioni, deduplicando per **forma canonica**
+  (`canonicalKey`): una sequenza e il suo **rovescio** percorrono la stessa
+  traiettoria — `pathLength` e incroci identici — quindi valgono come un unico
+  candidato.
+- Filtra i candidati alla **banda** `|pathLength − bersaglio| ≤ complexityTolerance`.
+- `pickUniformGroup` enumera, dentro la banda, **tutti** i gruppi ammissibili di
+  `count` sequenze a pari incroci e con ampiezza ≤ `complexityTolerance` (finestre
+  contigue sull'ordinamento per distanza), poi ne **estrae uno a sorte**.
+- Scala di degradazione, che cede una garanzia per volta: banda + ampiezza →
+  banda senza vincolo di ampiezza → sequenze più vicine al bersaglio.
+
+### Perché il rovescio va escluso
+
+Una sequenza e il suo rovescio hanno **ampiezza zero** per costruzione: qualunque
+criterio che cerchi "le due sequenze più simili" li seleziona sistematicamente.
+Misurato sulla versione precedente: a lunghezza 3 la coppia era un rovescio esatto
+in **194 run su 200** (es. `5-2-0` seguito da `0-2-5`). Formalmente equivalenti,
+ma il secondo trial ripercorre la stessa traiettoria all'indietro, sugli stessi
+blocchi — non è la prova indipendente prevista dalla somministrazione standard.
+
+### Verifica empirica (200 seed, tolleranza 8)
+
+| lunghezza | ampiezza dentro il livello (media / max) | sd difficoltà fra le run | rovesci | sequenze distinte |
+|---|---|---|---|---|
+| 3 | 0,3 / 0,9 | 4,4 | 0/200 | 107/400 |
+| 5 | 0,3 / 4,4 | 4,7 | 0/200 | 362/400 |
+| 7 | 0,3 / 2,8 | 4,5 | 0/200 | 396/400 |
+| 9 | 0,4 / 5,4 | 4,6 | 0/200 | 400/400 |
+
+Per confronto, la versione a sola finestra mobile aveva sd fra le run 17–28,5 ed
+escursione 94–134 unità: al livello 5 un partecipante poteva percorrere in media
+122 unità e un altro 255.
 
 ## 3. Geometria di supporto
 
@@ -72,7 +98,8 @@ da una soglia. Verifica empirica (seed 99): le coppie ora coincidono a meno di
 
 ## 5. Casi limite
 
-- Lunghezze estreme o pochi candidati → fallback su pool globale (documentato).
+- Banda troppo povera per formare un gruppo ammissibile → scala di degradazione
+  (banda senza vincolo di ampiezza, poi sequenze più vicine al bersaglio).
 - `startLength` di somministrazione diverso da 2 → il baseline del punteggio si
   adatta (`startLength − 1`).
 - Trial `INTERRUPTED` esclusi dal conteggio.
