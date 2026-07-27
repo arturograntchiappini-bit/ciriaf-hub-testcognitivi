@@ -52,11 +52,17 @@ export function importTemplateJson(text: string): SessionTemplate {
   ) {
     throw new Error('File di protocollo non valido: mancano "name" o "phases".');
   }
+  const phases = parsed.phases.map((p) => ({
+    ...p,
+    durationMs: typeof p.durationMs === 'number' ? p.durationMs : 0,
+  }));
+  const sumPhases = phases.reduce((acc, p) => acc + (p.durationMs || 0), 0);
   return {
     id: typeof parsed.id === 'string' ? parsed.id : `imp_${Math.floor(Math.random() * 1e9).toString(36)}`,
     name: parsed.name,
     createdAt: typeof parsed.createdAt === 'string' ? parsed.createdAt : new Date().toISOString(),
-    phases: parsed.phases,
+    totalMs: typeof parsed.totalMs === 'number' && parsed.totalMs > 0 ? parsed.totalMs : sumPhases,
+    phases,
   };
 }
 

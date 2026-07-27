@@ -16,8 +16,9 @@ function tpl(id: string, name = 'Protocollo'): SessionTemplate {
     id,
     name,
     createdAt: '2026-07-07T09:00:00.000Z',
+    totalMs: 30 * 60_000,
     phases: [
-      { id: 'p1', name: 'Baseline', pins: [{ id: 'pin-a', offsetMs: 0, battery: [{ testId: 'stroop1', params: {}, practice: false }] }] },
+      { id: 'p1', name: 'Baseline', durationMs: 30 * 60_000, pins: [{ id: 'pin-a', offsetMs: 0, battery: [{ testId: 'stroop1', params: {}, practice: false }] }] },
     ],
   };
 }

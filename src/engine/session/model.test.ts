@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   flattenPins,
   sessionTotalMs,
+  phaseSpans,
+  phaseAtElapsed,
   computeSessionState,
   makeRunId,
   type SessionTemplate,
@@ -12,10 +14,12 @@ function template(): SessionTemplate {
     id: 't1',
     name: 'Protocollo',
     createdAt: '2026-07-07T10:00:00.000Z',
+    totalMs: 60 * 60_000,
     phases: [
       {
         id: 'p1',
         name: 'Baseline',
+        durationMs: 30 * 60_000,
         pins: [
           { id: 'pin-a', offsetMs: 0, battery: [{ testId: 'stroop1', params: {}, practice: false }] },
           { id: 'pin-b', offsetMs: 15 * 60_000, battery: [{ testId: 'nback', params: {}, practice: false }] },
@@ -24,6 +28,7 @@ function template(): SessionTemplate {
       {
         id: 'p2',
         name: 'Carico',
+        durationMs: 30 * 60_000,
         pins: [
           { id: 'pin-c', offsetMs: 30 * 60_000, battery: [{ testId: 'gonogo', params: {}, practice: false }] },
         ],
@@ -41,11 +46,29 @@ describe('flattenPins', () => {
 });
 
 describe('sessionTotalMs', () => {
-  it('è l’offset dell’ultimo pin', () => {
-    expect(sessionTotalMs(template())).toBe(30 * 60_000);
+  it('è la durata totale esplicita', () => {
+    expect(sessionTotalMs(template())).toBe(60 * 60_000);
   });
-  it('è 0 per template senza pin', () => {
-    expect(sessionTotalMs({ id: 'x', name: 'y', createdAt: '', phases: [] })).toBe(0);
+  it('ricade sulla somma delle fasi se totalMs manca', () => {
+    const t = template();
+    t.totalMs = 0;
+    expect(sessionTotalMs(t)).toBe(60 * 60_000);
+  });
+  it('è 0 per template vuoto', () => {
+    expect(sessionTotalMs({ id: 'x', name: 'y', createdAt: '', totalMs: 0, phases: [] })).toBe(0);
+  });
+});
+
+describe('phaseSpans / phaseAtElapsed', () => {
+  it('calcola gli intervalli cumulativi delle fasi', () => {
+    const spans = phaseSpans(template());
+    expect(spans[0]).toMatchObject({ startMs: 0, endMs: 30 * 60_000 });
+    expect(spans[1]).toMatchObject({ startMs: 30 * 60_000, endMs: 60 * 60_000 });
+  });
+  it('trova la fase del tempo trascorso', () => {
+    expect(phaseAtElapsed(template(), 10 * 60_000)?.name).toBe('Baseline');
+    expect(phaseAtElapsed(template(), 45 * 60_000)?.name).toBe('Carico');
+    expect(phaseAtElapsed(template(), 90 * 60_000)?.name).toBe('Carico'); // oltre la fine → ultima
   });
 });
 

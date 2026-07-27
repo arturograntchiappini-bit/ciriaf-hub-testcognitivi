@@ -39,7 +39,7 @@ function run(): SessionRun {
   };
   return {
     runId: 'S-7K2Q-1000',
-    template: { id: 't', name: 'Protocollo', createdAt: '2026-07-07T09:00:00.000Z', phases: [] },
+    template: { id: 't', name: 'Protocollo', createdAt: '2026-07-07T09:00:00.000Z', totalMs: 0, phases: [] },
     startedAtEpoch: 1,
     startedAtIso: '2026-07-07T10:00:00.000Z',
     completedPinIds: ['pin-a', 'pin-b'],

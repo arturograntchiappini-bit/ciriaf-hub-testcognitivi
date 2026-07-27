@@ -5,18 +5,51 @@
  */
 import type { TestId, TestResult } from '../types';
 
-/** Protocollo riutilizzabile: fasi nominate con pin temporali "t". */
+/** Protocollo riutilizzabile: durata totale e fasi nominate con pin temporali "t". */
 export interface SessionTemplate {
   id: string;
   name: string;
   createdAt: string; // ISO
+  /** Durata totale della sessione, scelta per prima. */
+  totalMs: number;
   phases: SessionPhase[];
 }
 
 export interface SessionPhase {
   id: string;
   name: string;
+  /** Durata della fase; le fasi tassellano la timeline in ordine. */
+  durationMs: number;
   pins: TimePin[];
+}
+
+/** Fase con il suo intervallo temporale [startMs, endMs) sulla sessione. */
+export interface PhaseSpan {
+  phase: SessionPhase;
+  startMs: number;
+  endMs: number;
+}
+
+/** Intervalli delle fasi, calcolati dalle durate cumulative (in ordine). */
+export function phaseSpans(template: SessionTemplate): PhaseSpan[] {
+  const spans: PhaseSpan[] = [];
+  let acc = 0;
+  for (const phase of template.phases) {
+    spans.push({ phase, startMs: acc, endMs: acc + phase.durationMs });
+    acc += phase.durationMs;
+  }
+  return spans;
+}
+
+/** Fase che contiene un dato istante trascorso (l'ultima se oltre la fine). */
+export function phaseAtElapsed(template: SessionTemplate, elapsedMs: number): SessionPhase | null {
+  const spans = phaseSpans(template);
+  if (spans.length === 0) return null;
+  const inSpan = spans.find((s) => elapsedMs >= s.startMs && elapsedMs < s.endMs);
+  if (inSpan) return inSpan.phase;
+  const last = spans[spans.length - 1] as PhaseSpan;
+  if (elapsedMs >= last.endMs) return last.phase;
+  return spans[0]!.phase;
 }
 
 /** Pin temporale: offset assoluto (scelto liberamente) + batteria di test. */
@@ -72,8 +105,14 @@ export function flattenPins(template: SessionTemplate): FlatPin[] {
   return flat.sort((a, b) => a.pin.offsetMs - b.pin.offsetMs);
 }
 
-/** Durata di riferimento della timeline: offset dell'ultimo pin (0 se vuota). */
+/**
+ * Durata di riferimento della timeline: la durata totale esplicita; in mancanza
+ * (modelli legacy) ricade sulla somma delle fasi o sull'ultimo pin.
+ */
 export function sessionTotalMs(template: SessionTemplate): number {
+  if (template.totalMs && template.totalMs > 0) return template.totalMs;
+  const sumPhases = template.phases.reduce((acc, p) => acc + (p.durationMs || 0), 0);
+  if (sumPhases > 0) return sumPhases;
   const flat = flattenPins(template);
   const last = flat[flat.length - 1];
   return last ? last.pin.offsetMs : 0;
@@ -112,12 +151,14 @@ export function computeSessionState(
   const total = flat.length;
   const completed = new Set(completedPinIds);
   const next = flat.find((f) => !completed.has(f.pin.id));
+  const elapsedPhase = phaseAtElapsed(template, elapsedMs);
 
   if (!next) {
     const lastPhase = template.phases[template.phases.length - 1];
+    const phase = elapsedPhase ?? lastPhase;
     return {
-      currentPhaseName: lastPhase ? lastPhase.name : '',
-      currentPhaseId: lastPhase ? lastPhase.id : '',
+      currentPhaseName: phase ? phase.name : '',
+      currentPhaseId: phase ? phase.id : '',
       nextPin: null,
       upcomingTests: [],
       countdownMs: 0,
@@ -130,8 +171,9 @@ export function computeSessionState(
 
   const countdownMs = next.pin.offsetMs - elapsedMs;
   return {
-    currentPhaseName: next.phase.name,
-    currentPhaseId: next.phase.id,
+    // La fase corrente è quella del tempo trascorso (segmento temporale).
+    currentPhaseName: (elapsedPhase ?? next.phase).name,
+    currentPhaseId: (elapsedPhase ?? next.phase).id,
     nextPin: next.pin,
     upcomingTests: next.pin.battery.map((b) => b.testId),
     countdownMs,

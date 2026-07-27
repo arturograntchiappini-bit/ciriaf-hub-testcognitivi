@@ -18,7 +18,7 @@ function result(testId: TestResult['testId']): TestResult {
 function run(): SessionRun {
   return {
     runId: 'S-AAAA-1000',
-    template: { id: 't', name: 'Protocollo affaticamento', createdAt: '', phases: [] },
+    template: { id: 't', name: 'Protocollo affaticamento', createdAt: '', totalMs: 0, phases: [] },
     startedAtEpoch: 1,
     startedAtIso: '2026-07-07T10:00:00.000Z',
     completedPinIds: ['pin-a'],

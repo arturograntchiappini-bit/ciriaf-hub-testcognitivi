@@ -8,8 +8,9 @@ function tpl(overrides: Partial<SessionTemplate> = {}): SessionTemplate {
     id: 't',
     name: 'Protocollo',
     createdAt: '2026-07-07T09:00:00.000Z',
+    totalMs: 30 * 60_000,
     phases: [
-      { id: 'p1', name: 'Baseline', pins: [{ id: 'pin-a', offsetMs: 0, battery: [{ testId: 'stroop1', params: {}, practice: false }] }] },
+      { id: 'p1', name: 'Baseline', durationMs: 30 * 60_000, pins: [{ id: 'pin-a', offsetMs: 0, battery: [{ testId: 'stroop1', params: {}, practice: false }] }] },
     ],
     ...overrides,
   };
@@ -23,10 +24,10 @@ describe('validateTemplate', () => {
     expect(validateTemplate(tpl({ name: '  ' }))).toMatch(/nome/i);
   });
   it('richiede almeno un pin', () => {
-    expect(validateTemplate(tpl({ phases: [{ id: 'p1', name: 'x', pins: [] }] }))).toMatch(/pin/i);
+    expect(validateTemplate(tpl({ phases: [{ id: 'p1', name: 'x', durationMs: 60000, pins: [] }] }))).toMatch(/pin/i);
   });
   it('richiede almeno un test per pin', () => {
-    const t = tpl({ phases: [{ id: 'p1', name: 'x', pins: [{ id: 'pin', offsetMs: 0, battery: [] }] }] });
+    const t = tpl({ phases: [{ id: 'p1', name: 'x', durationMs: 60000, pins: [{ id: 'pin', offsetMs: 0, battery: [] }] }] });
     expect(validateTemplate(t)).toMatch(/test/i);
   });
 });

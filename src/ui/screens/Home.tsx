@@ -1,6 +1,5 @@
 import { Header } from '../components/Header';
 import { TestCard } from '../components/TestCard';
-import { Button } from '../components/Button';
 import { TEST_CATALOG } from '../router';
 import type { TestId } from '../../engine/types';
 
@@ -10,37 +9,43 @@ interface HomeProps {
   onOpenSession: () => void;
 }
 
-/** Schermata iniziale: catalogo dei 6 test + modalità Sessione. */
+/** Schermata iniziale: modalità Sessione + catalogo dei 6 test. */
 export function Home({ onSelectTest, onOpenSettings, onOpenSession }: HomeProps): JSX.Element {
   return (
-    <div className="min-h-full bg-paper">
+    <div className="flex min-h-full flex-col bg-paper">
       <Header onOpenSettings={onOpenSettings} />
-      <main className="mx-auto max-w-content px-6 py-10">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-ink">Batteria di test cognitivi</h1>
-            <p className="mt-2 max-w-2xl text-muted">
-              Seleziona il test indicato dallo sperimentatore. Ogni prova è anonima: al termine potrai
-              trascrivere i risultati a schermo ed esportare i dati grezzi.
-            </p>
-          </div>
-          <div className="rounded-card border border-accent bg-accent-soft px-5 py-4">
-            <p className="text-sm font-semibold text-ink">Modalità Sessione</p>
-            <p className="mt-1 max-w-xs text-xs text-muted">
-              Protocollo cronometrico: fasi e pin "t" con batterie di test a orari prestabiliti.
-            </p>
-            <div className="mt-3">
-              <Button onClick={onOpenSession}>Apri Sessione →</Button>
-            </div>
-          </div>
+      <main className="mx-auto w-full max-w-content flex-1 px-6 py-8">
+        <div className="flex items-baseline justify-between">
+          <h1 className="text-xl font-semibold tracking-tight text-ink">Batteria di test cognitivi</h1>
+          <span className="text-xs text-muted">Esecuzione anonima · dati esportabili</span>
         </div>
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+        {/* Modalità Sessione — banner snello */}
+        <button
+          onClick={onOpenSession}
+          className="mt-4 flex w-full items-center justify-between rounded-card border border-accent bg-accent-soft px-5 py-3 text-left transition-colors hover:brightness-[0.98]"
+        >
+          <span className="flex items-center gap-3">
+            <span aria-hidden className="text-lg">🕒</span>
+            <span>
+              <span className="block text-sm font-semibold text-ink">Modalità Sessione</span>
+              <span className="block text-xs text-muted">
+                Protocollo cronometrico: fasi e pin "t" con batterie a orari prestabiliti.
+              </span>
+            </span>
+          </span>
+          <span className="text-sm font-medium text-accent">Apri →</span>
+        </button>
+
+        {/* Test singoli */}
+        <p className="mb-3 mt-8 text-xs font-semibold uppercase tracking-wide text-muted">Test singoli</p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {TEST_CATALOG.map((meta) => (
             <TestCard key={meta.id} meta={meta} onSelect={() => onSelectTest(meta.id)} />
           ))}
         </div>
       </main>
-      <footer className="mx-auto max-w-content px-6 py-8 text-xs text-muted">
+      <footer className="mx-auto w-full max-w-content px-6 py-5 text-xs text-muted">
         CIRIAF — laboratorio COLAB/NEXTROOM · piattaforma di ricerca sperimentale
       </footer>
     </div>
