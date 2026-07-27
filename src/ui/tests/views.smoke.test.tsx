@@ -18,9 +18,9 @@ describe('smoke render viste interattive', () => {
     expect(screen.getByText('Inizia la pratica')).toBeInTheDocument();
   });
 
-  it('WcstView mostra le 4 carte stimolo e la carta da abbinare', () => {
+  it('WcstView mostra la carta da smistare e le carte di riferimento', () => {
     render(<WcstView params={DEFAULTS.wcst} {...common} />);
-    expect(screen.getByText('Carta da abbinare')).toBeInTheDocument();
+    expect(screen.getByText('Carta da smistare')).toBeInTheDocument();
     // 4 carte chiave in alto + 4 zone risposta + 1 carta da abbinare = 9 CardFace
     expect(screen.getByText(/Carta 1\//)).toBeInTheDocument();
   });
