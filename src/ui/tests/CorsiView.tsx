@@ -24,6 +24,7 @@ interface CorsiViewProps {
   sessionId: string;
   startedAt: string;
   seed: number;
+  practice?: boolean;
   onComplete: (result: TestResult) => void;
   onAbort: () => void;
 }
@@ -118,6 +119,15 @@ export function CorsiView(props: CorsiViewProps): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params, finish]);
 
+  // In modalità Sessione senza pratica: avvia subito il test.
+  useEffect(() => {
+    if (props.practice === false) {
+      setSkippedPractice(true);
+      startTestLevel();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const presentNextTestTrial = useCallback(() => {
     const q = levelQueueRef.current;
     if (q.length === 0) {
@@ -182,6 +192,13 @@ export function CorsiView(props: CorsiViewProps): JSX.Element {
 
   // Rendering
   if (phase === 'ready') {
+    if (props.practice === false) {
+      return (
+        <StimulusStage>
+          <div className="text-muted">Preparazione…</div>
+        </StimulusStage>
+      );
+    }
     return (
       <StimulusStage>
         <div className="text-center">

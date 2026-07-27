@@ -25,6 +25,8 @@ interface WcstViewProps {
   sessionId: string;
   startedAt: string;
   seed: number;
+  /** Accettata per uniformità di interfaccia; il WCST non prevede pratica. */
+  practice?: boolean;
   onComplete: (result: TestResult) => void;
   onAbort: () => void;
 }

@@ -39,6 +39,8 @@ export interface RtTestPlan {
 interface RtTestRunnerProps {
   plan: RtTestPlan;
   startedAt: string;
+  /** Se false, salta la fase di pratica (usato in modalità Sessione). Default true. */
+  practice?: boolean;
   onComplete: (result: TestResult) => void;
   onAbort: () => void;
 }
@@ -47,8 +49,10 @@ type Stage = 'practice' | 'countdown' | 'test' | 'paused';
 
 const KEY_SPACE = ' ';
 
-export function RtTestRunner({ plan, startedAt, onComplete, onAbort }: RtTestRunnerProps): JSX.Element {
-  const [stage, setStage] = useState<Stage>(plan.practiceTrials.length > 0 ? 'practice' : 'countdown');
+export function RtTestRunner({ plan, startedAt, practice = true, onComplete, onAbort }: RtTestRunnerProps): JSX.Element {
+  const [stage, setStage] = useState<Stage>(
+    practice && plan.practiceTrials.length > 0 ? 'practice' : 'countdown',
+  );
   const [seqState, setSeqState] = useState<SequencerState | null>(null);
   const [countdown, setCountdown] = useState(3);
 
