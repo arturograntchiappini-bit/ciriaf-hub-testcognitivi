@@ -116,23 +116,24 @@ export function WcstView(props: WcstViewProps): JSX.Element {
     <StimulusStage
       statusBar={
         <div className="flex items-center justify-between">
-          <span>Abbina la carta in alto a una delle quattro in basso</span>
+          <span>Clicca la carta di riferimento a cui abbinare quella da smistare</span>
           <span className="tabular-nums">
             Carta {Math.min(deckIndex + 1, deck.length)}/{deck.length}
           </span>
         </div>
       }
     >
-      <div className="flex flex-col items-center gap-8">
-        {/* Carte stimolo (chiave) */}
-        <div className="flex gap-4">
-          {WCST_STIMULUS_CARDS.map((c, i) => (
-            <CardFace key={i} card={c} />
-          ))}
-        </div>
+      <div className="flex flex-col items-center gap-6">
+        {/* Carta da smistare (in alto) */}
+        {target && (
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-xs uppercase tracking-wide text-muted">Carta da smistare</span>
+            <CardFace card={target} />
+          </div>
+        )}
 
         {/* Feedback */}
-        <div className="h-8">
+        <div className="flex h-7 items-center">
           {feedback && (
             <span
               className={`text-xl font-semibold ${feedback === 'correct' ? 'text-[color:var(--color-accent)]' : 'text-[#D0021B]'}`}
@@ -142,18 +143,18 @@ export function WcstView(props: WcstViewProps): JSX.Element {
           )}
         </div>
 
-        {/* Carta da smistare + zone di risposta (click sulle carte chiave in alto) */}
-        {target && (
-          <div className="flex flex-col items-center gap-3">
-            <span className="text-xs uppercase tracking-wide text-muted">Carta da abbinare</span>
-            <CardFace card={target} />
-            <div className="mt-4 flex gap-4">
-              {WCST_STIMULUS_CARDS.map((c, i) => (
-                <CardFace key={i} card={c} interactive onClick={() => handleChoice(c)} />
-              ))}
-            </div>
+        {/* Carte di riferimento (in basso, cliccabili) */}
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-xs text-muted">
+            Abbinala a una di queste — per <strong className="text-ink">colore</strong>,{' '}
+            <strong className="text-ink">forma</strong> o <strong className="text-ink">numero</strong>
+          </span>
+          <div className="flex gap-4">
+            {WCST_STIMULUS_CARDS.map((c, i) => (
+              <CardFace key={i} card={c} interactive onClick={() => handleChoice(c)} />
+            ))}
           </div>
-        )}
+        </div>
       </div>
     </StimulusStage>
   );
