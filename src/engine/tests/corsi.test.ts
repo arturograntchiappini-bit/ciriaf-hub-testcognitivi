@@ -73,9 +73,13 @@ describe('generateBalancedSequences', () => {
 });
 
 describe('span e regola di arresto', () => {
-  it('corsiSpan = 0.5 per trial superato', () => {
+  it('corsiSpan: baseline startLength-1 + 0.5 per trial superato, 0 se nessuno', () => {
     expect(corsiSpan(0)).toBe(0);
-    expect(corsiSpan(6)).toBe(3);
+    expect(corsiSpan(0, 3)).toBe(0);
+    // startLength=2 (default): superando entrambi i trial fino a L=5 (8 trial) → 5
+    expect(corsiSpan(8, 2)).toBe(5); // (2-1) + 0.5*8 = 5
+    // startLength=3: baseline 2, + 0.5*6 = 5
+    expect(corsiSpan(6, 3)).toBe(5);
   });
 
   it('shouldStop solo se entrambi i trial del livello falliti', () => {
@@ -93,9 +97,11 @@ describe('scoreCorsi', () => {
       { testId: 'corsi', sessionId: 'C', trialIndex: 1, phase: 'test', condition: 'len4', stimulus: '0-1-2-3', response: '0-1-2-3', correct: true, rtMs: null, flag: 'VALID', onsetTimestamp: 0 },
       { testId: 'corsi', sessionId: 'C', trialIndex: 2, phase: 'test', condition: 'len4', stimulus: '3-2-1-0', response: '3-2', correct: false, rtMs: null, flag: 'VALID', onsetTimestamp: 0 },
     ];
-    const summary = scoreCorsi(trials);
-    expect(summary.find((m) => m.label === 'Span (punteggio totale)')?.value).toBe(1); // 2 superati * 0.5
-    expect(summary.find((m) => m.label === 'Trial superati')?.value).toBe(2);
-    expect(summary.find((m) => m.label === 'Lunghezza massima raggiunta')?.value).toBe(4);
+    const summary = scoreCorsi(trials, 3);
+    // MBS = lunghezza massima riprodotta correttamente (len4 = "0-1-2-3")
+    expect(summary.find((m) => m.label === 'Span Visuo-Spaziale (MBS)')?.value).toBe(4);
+    // Ponderato: baseline (3-1)=2 + 0.5*2 superati = 3
+    expect(summary.find((m) => m.label === 'Punteggio Corsi (Ponderato)')?.value).toBe(3);
+    expect(summary.find((m) => m.label === 'Trial totali superati')?.value).toBe(2);
   });
 });

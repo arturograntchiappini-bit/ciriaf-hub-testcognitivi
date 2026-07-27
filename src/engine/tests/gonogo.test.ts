@@ -29,6 +29,13 @@ describe('generateGoNoGo', () => {
     }
   });
 
+  it('il primo trial è sempre un Go (risposta prepotente)', () => {
+    for (const seed of [1, 7, 3, 42, 99]) {
+      const seq = generateGoNoGo(PARAMS, mulberry32(seed));
+      expect(seq[0]!.kind).toBe('go');
+    }
+  });
+
   it('ogni ISI è in [500, 1000] ms', () => {
     const seq = generateGoNoGo(PARAMS, mulberry32(3));
     for (const s of seq) {
@@ -74,5 +81,7 @@ describe('scoreGoNoGo', () => {
     const summary = scoreGoNoGo(trials);
     expect(summary.find((m) => m.label === 'Errori di omissione (Go)')?.value).toBe(1);
     expect(summary.find((m) => m.label === 'RT medio Go corretti')?.value).toBe(400);
+    // CV = SD/mean*100; RT 300 e 500 → mean 400, SD campionaria √(20000)=141.42 → CV 35.4%
+    expect(summary.find((m) => m.label === 'CV RT Go corretti')?.value).toBe(35.4);
   });
 });

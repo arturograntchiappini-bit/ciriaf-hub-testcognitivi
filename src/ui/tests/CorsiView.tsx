@@ -99,7 +99,7 @@ export function CorsiView(props: CorsiViewProps): JSX.Element {
       startedAt,
       params: { ...params } as unknown as Record<string, unknown>,
       trials: trialsRef.current,
-      summary: scoreCorsi(trialsRef.current),
+      summary: scoreCorsi(trialsRef.current, params.startLength),
     });
   }, [params, sessionId, startedAt, props]);
 

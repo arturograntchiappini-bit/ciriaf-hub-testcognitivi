@@ -202,3 +202,11 @@ media.
 - Owen, A. M., McMillan, K. M., Laird, A. R., & Bullmore, E. (2005). *N-back working memory paradigm: A meta-analysis of normative functional neuroimaging studies.* **Human Brain Mapping, 25**(1), 46–59. DOI: [10.1002/hbm.20131](https://doi.org/10.1002/hbm.20131)
 - Kane, M. J., Conway, A. R. A., Miura, T. K., & Colflesh, G. J. H. (2007). *Working memory, attention control, and the N-back task: A question of construct validity.* **Journal of Experimental Psychology: LMC, 33**(3), 615–622. DOI: [10.1037/0278-7393.33.3.615](https://doi.org/10.1037/0278-7393.33.3.615)
 - Hautus, M. J. (1995). *Corrections for extreme proportions and their biasing effects on estimated values of d′.* **Behavior Research Methods, Instruments, & Computers, 27**, 46–51. DOI: [10.3758/BF03203619](https://doi.org/10.3758/BF03203619)
+
+## Aggiornamento metriche (revisione)
+
+Accanto a **d′** viene ora riportato il **criterio decisionale c** (bias di
+risposta), con la stessa correzione loglinear di Hautus:
+`c = −0.5 · (z(H) + z(F))`. `c > 0` indica un criterio conservativo (tende a non
+rispondere), `c < 0` liberale; separa la *tendenza di risposta* dalla
+*sensibilità* (d′). Restano d′ globale e per quartile temporale.

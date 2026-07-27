@@ -54,13 +54,14 @@ export function BatteryEditor({ battery, onChange }: BatteryEditorProps): JSX.El
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-[11px] uppercase tracking-wide text-muted">Aggiungi:</span>
         {TEST_CATALOG.map((t) => (
           <button
             key={t.id}
             onClick={() => addTest(t.id)}
-            className="rounded-card border border-line px-2.5 py-1 text-xs text-ink hover:border-accent"
+            className="rounded-full border border-line px-2 py-0.5 text-[11px] text-ink transition-colors hover:border-accent hover:bg-accent-soft"
           >
             + {t.title}
           </button>
@@ -71,7 +72,7 @@ export function BatteryEditor({ battery, onChange }: BatteryEditorProps): JSX.El
         <p className="text-xs text-muted">Nessun test in questa batteria: aggiungine almeno uno.</p>
       )}
 
-      <ol className="space-y-2">
+      <ol className="space-y-1.5">
         {battery.map((item, i) => {
           const section = paramSectionFor(item.testId);
           const params = item.params as Record<string, number>;

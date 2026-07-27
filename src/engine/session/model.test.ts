@@ -5,6 +5,10 @@ import {
   phaseSpans,
   phaseAtElapsed,
   computeSessionState,
+  phaseIndexAtOffset,
+  movePin,
+  movePinById,
+  distributePhasesEvenly,
   makeRunId,
   type SessionTemplate,
 } from './model';
@@ -36,6 +40,63 @@ function template(): SessionTemplate {
     ],
   };
 }
+
+describe('phaseIndexAtOffset', () => {
+  it('trova la fase che contiene l’offset, con clamp agli estremi', () => {
+    const t = template(); // p1 [0,30], p2 [30,60] minuti
+    expect(phaseIndexAtOffset(t, 0)).toBe(0);
+    expect(phaseIndexAtOffset(t, 15 * 60_000)).toBe(0);
+    expect(phaseIndexAtOffset(t, 30 * 60_000)).toBe(1); // confine → fase successiva
+    expect(phaseIndexAtOffset(t, 45 * 60_000)).toBe(1);
+    expect(phaseIndexAtOffset(t, 999 * 60_000)).toBe(1); // oltre la fine → ultima
+    expect(phaseIndexAtOffset(t, -5)).toBe(0); // prima dell'inizio → prima
+  });
+});
+
+describe('movePin', () => {
+  it('sposta un pin oltre il confine e lo riattacca alla fase corretta', () => {
+    const t = template();
+    // pin-b è in p1 (indice 1 della fase 0); spostalo a 40 min → deve finire in p2
+    const next = movePin(t, 0, 1, 40 * 60_000);
+    expect(next.phases[0]!.pins.map((p) => p.id)).toEqual(['pin-a']);
+    const moved = next.phases[1]!.pins.find((p) => p.id === 'pin-b');
+    expect(moved?.offsetMs).toBe(40 * 60_000);
+    // immutabilità: l'originale non cambia
+    expect(t.phases[0]!.pins.map((p) => p.id)).toEqual(['pin-a', 'pin-b']);
+  });
+
+  it('clampa l’offset a [0, totale] e resta nella fase se non cambia intervallo', () => {
+    const t = template();
+    const next = movePin(t, 0, 1, 999 * 60_000); // oltre la fine → clamp a 60 min → ultima fase
+    const moved = next.phases[1]!.pins.find((p) => p.id === 'pin-b');
+    expect(moved?.offsetMs).toBe(60 * 60_000);
+  });
+});
+
+describe('movePinById', () => {
+  it('sposta il pin (per id) attraverso i confini di fase, indipendente dagli indici', () => {
+    const t = template();
+    const next = movePinById(t, 'pin-b', 40 * 60_000);
+    expect(next.phases[0]!.pins.map((p) => p.id)).toEqual(['pin-a']);
+    expect(next.phases[1]!.pins.some((p) => p.id === 'pin-b')).toBe(true);
+  });
+  it('ritorna il template invariato se l’id non esiste', () => {
+    const t = template();
+    expect(movePinById(t, 'inesistente', 10)).toBe(t);
+  });
+});
+
+describe('distributePhasesEvenly', () => {
+  it('divide totalMs equamente, con la somma esatta (resto sull’ultima)', () => {
+    const t = template();
+    t.totalMs = 50 * 60_000 + 1; // dispari, per verificare il resto
+    const next = distributePhasesEvenly(t);
+    const sum = next.phases.reduce((a, p) => a + p.durationMs, 0);
+    expect(sum).toBe(t.totalMs);
+    expect(next.phases[0]!.durationMs).toBe(1500000);
+    expect(next.phases[1]!.durationMs).toBe(1500001);
+  });
+});
 
 describe('flattenPins', () => {
   it('ordina i pin per offset globale attraverso le fasi', () => {

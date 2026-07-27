@@ -146,3 +146,16 @@ In questo modo la variazione di prestazione tra trial dello stesso livello è at
 - Kessels, R. P. C., van Zandvoort, M. J. E., Postma, A., Kappelle, L. J., & de Haan, E. H. F. (2000). "The Corsi Block-Tapping Task: standardization and normative data." *Applied Neuropsychology, 7*(4), 252–258. DOI: 10.1207/S15324826AN0704_8
 - Berch, D. B., Krikorian, R., & Huha, E. M. (1998). "The Corsi block-tapping task: Methodological and theoretical considerations." *Brain and Cognition, 38*(3), 317–338. DOI: 10.1006/brcg.1998.1039
 - Mueller, S. T., & Piper, B. J. (2014). "The Psychology Experiment Building Language (PEBL) and PEBL Test Battery." *Journal of Neuroscience Methods, 222*, 250–259. DOI: 10.1016/j.jneumeth.2013.10.024 — *implementazione open-source di riferimento delle coordinate di Kessels (`CorsiPoints`).*
+
+## Aggiornamento metriche e generazione (revisione)
+
+- **Punteggio.** Lo scoring ora riporta lo **Span Visuo-Spaziale (MBS, Maximum
+  Block Span)** — la lunghezza massima riprodotta correttamente, indice classico
+  di Corsi — accanto al **Punteggio Corsi (Ponderato)** cumulativo, ancorato a
+  `startLength` (`startLength − 1 + 0.5 · trial superati`; 0 se nessuno). Così il
+  punteggio ponderato è commensurato alla lunghezza del blocco.
+- **Bilanciamento dei trial.** La selezione delle due sequenze dello stesso
+  livello usa una **finestra mobile** sulla distanza percorsa (il sottoinsieme di
+  difficoltà più simile in assoluto), al posto di una tolleranza allargabile;
+  resta invariato il vincolo di pari numero di incroci. Vedi
+  `revisione-motore/corsi.md` per i dettagli implementativi.

@@ -222,10 +222,18 @@ temporale**.
   allo scadere alert visivo + sonoro (`alert.ts`). `BatteryReady` precede ogni
   test; `TestHost` monta la vista giusta (riusata anche da `TestRunner`).
 - `SessionBuilder` + `SessionTimeline`: costruttore (totale → fasi → pin) con
-  anteprima grafica; validazione (durate, pin dentro la fascia della fase).
+  **linea temporale interattiva**. I pin si **trascinano** lungo la barra con
+  **aggancio magnetico** (passo di 5 min, adattivo per sessioni brevi) e possono
+  **cambiare fase** trascinandoli oltre il confine; un **clic sul vuoto** crea un
+  pin lì. Le durate hanno un campo **ore : minuti : secondi** riutilizzabile
+  (`DurationInput`) e un pulsante «Riparti durate equamente»; l'offset del pin è
+  editabile **relativo alla fase** (nessuna aritmetica per l'operatore). Righe
+  di fase/pin compatte e collassabili. Validazione (durate, pin dentro la fascia).
   `storage.ts` persiste modelli e run e importa/esporta il protocollo JSON.
 - I pin hanno `offsetMs` **assoluto** dall'inizio sessione; il builder li vincola
-  alla fascia temporale della loro fase.
+  alla fascia temporale della loro fase. Helper puri nel modello:
+  `phaseIndexAtOffset`, `movePin`/`movePinById` (riattacco alla fase corretta,
+  per id stabile durante il drag), `distributePhasesEvenly`.
 
 ### Riuso dei test
 

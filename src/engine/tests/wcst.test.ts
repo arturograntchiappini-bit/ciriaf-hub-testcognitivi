@@ -111,6 +111,12 @@ describe('scoreWcst', () => {
     expect(summary.find((m) => m.label === 'Categorie completate')?.value).toBe(1);
     expect(summary.find((m) => m.label === 'Errori totali')?.value).toBe(2);
     expect(summary.find((m) => m.label === 'Errori perseverativi')?.value).toBe(2);
+    // 5 trial: 2 perseverativi → 40%
+    expect(summary.find((m) => m.label === '% errori perseverativi')?.value).toBe(40);
+    // corsa di 3 corrette (CLR) su 5 trial → 60%
+    expect(summary.find((m) => m.label === 'Risposte a livello concettuale')?.value).toBe(60);
+    // 1ª categoria completata al 3° trial
+    expect(summary.find((m) => m.label === 'Trial per la 1ª categoria')?.value).toBe(3);
   });
 
   it('failure to maintain set: errore dopo 5–9 corrette consecutive', () => {

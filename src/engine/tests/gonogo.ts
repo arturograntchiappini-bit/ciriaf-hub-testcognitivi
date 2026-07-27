@@ -67,6 +67,7 @@ function tryArrange(nGo: number, nNoGo: number, rand: () => number): GoNoGoKind[
     const canGo = goLeft > 0;
     let chooseNoGo: boolean;
     if (!canGo) chooseNoGo = true;
+    else if (i === 0) chooseNoGo = false; // il primo trial è sempre Go: instaura la risposta prepotente
     else if (!canNoGo) chooseNoGo = false;
     else chooseNoGo = rand() < noGoLeft / (goLeft + noGoLeft);
 
@@ -119,13 +120,20 @@ export function scoreGoNoGo(trials: readonly TrialResult[]): SummaryMetric[] {
   const commissionRate = noGoTrials.length > 0 ? (commissionErrors / noGoTrials.length) * 100 : 0;
   const omissionRate = goTrials.length > 0 ? (omissionErrors / goTrials.length) * 100 : 0;
 
+  const meanGo = mean(goRts);
+  const sdGo = standardDeviation(goRts);
+  // Coefficiente di variazione: dispersione normalizzata sulla media, indice
+  // robusto di variabilità intra-soggetto (lapse/instabilità attentiva).
+  const cvGo = meanGo > 0 ? (sdGo / meanGo) * 100 : 0;
+
   return [
     { label: 'Errori di commissione (No-Go)', value: commissionErrors },
     { label: 'Tasso di commissione', value: round1(commissionRate), unit: '%' },
     { label: 'Errori di omissione (Go)', value: omissionErrors },
     { label: 'Tasso di omissione', value: round1(omissionRate), unit: '%' },
-    { label: 'RT medio Go corretti', value: round1(mean(goRts)), unit: 'ms' },
-    { label: 'SD RT Go corretti', value: round1(standardDeviation(goRts)), unit: 'ms' },
+    { label: 'RT medio Go corretti', value: round1(meanGo), unit: 'ms' },
+    { label: 'SD RT Go corretti', value: round1(sdGo), unit: 'ms' },
+    { label: 'CV RT Go corretti', value: round1(cvGo), unit: '%' },
     { label: 'Errori di anticipazione', value: countFlag(trials, 'ANTICIPATION') },
   ];
 }

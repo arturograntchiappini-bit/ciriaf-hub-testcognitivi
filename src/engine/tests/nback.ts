@@ -135,6 +135,19 @@ export function dPrime(hits: number, targets: number, falseAlarms: number, nonTa
   return probit(h) - probit(f);
 }
 
+/**
+ * Criterio decisionale c (bias di risposta), con la stessa correzione loglinear
+ * di Hautus: c = −0.5·(z(H) + z(F)). c > 0 = criterio conservativo (tende a NON
+ * rispondere, favorisce i miss); c < 0 = criterio liberale (tende a rispondere,
+ * favorisce i falsi allarmi); c ≈ 0 = nessun bias. Complementa d' separando la
+ * sensibilità dalla tendenza di risposta.
+ */
+export function criterionC(hits: number, targets: number, falseAlarms: number, nonTargets: number): number {
+  const h = (hits + 0.5) / (targets + 1);
+  const f = (falseAlarms + 0.5) / (nonTargets + 1);
+  return -0.5 * (probit(h) + probit(f));
+}
+
 interface Counts {
   hits: number;
   targets: number;
@@ -178,6 +191,7 @@ export function scoreNBack(trials: readonly TrialResult[], nQuartiles = 4): Summ
     { label: 'Miss (target mancati)', value: misses },
     { label: 'Falsi allarmi', value: c.falseAlarms },
     { label: "Sensibilità d'", value: round2(dPrime(c.hits, c.targets, c.falseAlarms, c.nonTargets)) },
+    { label: 'Criterio decisionale (c)', value: round2(criterionC(c.hits, c.targets, c.falseAlarms, c.nonTargets)) },
     { label: 'RT medio hit', value: round1(mean(hitRts)), unit: 'ms' },
     { label: 'SD RT hit', value: round1(standardDeviation(hitRts)), unit: 'ms' },
   ];

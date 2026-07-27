@@ -98,11 +98,64 @@ function keyOf(indices: number[]): string {
   return indices.join('-');
 }
 
+/** Ampiezza di distanza di una finestra ordinata (ultimo − primo pathLength). */
+function windowSpread(window: readonly CorsiSequence[]): number {
+  if (window.length < 2) return 0;
+  return (window[window.length - 1] as CorsiSequence).pathLength - (window[0] as CorsiSequence).pathLength;
+}
+
 /**
- * Genera `count` sequenze DISTINTE della lunghezza data, tutte con lo stesso
- * numero di incroci e distanza totale entro `complexityTolerance`. Campiona
- * permutazioni casuali, sceglie il valore di incroci più frequente e una
- * distanza di riferimento (mediana), poi seleziona le sequenze compatibili.
+ * Finestra mobile: fra le sequenze ordinate per `pathLength`, ritorna il
+ * sottoinsieme CONTIGUO di `count` elementi con la minima ampiezza di distanza —
+ * cioè il gruppo di difficoltà più simile in assoluto (non "entro una soglia").
+ */
+function tightestWindow(sorted: readonly CorsiSequence[], count: number): CorsiSequence[] {
+  if (sorted.length <= count) return sorted.slice();
+  let bestStart = 0;
+  let bestSpread = Infinity;
+  for (let i = 0; i + count <= sorted.length; i++) {
+    const spread = (sorted[i + count - 1] as CorsiSequence).pathLength - (sorted[i] as CorsiSequence).pathLength;
+    if (spread < bestSpread) {
+      bestSpread = spread;
+      bestStart = i;
+    }
+  }
+  return sorted.slice(bestStart, bestStart + count);
+}
+
+/**
+ * Nel gruppo di incroci più numeroso (per mantenere UNIFORME il numero di
+ * incroci fra le sequenze di uno stesso livello), estrae la finestra mobile di
+ * `count` sequenze più stretta per `pathLength`. Ritorna null se il gruppo più
+ * uniforme non ha abbastanza sequenze.
+ */
+function bestUniformWindow(candidates: readonly CorsiSequence[], count: number): CorsiSequence[] | null {
+  const byCrossings = new Map<number, CorsiSequence[]>();
+  for (const c of candidates) {
+    const arr = byCrossings.get(c.crossings) ?? [];
+    arr.push(c);
+    byCrossings.set(c.crossings, arr);
+  }
+  let bestGroup: CorsiSequence[] = [];
+  for (const arr of byCrossings.values()) {
+    if (arr.length > bestGroup.length) bestGroup = arr;
+  }
+  if (bestGroup.length < count) return null;
+  const sorted = [...bestGroup].sort((a, b) => a.pathLength - b.pathLength);
+  return tightestWindow(sorted, count);
+}
+
+/**
+ * Genera `count` sequenze DISTINTE della lunghezza data, con lo STESSO numero di
+ * incroci e la distanza percorsa più simile possibile.
+ *
+ * Strategia: campiona permutazioni uniche accumulando un pool di candidati; ogni
+ * tanto prova a estrarre la finestra mobile più stretta nel gruppo di incroci più
+ * numeroso e si ferma appena la sua ampiezza rientra in `complexityTolerance`
+ * (campionamento adattivo: più stretta è la tolleranza richiesta, più a lungo
+ * cerca). Esaurito il budget, ritorna comunque la migliore finestra uniforme
+ * trovata; solo come ultima risorsa (candidati insufficienti) ripiega sul pool
+ * globale ordinato per distanza.
  */
 export function generateBalancedSequences(
   length: number,
@@ -114,45 +167,43 @@ export function generateBalancedSequences(
   const nBlocks = blocks.length;
   const allIndices = Array.from({ length: nBlocks }, (_, i) => i);
 
-  // Campiona candidati unici.
+  const HARD_CAP = 2000; // tetto ai campionamenti (evita loop infiniti su lunghezze estreme)
+  const MIN_POOL = 200; // candidati minimi prima di tentare l'estrazione
   const candidates: CorsiSequence[] = [];
   const seen = new Set<string>();
-  for (let i = 0; i < 600 && candidates.length < 300; i++) {
+
+  for (let i = 0; i < HARD_CAP; i++) {
     const perm = shuffle(allIndices, rand).slice(0, length);
     const k = keyOf(perm);
-    if (seen.has(k)) continue;
-    seen.add(k);
-    candidates.push(complexityOf(perm, blocks));
+    if (!seen.has(k)) {
+      seen.add(k);
+      candidates.push(complexityOf(perm, blocks));
+    }
+    // Prova un'estrazione periodica: se già abbastanza stretta, ci fermiamo.
+    if (candidates.length >= MIN_POOL && i % 50 === 0) {
+      const w = bestUniformWindow(candidates, count);
+      if (w && windowSpread(w) <= params.complexityTolerance) return w;
+    }
   }
 
-  // Raggruppa per numero di incroci; scegli il gruppo più numeroso.
-  const byCrossings = new Map<number, CorsiSequence[]>();
-  for (const c of candidates) {
-    const arr = byCrossings.get(c.crossings) ?? [];
-    arr.push(c);
-    byCrossings.set(c.crossings, arr);
-  }
-  let bestGroup: CorsiSequence[] = [];
-  for (const arr of byCrossings.values()) {
-    if (arr.length > bestGroup.length) bestGroup = arr;
-  }
-
-  // Distanza di riferimento = mediana del gruppo.
-  const sortedByPath = [...bestGroup].sort((a, b) => a.pathLength - b.pathLength);
-  const ref = sortedByPath[Math.floor(sortedByPath.length / 2)];
-  if (!ref) return bestGroup.slice(0, count);
-
-  // Seleziona quelle entro tolleranza; allarga se non bastano.
-  for (let tol = params.complexityTolerance; tol <= params.complexityTolerance * 8; tol *= 2) {
-    const matching = sortedByPath.filter((c) => Math.abs(c.pathLength - ref.pathLength) <= tol);
-    if (matching.length >= count) return matching.slice(0, count);
-  }
-  return sortedByPath.slice(0, count);
+  // Miglior sforzo con quanto raccolto: finestra uniforme più stretta…
+  const uniform = bestUniformWindow(candidates, count);
+  if (uniform) return uniform;
+  // …oppure, se non ci sono abbastanza sequenze a incroci uniformi, pool globale.
+  const allSorted = [...candidates].sort((a, b) => a.pathLength - b.pathLength);
+  return tightestWindow(allSorted, count);
 }
 
-/** Span cumulativo: 0.5 punti per trial superato. */
-export function corsiSpan(passedTrials: number): number {
-  return 0.5 * passedTrials;
+/**
+ * Punteggio Corsi ponderato (cumulativo). Assume superati i livelli sotto
+ * `startLength` (baseline `startLength − 1`, poiché la somministrazione parte da
+ * lì) e aggiunge 0.5 per ogni trial superato — con 2 trial per livello, superare
+ * entrambi i trial di lunghezza L porta il punteggio esattamente a L. Ritorna 0
+ * se nessun trial è stato superato (fallimento al primo livello somministrato).
+ */
+export function corsiSpan(passedTrials: number, startLength = 2): number {
+  if (passedTrials <= 0) return 0;
+  return startLength - 1 + 0.5 * passedTrials;
 }
 
 /** Regola di arresto: si ferma se entrambi i trial del livello sono falliti. */
@@ -160,17 +211,20 @@ export function shouldStop(levelResults: readonly boolean[]): boolean {
   return levelResults.length >= 2 && levelResults.every((r) => !r);
 }
 
-/** Metriche: span totale, livello massimo raggiunto, trial superati. */
-export function scoreCorsi(trials: readonly TrialResult[]): SummaryMetric[] {
+/**
+ * Metriche cliniche standard:
+ * - Span Visuo-Spaziale (MBS, Maximum Block Span): la lunghezza massima di
+ *   sequenza riprodotta correttamente — l'indice classico di Corsi.
+ * - Punteggio Corsi (Ponderato): punteggio cumulativo ancorato a `startLength`.
+ * - Trial totali superati.
+ */
+export function scoreCorsi(trials: readonly TrialResult[], startLength = 2): SummaryMetric[] {
   const test = trials.filter((t) => t.phase === 'test' && t.flag !== 'INTERRUPTED');
   const passed = test.filter((t) => t.correct);
-  const maxLevel = passed.reduce((max, t) => {
-    const len = t.stimulus.split('-').length;
-    return Math.max(max, len);
-  }, 0);
+  const mbs = passed.reduce((max, t) => Math.max(max, t.stimulus.split('-').length), 0);
   return [
-    { label: 'Span (punteggio totale)', value: corsiSpan(passed.length) },
-    { label: 'Trial superati', value: passed.length },
-    { label: 'Lunghezza massima raggiunta', value: maxLevel },
+    { label: 'Span Visuo-Spaziale (MBS)', value: mbs },
+    { label: 'Punteggio Corsi (Ponderato)', value: corsiSpan(passed.length, startLength) },
+    { label: 'Trial totali superati', value: passed.length },
   ];
 }

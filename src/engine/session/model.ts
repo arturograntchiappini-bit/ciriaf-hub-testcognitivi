@@ -184,6 +184,91 @@ export function computeSessionState(
   };
 }
 
+/** Clona in profondità un template (puro, senza Date: i campi data sono stringhe ISO). */
+function cloneTemplate(template: SessionTemplate): SessionTemplate {
+  return JSON.parse(JSON.stringify(template)) as SessionTemplate;
+}
+
+/**
+ * Indice della fase il cui intervallo temporale contiene `offsetMs` (clampato a
+ * [0, durata totale]). Ritorna l'ultima fase se l'offset cade sull'estremo finale,
+ * −1 se non ci sono fasi. Serve a "capire in quale fase" finisce un pin trascinato.
+ */
+export function phaseIndexAtOffset(template: SessionTemplate, offsetMs: number): number {
+  const spans = phaseSpans(template);
+  if (spans.length === 0) return -1;
+  const total = (spans[spans.length - 1] as PhaseSpan).endMs;
+  const x = Math.max(0, Math.min(total, offsetMs));
+  for (let i = 0; i < spans.length; i++) {
+    if (x < (spans[i] as PhaseSpan).endMs) return i;
+  }
+  return spans.length - 1;
+}
+
+/**
+ * Sposta un pin al nuovo offset assoluto (clampato a [0, totale]) e lo RIATTACCA
+ * alla fase che contiene quell'offset — così trascinandolo lungo la timeline può
+ * cambiare fase in modo naturale, senza aritmetica manuale. Ritorna un NUOVO
+ * template (immutabile); no-op se gli indici non sono validi.
+ */
+export function movePin(
+  template: SessionTemplate,
+  fromPhaseIdx: number,
+  pinIdx: number,
+  newOffsetMs: number,
+): SessionTemplate {
+  const next = cloneTemplate(template);
+  const from = next.phases[fromPhaseIdx];
+  if (!from) return next;
+  const pin = from.pins[pinIdx];
+  if (!pin) return next;
+  const total = sessionTotalMs(next);
+  const clamped = Math.max(0, Math.min(total, Math.round(newOffsetMs)));
+  pin.offsetMs = clamped;
+  const targetIdx = phaseIndexAtOffset(next, clamped);
+  if (targetIdx >= 0 && targetIdx !== fromPhaseIdx) {
+    from.pins.splice(pinIdx, 1);
+    (next.phases[targetIdx] as SessionPhase).pins.push(pin);
+  }
+  return next;
+}
+
+/**
+ * Come `movePin`, ma identifica il pin per **id** (stabile) invece che per indici
+ * di fase/posizione: durante un trascinamento che attraversa i confini di fase gli
+ * indici cambiano, l'id no. Ritorna il template invariato se l'id non esiste.
+ */
+export function movePinById(template: SessionTemplate, pinId: string, newOffsetMs: number): SessionTemplate {
+  for (let pi = 0; pi < template.phases.length; pi++) {
+    const ti = (template.phases[pi] as SessionPhase).pins.findIndex((p) => p.id === pinId);
+    if (ti >= 0) return movePin(template, pi, ti, newOffsetMs);
+  }
+  return template;
+}
+
+/**
+ * Ridistribuisce equamente `totalMs` tra tutte le fasi; l'ultima assorbe il resto
+ * della divisione intera (così la somma resta esattamente `totalMs`). Ritorna un
+ * NUOVO template.
+ */
+export function distributePhasesEvenly(template: SessionTemplate): SessionTemplate {
+  const next = cloneTemplate(template);
+  const n = next.phases.length;
+  if (n === 0) return next;
+  const total = next.totalMs;
+  const base = Math.floor(total / n);
+  let acc = 0;
+  next.phases.forEach((p, i) => {
+    if (i === n - 1) {
+      p.durationMs = total - acc;
+    } else {
+      p.durationMs = base;
+      acc += base;
+    }
+  });
+  return next;
+}
+
 const RUN_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 function pad2(v: number): string {

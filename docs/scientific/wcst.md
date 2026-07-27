@@ -238,3 +238,11 @@ Interpretazione: distraibilità / instabilità del set, distinta dalla rigidità
   DOI: `10.3758/s13428-021-01551-3`
 - Aggiornamento diagrammatico dello scoring Heaton (update di Berry, 1996):
   **Behavior Research Methods** (2024). DOI: `10.3758/s13428-024-02499-w`
+
+## Aggiornamento metriche (revisione)
+
+Aggiunti tre indici canonici di Heaton: **% errori perseverativi** (sul totale
+dei trial), **Risposte a Livello Concettuale (CLR, %)** — quota di risposte in
+corse di ≥ 3 corrette consecutive — e **Trial per la 1ª categoria**
+(learning-to-learn). Le corse concettuali non sono azzerate dal cambio di
+categoria.

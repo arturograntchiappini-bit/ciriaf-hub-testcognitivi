@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateNBack, dPrime, probit, scoreNBack, splitIntoChunks, type NBackParams } from './nback';
+import { generateNBack, dPrime, criterionC, probit, scoreNBack, splitIntoChunks, type NBackParams } from './nback';
 import { mulberry32 } from '../rng';
 import type { TrialResult } from '../types';
 
@@ -63,6 +63,11 @@ describe('probit e dPrime', () => {
   it("d' è ~0 quando hit rate ≈ false alarm rate", () => {
     const d = dPrime(15, 30, 35, 70); // 0.5 vs 0.5
     expect(Math.abs(d)).toBeLessThan(0.1);
+  });
+  it('criterio c ≈ 0 senza bias (H ≈ F) ed è positivo se conservativo', () => {
+    expect(Math.abs(criterionC(15, 30, 35, 70))).toBeLessThan(0.1); // H≈F≈0.5
+    // Molti miss e pochi FA (H bassa, F bassa) → criterio conservativo, c > 0
+    expect(criterionC(5, 30, 2, 70)).toBeGreaterThan(0);
   });
 });
 

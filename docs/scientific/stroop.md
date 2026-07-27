@@ -204,3 +204,9 @@ difficoltà nel rispettare la finestra temporale.
 - Stoet, G. (2010). *PsyToolkit: A software package for programming
   psychological experiments using Linux.* **Behavior Research Methods, 42**(4),
   1096–1104. https://doi.org/10.3758/BRM.42.4.1096
+
+## Aggiornamento metriche (revisione)
+
+Aggiunto il **coefficiente di variazione (CV) del RT** per condizione
+(congruente/incongruente), `SD/media · 100`: misura normalizzata della
+variabilità intra-soggetto, complementare a media e SD.

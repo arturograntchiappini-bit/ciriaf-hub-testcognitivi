@@ -106,6 +106,11 @@ export function scoreWcst(
   let failureToMaintainSet = 0;
   let perseveratedPrinciple: WcstDim | null = null;
 
+  // Indici aggiuntivi (Heaton).
+  let correctRun = 0; // corse di corrette consecutive, NON azzerate dallo shift
+  let conceptualResponses = 0; // risposte in corse di ≥3 corrette consecutive (CLR)
+  let trialsToFirstCategory: number | null = null;
+
   const test = trials.filter((t) => t.phase === 'test' && t.flag !== 'INTERRUPTED');
 
   for (let i = 0; i < test.length; i++) {
@@ -115,6 +120,9 @@ export function scoreWcst(
 
     if (!correct) {
       totalErrors++;
+      // Chiudi l'eventuale corsa concettuale (≥3 corrette) prima dell'errore.
+      if (correctRun >= 3) conceptualResponses += correctRun;
+      correctRun = 0;
       // Stabilisce il PP al primo errore non ambiguo.
       if (perseveratedPrinciple === null && meta.matchedDims.length === 1) {
         const only = meta.matchedDims[0] as WcstDim;
@@ -135,22 +143,34 @@ export function scoreWcst(
       consecutiveCorrect = 0;
     } else {
       consecutiveCorrect++;
+      correctRun++;
       if (consecutiveCorrect >= params.runToShift) {
         categories++;
+        if (trialsToFirstCategory === null) trialsToFirstCategory = i + 1;
         perseveratedPrinciple = meta.currentRule; // perseverare verso la regola appena abbandonata
         consecutiveCorrect = 0;
       }
     }
   }
+  // Chiudi l'ultima corsa concettuale aperta a fine test.
+  if (correctRun >= 3) conceptualResponses += correctRun;
 
   const nonPerseverativeErrors = totalErrors - perseverativeErrors;
+  const pct = (n: number): number => (test.length > 0 ? round1((n / test.length) * 100) : 0);
 
   return [
     { label: 'Categorie completate', value: categories },
     { label: 'Trial totali', value: test.length },
     { label: 'Errori totali', value: totalErrors },
     { label: 'Errori perseverativi', value: perseverativeErrors },
+    { label: '% errori perseverativi', value: pct(perseverativeErrors), unit: '%' },
     { label: 'Errori non perseverativi', value: nonPerseverativeErrors },
     { label: 'Failure to maintain set', value: failureToMaintainSet },
+    { label: 'Risposte a livello concettuale', value: pct(conceptualResponses), unit: '%' },
+    { label: 'Trial per la 1ª categoria', value: trialsToFirstCategory ?? test.length },
   ];
+}
+
+function round1(x: number): number {
+  return Math.round(x * 10) / 10;
 }

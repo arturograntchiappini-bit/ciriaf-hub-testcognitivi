@@ -164,3 +164,11 @@ $$d' = z(\text{hit rate}) - z(\text{false-alarm rate})$$
 
 dove $z(\cdot)$ è l'inversa della CDF normale standard (con correzione per rate pari a 0 o 1). Utile come
 misura riassuntiva; le metriche §5.1–5.4 restano quelle di riferimento per il report.
+
+## Aggiornamento (revisione)
+
+- **Sequenza.** Il **primo trial è sempre un Go**, per instaurare la risposta
+  prepotente prima di ogni possibile inibizione; resta il vincolo di ≤ 2 No-Go
+  consecutivi.
+- **Metriche.** Aggiunto il **CV del RT dei Go** (`SD/media · 100`), indice
+  normalizzato di variabilità intra-soggetto.

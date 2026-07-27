@@ -1,6 +1,7 @@
 /**
- * Costruttore di sessione: prima la durata totale, poi le fasi (con durata) e i
- * pin "t" al loro interno, con anteprima su linea temporale. Salva come modello.
+ * Costruttore di sessione (flusso Ibrido): durata totale → fasi (con durata e
+ * distribuzione automatica) → pin "t" collocati per offset RELATIVO alla fase e
+ * trascinabili sulla linea temporale. Salva come modello riutilizzabile.
  * @see docs/superpowers/specs/2026-07-07-feature-sessione-design.md
  */
 import { useRef, useState } from 'react';
@@ -8,15 +9,22 @@ import { Header } from '../components/Header';
 import { Button } from '../components/Button';
 import { BatteryEditor } from './BatteryEditor';
 import { SessionTimeline } from './SessionTimeline';
+import { DurationInput } from './DurationInput';
 import { exportTemplateJson, importTemplateJson } from './storage';
 import { triggerDownload } from '../download';
+import { TEST_CATALOG } from '../router';
 import {
   makeLocalId,
   phaseSpans,
+  phaseIndexAtOffset,
+  movePinById,
+  distributePhasesEvenly,
   type SessionTemplate,
   type SessionPhase,
   type BatteryItem,
+  type TimePin,
 } from '../../engine/session/model';
+import type { TestId } from '../../engine/types';
 
 interface SessionBuilderProps {
   initial: SessionTemplate | null;
@@ -36,9 +44,13 @@ function emptyTemplate(): SessionTemplate {
   };
 }
 
-function msToMinSec(ms: number): { min: number; sec: number } {
-  const total = Math.max(0, Math.round(ms / 1000));
-  return { min: Math.floor(total / 60), sec: total % 60 };
+function fmtMs(ms: number): string {
+  const t = Math.round(ms / 1000);
+  return `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
+}
+
+function testTitle(testId: TestId): string {
+  return TEST_CATALOG.find((t) => t.id === testId)?.title ?? testId;
 }
 
 /** Errore di validazione, o null se il protocollo è valido. */
@@ -69,6 +81,7 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
   const [draft, setDraft] = useState<SessionTemplate>(() =>
     initial ? (JSON.parse(JSON.stringify(initial)) as SessionTemplate) : emptyTemplate(),
   );
+  const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -82,11 +95,10 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
 
   const spans = phaseSpans(draft);
   const allocated = draft.phases.reduce((acc, p) => acc + p.durationMs, 0);
-  const totalMinSec = msToMinSec(draft.totalMs);
+  const overAllocated = allocated > draft.totalMs;
 
   // --- durata totale ---
-  const setTotal = (min: number, sec: number): void =>
-    update((d) => void (d.totalMs = (min * 60 + sec) * 1000));
+  const setTotalMs = (ms: number): void => update((d) => void (d.totalMs = ms));
 
   // --- fasi ---
   const addPhase = (): void =>
@@ -97,8 +109,8 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
   const removePhase = (pi: number): void => update((d) => d.phases.splice(pi, 1));
   const renamePhase = (pi: number, name: string): void =>
     update((d) => void ((d.phases[pi] as SessionPhase).name = name));
-  const setPhaseDuration = (pi: number, min: number, sec: number): void =>
-    update((d) => void ((d.phases[pi] as SessionPhase).durationMs = (min * 60 + sec) * 1000));
+  const setPhaseDurationMs = (pi: number, ms: number): void =>
+    update((d) => void ((d.phases[pi] as SessionPhase).durationMs = ms));
   const movePhase = (pi: number, dir: -1 | 1): void =>
     update((d) => {
       const j = pi + dir;
@@ -107,28 +119,40 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
       d.phases[pi] = d.phases[j] as SessionPhase;
       d.phases[j] = tmp;
     });
+  const distributeEvenly = (): void => setDraft((prev) => distributePhasesEvenly(prev));
 
   // --- pin ---
   const addPin = (pi: number): void =>
     update((d) => {
       const s = phaseSpans(d)[pi];
-      (d.phases[pi] as SessionPhase).pins.push({
-        id: makeLocalId('pin'),
-        offsetMs: s ? s.startMs : 0,
-        battery: [],
-      });
+      const pin: TimePin = { id: makeLocalId('pin'), offsetMs: s ? s.startMs : 0, battery: [] };
+      (d.phases[pi] as SessionPhase).pins.push(pin);
+      queueMicrotask(() => setSelectedPinId(pin.id));
+    });
+  /** Crea un pin all'offset assoluto indicato dalla timeline, nella fase che lo contiene. */
+  const addPinAt = (offsetMs: number): void =>
+    update((d) => {
+      const pi = phaseIndexAtOffset(d, offsetMs);
+      if (pi < 0) return;
+      const pin: TimePin = { id: makeLocalId('pin'), offsetMs, battery: [] };
+      (d.phases[pi] as SessionPhase).pins.push(pin);
+      queueMicrotask(() => setSelectedPinId(pin.id));
     });
   const removePin = (pi: number, ti: number): void =>
     update((d) => (d.phases[pi] as SessionPhase).pins.splice(ti, 1));
-  const setPinOffset = (pi: number, ti: number, min: number, sec: number): void =>
+  /** Offset del pin RELATIVO all'inizio della fase (niente aritmetica per l'operatore). */
+  const setPinOffsetRelMs = (pi: number, ti: number, relMs: number): void =>
     update((d) => {
       const s = phaseSpans(d)[pi];
-      const raw = (min * 60 + sec) * 1000;
-      const clamped = s ? Math.max(s.startMs, Math.min(s.endMs, raw)) : raw;
+      if (!s) return;
+      const clamped = Math.max(s.startMs, Math.min(s.endMs, s.startMs + relMs));
       (d.phases[pi] as SessionPhase).pins[ti]!.offsetMs = clamped;
     });
   const setPinBattery = (pi: number, ti: number, battery: BatteryItem[]): void =>
     update((d) => void ((d.phases[pi] as SessionPhase).pins[ti]!.battery = battery));
+  /** Trascinamento dal componente timeline (per id stabile): può cambiare fase. */
+  const onMovePinFromTimeline = (pinId: string, offsetMs: number): void =>
+    setDraft((prev) => movePinById(prev, pinId, offsetMs));
 
   function doExport(): void {
     triggerDownload(`protocollo_${draft.name || 'senza-nome'}.json`, exportTemplateJson(draft), 'application/json');
@@ -150,10 +174,6 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
   }
 
   const error = validateTemplate(draft);
-  const fmtMs = (ms: number): string => {
-    const t = Math.round(ms / 1000);
-    return `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
-  };
 
   return (
     <div className="min-h-full bg-paper">
@@ -170,7 +190,7 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
         {importError && <p className="mt-3 text-sm text-[#D0021B]">{importError}</p>}
 
         {/* 1. Nome + durata totale */}
-        <div className="mt-6 flex flex-wrap items-end gap-6">
+        <div className="mt-6 flex flex-wrap items-end gap-x-6 gap-y-3">
           <label className="flex flex-col gap-1">
             <span className="text-sm text-ink">Nome della sessione</span>
             <input
@@ -180,73 +200,117 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
               className="w-80 rounded-card border border-line px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
             />
           </label>
-          <label className="flex items-end gap-1 text-sm text-ink">
-            <span className="mb-2">Durata totale</span>
-            <input type="number" min={0} value={totalMinSec.min} onChange={(e) => setTotal(Number(e.target.value) || 0, totalMinSec.sec)} className="w-16 rounded-card border border-line px-2 py-1 focus:border-accent focus:outline-none" />
-            <span className="mb-2">min</span>
-            <input type="number" min={0} max={59} value={totalMinSec.sec} onChange={(e) => setTotal(totalMinSec.min, Number(e.target.value) || 0)} className="w-16 rounded-card border border-line px-2 py-1 focus:border-accent focus:outline-none" />
-            <span className="mb-2">sec</span>
-          </label>
-          <span className={`mb-2 text-xs ${allocated > draft.totalMs ? 'text-[#D0021B]' : 'text-muted'}`}>
-            Allocato nelle fasi: {fmtMs(allocated)} / {fmtMs(draft.totalMs)}
-          </span>
+          <div className="flex flex-col gap-1">
+            <span className="text-sm text-ink">Durata totale</span>
+            <DurationInput valueMs={draft.totalMs} onChange={setTotalMs} ariaPrefix="Durata totale" />
+          </div>
         </div>
 
-        {/* 2. Timeline */}
+        {/* 2. Timeline interattiva */}
         <div className="mt-6">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Linea temporale</p>
-          <SessionTimeline template={draft} />
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Linea temporale</p>
+            <span className={`text-xs ${overAllocated ? 'text-[#D0021B]' : 'text-muted'}`}>
+              Fasi allocate: {fmtMs(allocated)} / {fmtMs(draft.totalMs)}
+            </span>
+          </div>
+          <SessionTimeline
+            template={draft}
+            editable
+            selectedPinId={selectedPinId}
+            onSelectPin={(pi, ti) => setSelectedPinId(draft.phases[pi]?.pins[ti]?.id ?? null)}
+            onMovePin={onMovePinFromTimeline}
+            onAddPinAt={addPinAt}
+          />
         </div>
 
-        {/* 3. Fasi e pin */}
-        <div className="mt-8 space-y-5">
+        {/* 3. Fasi */}
+        <div className="mt-8 flex items-center justify-between">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Fasi e pin</p>
+          <button onClick={distributeEvenly} className="text-xs text-accent hover:underline">
+            Riparti durate equamente
+          </button>
+        </div>
+
+        <div className="mt-3 space-y-4">
           {draft.phases.map((phase, pi) => {
             const span = spans[pi];
-            const dur = msToMinSec(phase.durationMs);
+            const sortedPins = phase.pins
+              .map((pin, ti) => ({ pin, ti }))
+              .sort((a, b) => a.pin.offsetMs - b.pin.offsetMs);
             return (
-              <section key={phase.id} className="rounded-card border border-line p-5">
-                <div className="mb-4 flex flex-wrap items-center gap-2">
+              <section key={phase.id} className="rounded-card border border-line">
+                {/* Header fase compatto */}
+                <div className="flex flex-wrap items-center gap-2 border-b border-line bg-accent-soft/50 px-4 py-2.5">
+                  <span className="text-xs text-muted">{pi + 1}.</span>
                   <input
                     value={phase.name}
                     onChange={(e) => renamePhase(pi, e.target.value)}
-                    className="min-w-40 flex-1 rounded-card border border-line px-3 py-2 text-sm font-semibold text-ink focus:border-accent focus:outline-none"
+                    className="min-w-32 flex-1 rounded border border-line px-2 py-1 text-sm font-semibold text-ink focus:border-accent focus:outline-none"
                   />
-                  <span className="flex items-center gap-1 text-sm text-ink">
-                    durata
-                    <input type="number" min={0} value={dur.min} onChange={(e) => setPhaseDuration(pi, Number(e.target.value) || 0, dur.sec)} className="w-14 rounded-card border border-line px-2 py-1 focus:border-accent focus:outline-none" />
-                    m
-                    <input type="number" min={0} max={59} value={dur.sec} onChange={(e) => setPhaseDuration(pi, dur.min, Number(e.target.value) || 0)} className="w-14 rounded-card border border-line px-2 py-1 focus:border-accent focus:outline-none" />
-                    s
-                  </span>
-                  {span && <span className="text-xs text-muted">({fmtMs(span.startMs)}–{fmtMs(span.endMs)})</span>}
+                  <DurationInput valueMs={phase.durationMs} onChange={(ms) => setPhaseDurationMs(pi, ms)} compact ariaPrefix={`Durata ${phase.name}`} />
+                  {span && <span className="text-[11px] text-muted">{fmtMs(span.startMs)}–{fmtMs(span.endMs)}</span>}
                   <span className="ml-auto flex gap-1">
-                    <button onClick={() => movePhase(pi, -1)} aria-label="Su" className="rounded border border-line px-2 py-1 text-xs text-muted hover:border-accent">↑</button>
-                    <button onClick={() => movePhase(pi, 1)} aria-label="Giù" className="rounded border border-line px-2 py-1 text-xs text-muted hover:border-accent">↓</button>
-                    <button onClick={() => removePhase(pi)} className="rounded border border-line px-2 py-1 text-xs text-[#D0021B] hover:border-[#D0021B]">Elimina</button>
+                    <button onClick={() => movePhase(pi, -1)} aria-label="Su" className="rounded border border-line px-1.5 py-0.5 text-xs text-muted hover:border-accent">↑</button>
+                    <button onClick={() => movePhase(pi, 1)} aria-label="Giù" className="rounded border border-line px-1.5 py-0.5 text-xs text-muted hover:border-accent">↓</button>
+                    <button onClick={() => removePhase(pi)} aria-label="Elimina fase" className="rounded border border-line px-1.5 py-0.5 text-xs text-[#D0021B] hover:border-[#D0021B]">✕</button>
                   </span>
                 </div>
 
-                <div className="space-y-4">
-                  {phase.pins.map((pin, ti) => {
-                    const { min, sec } = msToMinSec(pin.offsetMs);
+                {/* Pin della fase */}
+                <div className="space-y-2 px-4 py-3">
+                  {sortedPins.length === 0 && (
+                    <p className="text-xs text-muted">Nessun pin: clicca sulla timeline o «+ pin».</p>
+                  )}
+                  {sortedPins.map(({ pin, ti }) => {
+                    const relMs = pin.offsetMs - (span ? span.startMs : 0);
+                    const open = selectedPinId === pin.id;
                     return (
-                      <div key={pin.id} className="rounded-card border border-line bg-accent-soft/40 p-4">
-                        <div className="mb-3 flex flex-wrap items-center gap-3">
-                          <span className="text-sm font-medium text-ink">Pin "t"</span>
-                          <label className="flex items-center gap-1 text-sm text-ink">
+                      <div
+                        key={pin.id}
+                        className={`rounded-card border ${open ? 'border-accent bg-accent-soft/40' : 'border-line'}`}
+                      >
+                        {/* Riga compatta del pin */}
+                        <div className="flex flex-wrap items-center gap-2 px-3 py-2">
+                          <button
+                            onClick={() => setSelectedPinId(open ? null : pin.id)}
+                            className="flex items-center gap-1.5 text-sm font-medium text-ink"
+                            aria-expanded={open}
+                          >
+                            <span className={`transition-transform ${open ? 'rotate-90' : ''}`}>▸</span>
+                            pin t = {fmtMs(pin.offsetMs)}
+                          </button>
+                          <span className="flex items-center gap-1 text-xs text-muted">
                             a
-                            <input type="number" min={0} value={min} onChange={(e) => setPinOffset(pi, ti, Number(e.target.value) || 0, sec)} className="w-16 rounded-card border border-line px-2 py-1 focus:border-accent focus:outline-none" />
-                            min
-                            <input type="number" min={0} max={59} value={sec} onChange={(e) => setPinOffset(pi, ti, min, Number(e.target.value) || 0)} className="w-16 rounded-card border border-line px-2 py-1 focus:border-accent focus:outline-none" />
-                            sec dall'inizio
-                          </label>
-                          <button onClick={() => removePin(pi, ti)} className="ml-auto rounded border border-line px-2 py-1 text-xs text-[#D0021B] hover:border-[#D0021B]">Rimuovi pin</button>
+                            <DurationInput valueMs={relMs} onChange={(ms) => setPinOffsetRelMs(pi, ti, ms)} compact ariaPrefix="Offset pin nella fase" />
+                            nella fase
+                          </span>
+                          {/* Riepilogo batteria */}
+                          <span className="flex flex-wrap items-center gap-1">
+                            {pin.battery.length === 0 ? (
+                              <span className="text-[11px] text-[#D0021B]">batteria vuota</span>
+                            ) : (
+                              pin.battery.map((b, k) => (
+                                <span key={k} className="rounded-full bg-white px-2 py-0.5 text-[11px] text-ink ring-1 ring-line">
+                                  {testTitle(b.testId)}
+                                </span>
+                              ))
+                            )}
+                          </span>
+                          <button onClick={() => removePin(pi, ti)} aria-label="Rimuovi pin" className="ml-auto rounded border border-line px-1.5 py-0.5 text-xs text-[#D0021B] hover:border-[#D0021B]">✕</button>
                         </div>
-                        <BatteryEditor battery={pin.battery} onChange={(b) => setPinBattery(pi, ti, b)} />
+                        {/* Editor batteria (espanso) */}
+                        {open && (
+                          <div className="border-t border-line px-3 py-3">
+                            <BatteryEditor battery={pin.battery} onChange={(b) => setPinBattery(pi, ti, b)} />
+                          </div>
+                        )}
                       </div>
                     );
                   })}
-                  <Button variant="secondary" onClick={() => addPin(pi)}>+ Aggiungi pin "t"</Button>
+                  <button onClick={() => addPin(pi)} className="text-xs text-accent hover:underline">
+                    + pin "t" in questa fase
+                  </button>
                 </div>
               </section>
             );

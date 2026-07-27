@@ -135,15 +135,21 @@ function accuracyByCondition(trials: readonly TrialResult[], condition: string):
 export function scoreStroop(trials: readonly TrialResult[]): SummaryMetric[] {
   const meanCon = meanRtByCondition(trials, 'congruent');
   const meanInc = meanRtByCondition(trials, 'incongruent');
+  const sdCon = sdRtByCondition(trials, 'congruent');
+  const sdInc = sdRtByCondition(trials, 'incongruent');
   const interference = meanInc - meanCon;
+  // Coefficiente di variazione (dispersione normalizzata): variabilità intra-soggetto.
+  const cv = (sd: number, m: number): number => (m > 0 ? (sd / m) * 100 : 0);
 
   return [
     { label: 'Accuratezza congruenti', value: round1(accuracyByCondition(trials, 'congruent')), unit: '%' },
     { label: 'Accuratezza incongruenti', value: round1(accuracyByCondition(trials, 'incongruent')), unit: '%' },
     { label: 'RT medio congruenti', value: round1(meanCon), unit: 'ms' },
     { label: 'RT medio incongruenti', value: round1(meanInc), unit: 'ms' },
-    { label: 'SD RT congruenti', value: round1(sdRtByCondition(trials, 'congruent')), unit: 'ms' },
-    { label: 'SD RT incongruenti', value: round1(sdRtByCondition(trials, 'incongruent')), unit: 'ms' },
+    { label: 'SD RT congruenti', value: round1(sdCon), unit: 'ms' },
+    { label: 'SD RT incongruenti', value: round1(sdInc), unit: 'ms' },
+    { label: 'CV RT congruenti', value: round1(cv(sdCon, meanCon)), unit: '%' },
+    { label: 'CV RT incongruenti', value: round1(cv(sdInc, meanInc)), unit: '%' },
     { label: 'Effetto interferenza (inc − con)', value: round1(interference), unit: 'ms' },
     { label: 'Errori di anticipazione', value: countFlag(trials, 'ANTICIPATION') },
     { label: 'Errori di omissione', value: countFlag(trials, 'OMISSION') },
