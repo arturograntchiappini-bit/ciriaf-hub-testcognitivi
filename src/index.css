@@ -8,12 +8,15 @@
 @tailwind utilities;
 
 :root {
-  /* Token speculari a tailwind.config.js — identità visiva CIRIAF */
-  --color-ink: #111111;
-  --color-paper: #ffffff;
-  --color-accent: #4a90d9;
-  --color-accent-soft: #eaf2fb;
-  --color-line: #e4e7ec;
+  /* Token — palette scientifica dark CIRIAF */
+  --color-ink: #E1E7EF;
+  --color-paper: #0A0E1A;
+  --color-surface: #111827;
+  --color-elevated: #1A2538;
+  --color-accent: #4A90D9;
+  --color-accent-soft: #132238;
+  --color-line: #1E2740;
+  --color-muted: #8892A4;
 }
 
 html,
@@ -35,6 +38,24 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+/* Scrollbar sottile per l'ambiente scuro */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 3px;
+}
+
+/* Selezione testo */
+::selection {
+  background: var(--color-accent);
+  color: var(--color-ink);
 }
 
 /* Rispetto della preferenza di movimento ridotto */

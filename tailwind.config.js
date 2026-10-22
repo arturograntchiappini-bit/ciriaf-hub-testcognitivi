@@ -4,14 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Palette istituzionale — identità visiva CIRIAF (vedi docs/architettura.md).
-        // L'accento è usato solo per rifiniture, mai come sfondo di ampie aree.
-        ink: '#111111', // testo principale
-        paper: '#FFFFFF', // sfondo
-        accent: '#4A90D9', // azzurrino primario (bordi attivi, focus, pulsante primario)
-        'accent-soft': '#EAF2FB', // superficie tenue
-        line: '#E4E7EC', // bordi sottili
-        muted: '#667085', // testo secondario
+        // Palette scientifica dark — laboratorio CIRIAF.
+        ink: '#E1E7EF', // testo principale su dark
+        paper: '#0A0E1A', // sfondo principale
+        surface: '#111827', // sfondo card
+        elevated: '#1A2538', // hover/raised
+        accent: '#4A90D9', // azzurrino primario
+        'accent-soft': '#132238', // superficie tenue accent
+        'accent-glow': '#6BB5FF', // glow hover
+        line: '#1E2740', // bordi
+        muted: '#8892A4', // testo secondario
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
@@ -20,7 +22,7 @@ export default {
         card: '10px',
       },
       boxShadow: {
-        card: '0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06)',
+        card: '0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.4)',
       },
       maxWidth: {
         content: '960px',

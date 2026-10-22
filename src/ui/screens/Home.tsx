@@ -24,10 +24,10 @@ export function Home({ onSelectTest, onOpenSettings, onOpenSession }: HomeProps)
         {/* Modalità Sessione */}
         <button
           onClick={onOpenSession}
-          className="group flex w-full items-center justify-between rounded-card border border-accent bg-accent-soft px-5 py-4 text-left transition-all duration-200 hover:shadow-md"
+          className="group flex w-full items-center justify-between rounded-card border border-accent/30 bg-accent-soft px-5 py-4 text-left transition-all duration-200 hover:border-accent/60 hover:shadow-md hover:shadow-accent/5"
         >
           <span className="flex items-center gap-3">
-            <span aria-hidden className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-lg">🕒</span>
+            <span aria-hidden className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/15 text-lg">🕒</span>
             <span>
               <span className="block text-sm font-semibold text-ink">Modalità Sessione</span>
               <span className="block text-xs text-muted">
