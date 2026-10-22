@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CIRIAF Hub — graphify tree viewer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      margin: 20px 0 0 24px;
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #1e3a56;
+    }
+    .controls {
+      margin: 20px 0 15px 24px;
+    }
+    button {
+      margin-right: 10px;
+      padding: 8px 18px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:active {
+      background: #004085;
+    }
+    #tree-container {
+      width: calc(100vw - 48px); /* Adjust for body margin/padding */
+      height: 85vh;
+      overflow: auto;
+      border-radius: 8px;
+      background: #fff;
+      margin-left: 24px;
+      margin-right: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid #ddd;
+    }
+    svg {
+      background: #fff;
+      border-radius: 8px;
+      display: block; /* Important for D3 */
+    }
+    .node circle {
+      stroke-width: 2.5px;
+    }
+    .node text { /* Base style for the <text> container */
+      font: 13px 'Segoe UI', sans-serif;
+      paint-order: stroke fill; /* Ensures text is readable over lines */
+      stroke: #fff; /* White halo */
+      stroke-width: 3px; /* Halo thickness */
+      stroke-linejoin: round;
+      stroke-opacity: 0.85; /* Halo opacity */
+    }
+    .link {
+      fill: none;
+      stroke-opacity: 0.7;
+      stroke-width: 2px;
+    }
+  </style>
+</head>
+<body>
+  <h1>CIRIAF Hub — Knowledge Graph</h1>
+  <div class="controls">
+    <button onclick="expandAll()">Expand All</button>
+    <button onclick="collapseAll()">Collapse All</button>
+    <button onclick="resetView()">Reset View</button>
+  </div>
+  <div id="tree-container">
+    <svg id="tree-svg" width="6000" height="8000"></svg>
+  </div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    const initialJsonData = {"name":"CIRIAF Hub","total_count":583,"children":[{"name":"2026-07-07-feature-sessione-design.md","total_count":4,"children":[{"name":"SessionPhase (Named Time Block)","total_count":1,"children":[]},{"name":"SessionState (Derived Runtime State)","total_count":1,"children":[]},{"name":"SessionTemplate","total_count":1,"children":[]},{"name":"TimePin (Absolute Offset for Test Battery)","total_count":1,"children":[]}]},{"name":"architettura.md","total_count":2,"children":[{"name":"Session Mode (Protocol Chronometric)","total_count":1,"children":[]},{"name":"Two-Layer Architecture (Engine + UI Separation)","total_count":1,"children":[]}]},{"name":"bibliography.md","total_count":15,"children":[{"name":"Berch et al. 1998 (Corsi Methodological Considerations)","total_count":1,"children":[]},{"name":"Berg 1948 (Simple Objective Technique for Measuring Flexibility)","total_count":1,"children":[]},{"name":"Hautus 1995 (Corrections for Extreme Proportions and d-prime)","total_count":1,"children":[]},{"name":"Heaton 1993 (WCST Manual Revised)","total_count":1,"children":[]},{"name":"Jaeggi et al. 2010 (Concurrent Validity of N-Back as Working Memory Measure)","total_count":1,"children":[]},{"name":"Kessels et al. 2000 (Corsi Standardization and Normative Data)","total_count":1,"children":[]},{"name":"Kirchner 1958 (Age Differences in Short-Term Retention)","total_count":1,"children":[]},{"name":"Luce 1986 (Response Times: Their Role in Inferring Elementary Mental Organization)","total_count":1,"children":[]},{"name":"MacLeod 1991 (Half a Century of Research on the Stroop Effect)","total_count":1,"children":[]},{"name":"Owen et al. 2005 (N-Back Meta-Analysis of Neuroimaging)","total_count":1,"children":[]},{"name":"Ratcliff 1993 (Methods for Dealing with Reaction Time Outliers)","total_count":1,"children":[]},{"name":"Stroop 1935 (Studies of Interference in Serial Verbal Reactions)","total_count":1,"children":[]},{"name":"Verbruggen & Logan 2008 (Automatic and Controlled Response Inhibition)","total_count":1,"children":[]},{"name":"Wessel 2018 (Prepotent Motor Activity and Inhibitory Control)","total_count":1,"children":[]},{"name":"Whelan 2008 (Effective Analysis of Reaction Time Data)","total_count":1,"children":[]}]},{"name":"corsi.md","total_count":7,"children":[{"name":"Balanced Sequence Generation (Intra-Level Equivalence)","total_count":1,"children":[]},{"name":"Corsi Block-Tapping Task","total_count":1,"children":[]},{"name":"Corsi Span (Visuo-Spatial Memory Span)","total_count":1,"children":[]},{"name":"Level Target Difficulty (k-1 * d-bar)","total_count":1,"children":[]},{"name":"Path Complexity Index (L(S) + X(S))","total_count":1,"children":[]},{"name":"Reverse Trajectory Exclusion (Corsi Deduplication)","total_count":1,"children":[]},{"name":"Visuo-Spatial Sketchpad (Working Memory Model)","total_count":1,"children":[]}]},{"name":"favicon.svg","total_count":1,"children":[{"name":"CIRIAF Favicon (Blue Rounded Square with Triangles)","total_count":1,"children":[]}]},{"name":"gonogo.md","total_count":5,"children":[{"name":"Coefficient of Variation (CV) of RT","total_count":1,"children":[]},{"name":"Commission Errors (False Alarms on No-Go)","total_count":1,"children":[]},{"name":"Go/No-Go Task (Motor Inhibition)","total_count":1,"children":[]},{"name":"Motor Inhibition (Prepotent Response Suppression)","total_count":1,"children":[]},{"name":"Omission Errors (Missed Go Responses)","total_count":1,"children":[]}]},{"name":"index.html","total_count":1,"children":[{"name":"CIRIAF Hub HTML Entry Point","total_count":1,"children":[]}]},{"name":"nback.md","total_count":5,"children":[{"name":"Criterion c (Response Bias)","total_count":1,"children":[]},{"name":"d-prime (Sensitivity)","total_count":1,"children":[]},{"name":"Loglinear Correction (Hautus 1995)","total_count":1,"children":[]},{"name":"N-Back Task (2-back Verbal)","total_count":1,"children":[]},{"name":"Quartile Temporal Analysis (N-Back Stability)","total_count":1,"children":[]}]},{"name":"package.json","total_count":47,"children":[{"name":"@fontsource/inter","total_count":1,"children":[]},{"name":"@fontsource/inter","total_count":1,"children":[]},{"name":"@testing-library/dom","total_count":1,"children":[]},{"name":"@testing-library/dom","total_count":1,"children":[]},{"name":"@testing-library/jest-dom","total_count":1,"children":[]},{"name":"@testing-library/react","total_count":1,"children":[]},{"name":"@testing-library/react","total_count":1,"children":[]},{"name":"@testing-library/user-event","total_count":1,"children":[]},{"name":"@testing-library/user-event","total_count":1,"children":[]},{"name":"@types/react","total_count":1,"children":[]},{"name":"@types/react","total_count":1,"children":[]},{"name":"@types/react-dom","total_count":1,"children":[]},{"name":"@types/react-dom","total_count":1,"children":[]},{"name":"@vitejs/plugin-react","total_count":1,"children":[]},{"name":"@vitejs/plugin-react","total_count":1,"children":[]},{"name":"autoprefixer","total_count":1,"children":[]},{"name":"autoprefixer","total_count":1,"children":[]},{"name":"build","total_count":1,"children":[]},{"name":"dependencies","total_count":1,"children":[]},{"name":"description","total_count":1,"children":[]},{"name":"dev","total_count":1,"children":[]},{"name":"devDependencies","total_count":1,"children":[]},{"name":"jsdom","total_count":1,"children":[]},{"name":"jsdom","total_count":1,"children":[]},{"name":"name","total_count":1,"children":[]},{"name":"postcss","total_count":1,"children":[]},{"name":"postcss","total_count":1,"children":[]},{"name":"preview","total_count":1,"children":[]},{"name":"private","total_count":1,"children":[]},{"name":"react","total_count":1,"children":[]},{"name":"react","total_count":1,"children":[]},{"name":"react-dom","total_count":1,"children":[]},{"name":"react-dom","total_count":1,"children":[]},{"name":"scripts","total_count":1,"children":[]},{"name":"tailwindcss","total_count":1,"children":[]},{"name":"tailwindcss","total_count":1,"children":[]},{"name":"test","total_count":1,"children":[]},{"name":"test:watch","total_count":1,"children":[]},{"name":"type","total_count":1,"children":[]},{"name":"typecheck","total_count":1,"children":[]},{"name":"typescript","total_count":1,"children":[]},{"name":"typescript","total_count":1,"children":[]},{"name":"version","total_count":1,"children":[]},{"name":"vite","total_count":1,"children":[]},{"name":"vite","total_count":1,"children":[]},{"name":"vitest","total_count":1,"children":[]},{"name":"vitest","total_count":1,"children":[]}]},{"name":"README.md","total_count":1,"children":[{"name":"CIRIAF COLAB/NEXTROOM Cognitive Testing Hub","total_count":1,"children":[]}]},{"name":"README.md","total_count":1,"children":[{"name":"Engine Review Copies (Standalone Scripts)","total_count":1,"children":[]}]},{"name":"revisione-motore","total_count":107,"children":[{"name":"corsi.ts","total_count":22,"children":[{"name":"canonicalKey()","total_count":1,"children":[]},{"name":"complexityOf()","total_count":1,"children":[]},{"name":"CORSI_BLOCKS","total_count":1,"children":[]},{"name":"CorsiParams","total_count":1,"children":[]},{"name":"CorsiSequence","total_count":1,"children":[]},{"name":"corsiSpan()","total_count":1,"children":[]},{"name":"countCrossings()","total_count":1,"children":[]},{"name":"distance()","total_count":1,"children":[]},{"name":"generateBalancedSequences()","total_count":1,"children":[]},{"name":"meanPairwiseDistance()","total_count":1,"children":[]},{"name":"mulberry32()","total_count":1,"children":[]},{"name":"orientation()","total_count":1,"children":[]},{"name":"pathLength()","total_count":1,"children":[]},{"name":"pickUniformGroup()","total_count":1,"children":[]},{"name":"Point","total_count":1,"children":[]},{"name":"properlyIntersect()","total_count":1,"children":[]},{"name":"scoreCorsi()","total_count":1,"children":[]},{"name":"shouldStop()","total_count":1,"children":[]},{"name":"shuffle()","total_count":1,"children":[]},{"name":"SummaryMetric","total_count":1,"children":[]},{"name":"targetPathLength()","total_count":1,"children":[]},{"name":"TrialResult","total_count":1,"children":[]}]},{"name":"gonogo.ts","total_count":17,"children":[{"name":"arrangeKinds()","total_count":1,"children":[]},{"name":"countFlag()","total_count":1,"children":[]},{"name":"deterministicArrange()","total_count":1,"children":[]},{"name":"generateGoNoGo()","total_count":1,"children":[]},{"name":"GoNoGoKind","total_count":1,"children":[]},{"name":"GoNoGoParams","total_count":1,"children":[]},{"name":"GoNoGoStimulus","total_count":1,"children":[]},{"name":"mean()","total_count":1,"children":[]},{"name":"mulberry32()","total_count":1,"children":[]},{"name":"randInt()","total_count":1,"children":[]},{"name":"round1()","total_count":1,"children":[]},{"name":"scoreGoNoGo()","total_count":1,"children":[]},{"name":"standardDeviation()","total_count":1,"children":[]},{"name":"SummaryMetric","total_count":1,"children":[]},{"name":"TrialResult","total_count":1,"children":[]},{"name":"tryArrange()","total_count":1,"children":[]},{"name":"ValidationFlag","total_count":1,"children":[]}]},{"name":"nback.ts","total_count":22,"children":[{"name":"chooseTargetPositions()","total_count":1,"children":[]},{"name":"countHitsFa()","total_count":1,"children":[]},{"name":"Counts","total_count":1,"children":[]},{"name":"criterionC()","total_count":1,"children":[]},{"name":"dPrime()","total_count":1,"children":[]},{"name":"generateNBack()","total_count":1,"children":[]},{"name":"mean()","total_count":1,"children":[]},{"name":"mulberry32()","total_count":1,"children":[]},{"name":"NBACK_LETTERS","total_count":1,"children":[]},{"name":"NBackParams","total_count":1,"children":[]},{"name":"NBackStimulus","total_count":1,"children":[]},{"name":"pick()","total_count":1,"children":[]},{"name":"pickNonTarget()","total_count":1,"children":[]},{"name":"probit()","total_count":1,"children":[]},{"name":"round1()","total_count":1,"children":[]},{"name":"round2()","total_count":1,"children":[]},{"name":"scoreNBack()","total_count":1,"children":[]},{"name":"splitIntoChunks()","total_count":1,"children":[]},{"name":"standardDeviation()","total_count":1,"children":[]},{"name":"SummaryMetric","total_count":1,"children":[]},{"name":"TrialResult","total_count":1,"children":[]},{"name":"ValidationFlag","total_count":1,"children":[]}]},{"name":"stroop.ts","total_count":24,"children":[{"name":"accuracyByCondition()","total_count":1,"children":[]},{"name":"correctKeyStroop()","total_count":1,"children":[]},{"name":"countFlag()","total_count":1,"children":[]},{"name":"generateStroop()","total_count":1,"children":[]},{"name":"mean()","total_count":1,"children":[]},{"name":"meanRtByCondition()","total_count":1,"children":[]},{"name":"mulberry32()","total_count":1,"children":[]},{"name":"round1()","total_count":1,"children":[]},{"name":"scoreStroop()","total_count":1,"children":[]},{"name":"sdRtByCondition()","total_count":1,"children":[]},{"name":"shuffle()","total_count":1,"children":[]},{"name":"standardDeviation()","total_count":1,"children":[]},{"name":"STROOP_COLORS","total_count":1,"children":[]},{"name":"STROOP_KEYS","total_count":1,"children":[]},{"name":"StroopColor","total_count":1,"children":[]},{"name":"StroopKey","total_count":1,"children":[]},{"name":"StroopParams","total_count":1,"children":[]},{"name":"StroopStimulus","total_count":1,"children":[]},{"name":"stroopStimulusLabel()","total_count":1,"children":[]},{"name":"StroopVariant","total_count":1,"children":[]},{"name":"SummaryMetric","total_count":1,"children":[]},{"name":"TrialResult","total_count":1,"children":[]},{"name":"ValidationFlag","total_count":1,"children":[]},{"name":"violatesRun()","total_count":1,"children":[]}]},{"name":"wcst.ts","total_count":22,"children":[{"name":"ALL_COLORS","total_count":1,"children":[]},{"name":"ALL_NUMBERS","total_count":1,"children":[]},{"name":"ALL_SHAPES","total_count":1,"children":[]},{"name":"buildDeck()","total_count":1,"children":[]},{"name":"matchesOn()","total_count":1,"children":[]},{"name":"matchingDims()","total_count":1,"children":[]},{"name":"mulberry32()","total_count":1,"children":[]},{"name":"round1()","total_count":1,"children":[]},{"name":"ruleForCategory()","total_count":1,"children":[]},{"name":"scoreWcst()","total_count":1,"children":[]},{"name":"shuffle()","total_count":1,"children":[]},{"name":"SummaryMetric","total_count":1,"children":[]},{"name":"TrialResult","total_count":1,"children":[]},{"name":"WCST_RULE_ORDER","total_count":1,"children":[]},{"name":"WCST_STIMULUS_CARDS","total_count":1,"children":[]},{"name":"WcstCard","total_count":1,"children":[]},{"name":"WcstColor","total_count":1,"children":[]},{"name":"WcstDim","total_count":1,"children":[]},{"name":"WcstNumber","total_count":1,"children":[]},{"name":"WcstParams","total_count":1,"children":[]},{"name":"WcstShape","total_count":1,"children":[]},{"name":"WcstTrialMeta","total_count":1,"children":[]}]}]},{"name":"src","total_count":343,"children":[{"name":"App.tsx","total_count":7,"children":[{"name":"App()","total_count":1,"children":[]},{"name":"goHome()","total_count":1,"children":[]},{"name":"persistSettings()","total_count":1,"children":[]},{"name":"refreshTemplates()","total_count":1,"children":[]},{"name":"resumeSession()","total_count":1,"children":[]},{"name":"saveSessionTemplate()","total_count":1,"children":[]},{"name":"startSession()","total_count":1,"children":[]}]},{"name":"config","total_count":4,"children":[{"name":"defaults.ts","total_count":3,"children":[{"name":"AllParams","total_count":1,"children":[]},{"name":"DEFAULTS","total_count":1,"children":[]},{"name":"STROOP_BASE","total_count":1,"children":[]}]},{"name":"defaults.test.ts","total_count":1,"children":[]}]},{"name":"engine","total_count":158,"children":[{"name":"clock.ts","total_count":8,"children":[{"name":".afterPaint()","total_count":1,"children":[]},{"name":".now()","total_count":1,"children":[]},{"name":".timeout()","total_count":1,"children":[]},{"name":"Cancel","total_count":1,"children":[]},{"name":"Clock","total_count":1,"children":[]},{"name":"performanceClock","total_count":1,"children":[]},{"name":"realScheduler()","total_count":1,"children":[]},{"name":"Scheduler","total_count":1,"children":[]}]},{"name":"export.test.ts","total_count":1,"children":[{"name":"sampleResult()","total_count":1,"children":[]}]},{"name":"export.ts","total_count":9,"children":[{"name":"CSV_HEADER","total_count":1,"children":[]},{"name":"CSV_SEPARATOR","total_count":1,"children":[]},{"name":"csvField()","total_count":1,"children":[]},{"name":"exportFilename()","total_count":1,"children":[]},{"name":"JsonExport","total_count":1,"children":[]},{"name":"toCsv()","total_count":1,"children":[]},{"name":"toJson()","total_count":1,"children":[]},{"name":"trialCsvValues()","total_count":1,"children":[]},{"name":"trialToCsvRow()","total_count":1,"children":[]}]},{"name":"rng.ts","total_count":4,"children":[{"name":"mulberry32()","total_count":1,"children":[]},{"name":"pick()","total_count":1,"children":[]},{"name":"randInt()","total_count":1,"children":[]},{"name":"shuffle()","total_count":1,"children":[]}]},{"name":"session","total_count":30,"children":[{"name":"export.test.ts","total_count":2,"children":[{"name":"run()","total_count":1,"children":[]},{"name":"trial()","total_count":1,"children":[]}]},{"name":"export.ts","total_count":5,"children":[{"name":"SESSION_CSV_HEADER","total_count":1,"children":[]},{"name":"sessionFilename()","total_count":1,"children":[]},{"name":"SessionJsonExport","total_count":1,"children":[]},{"name":"toSessionCsv()","total_count":1,"children":[]},{"name":"toSessionJson()","total_count":1,"children":[]}]},{"name":"model.test.ts","total_count":1,"children":[{"name":"template()","total_count":1,"children":[]}]},{"name":"model.ts","total_count":22,"children":[{"name":"BatteryItem","total_count":1,"children":[]},{"name":"cloneTemplate()","total_count":1,"children":[]},{"name":"computeSessionState()","total_count":1,"children":[]},{"name":"distributePhasesEvenly()","total_count":1,"children":[]},{"name":"FlatPin","total_count":1,"children":[]},{"name":"flattenPins()","total_count":1,"children":[]},{"name":"makeLocalId()","total_count":1,"children":[]},{"name":"makeRunId()","total_count":1,"children":[]},{"name":"movePin()","total_count":1,"children":[]},{"name":"movePinById()","total_count":1,"children":[]},{"name":"pad2()","total_count":1,"children":[]},{"name":"phaseAtElapsed()","total_count":1,"children":[]},{"name":"phaseIndexAtOffset()","total_count":1,"children":[]},{"name":"PhaseSpan","total_count":1,"children":[]},{"name":"phaseSpans()","total_count":1,"children":[]},{"name":"SessionPhase","total_count":1,"children":[]},{"name":"SessionRun","total_count":1,"children":[]},{"name":"SessionState","total_count":1,"children":[]},{"name":"SessionTemplate","total_count":1,"children":[]},{"name":"SessionTestResult","total_count":1,"children":[]},{"name":"sessionTotalMs()","total_count":1,"children":[]},{"name":"TimePin","total_count":1,"children":[]}]}]},{"name":"session.ts","total_count":2,"children":[{"name":"makeSessionId()","total_count":1,"children":[]},{"name":"pad2()","total_count":1,"children":[]}]},{"name":"tests","total_count":85,"children":[{"name":"corsi.test.ts","total_count":1,"children":[{"name":"PARAMS","total_count":1,"children":[]}]},{"name":"corsi.ts","total_count":18,"children":[{"name":"canonicalKey()","total_count":1,"children":[]},{"name":"complexityOf()","total_count":1,"children":[]},{"name":"CORSI_BLOCKS","total_count":1,"children":[]},{"name":"CorsiParams","total_count":1,"children":[]},{"name":"CorsiSequence","total_count":1,"children":[]},{"name":"corsiSpan()","total_count":1,"children":[]},{"name":"countCrossings()","total_count":1,"children":[]},{"name":"distance()","total_count":1,"children":[]},{"name":"generateBalancedSequences()","total_count":1,"children":[]},{"name":"meanPairwiseDistance()","total_count":1,"children":[]},{"name":"orientation()","total_count":1,"children":[]},{"name":"pathLength()","total_count":1,"children":[]},{"name":"pickUniformGroup()","total_count":1,"children":[]},{"name":"Point","total_count":1,"children":[]},{"name":"properlyIntersect()","total_count":1,"children":[]},{"name":"scoreCorsi()","total_count":1,"children":[]},{"name":"shouldStop()","total_count":1,"children":[]},{"name":"targetPathLength()","total_count":1,"children":[]}]},{"name":"gonogo.test.ts","total_count":2,"children":[{"name":"PARAMS","total_count":1,"children":[]},{"name":"trial()","total_count":1,"children":[]}]},{"name":"gonogo.ts","total_count":9,"children":[{"name":"arrangeKinds()","total_count":1,"children":[]},{"name":"deterministicArrange()","total_count":1,"children":[]},{"name":"generateGoNoGo()","total_count":1,"children":[]},{"name":"GoNoGoKind","total_count":1,"children":[]},{"name":"GoNoGoParams","total_count":1,"children":[]},{"name":"GoNoGoStimulus","total_count":1,"children":[]},{"name":"round1()","total_count":1,"children":[]},{"name":"scoreGoNoGo()","total_count":1,"children":[]},{"name":"tryArrange()","total_count":1,"children":[]}]},{"name":"nback.test.ts","total_count":2,"children":[{"name":"PARAMS","total_count":1,"children":[]},{"name":"trial()","total_count":1,"children":[]}]},{"name":"nback.ts","total_count":15,"children":[{"name":"chooseTargetPositions()","total_count":1,"children":[]},{"name":"countHitsFa()","total_count":1,"children":[]},{"name":"Counts","total_count":1,"children":[]},{"name":"criterionC()","total_count":1,"children":[]},{"name":"dPrime()","total_count":1,"children":[]},{"name":"generateNBack()","total_count":1,"children":[]},{"name":"NBACK_LETTERS","total_count":1,"children":[]},{"name":"NBackParams","total_count":1,"children":[]},{"name":"NBackStimulus","total_count":1,"children":[]},{"name":"pickNonTarget()","total_count":1,"children":[]},{"name":"probit()","total_count":1,"children":[]},{"name":"round1()","total_count":1,"children":[]},{"name":"round2()","total_count":1,"children":[]},{"name":"scoreNBack()","total_count":1,"children":[]},{"name":"splitIntoChunks()","total_count":1,"children":[]}]},{"name":"stroop.test.ts","total_count":2,"children":[{"name":"PARAMS","total_count":1,"children":[]},{"name":"trial()","total_count":1,"children":[]}]},{"name":"stroop.ts","total_count":16,"children":[{"name":"accuracyByCondition()","total_count":1,"children":[]},{"name":"correctKeyStroop()","total_count":1,"children":[]},{"name":"generateStroop()","total_count":1,"children":[]},{"name":"meanRtByCondition()","total_count":1,"children":[]},{"name":"round1()","total_count":1,"children":[]},{"name":"scoreStroop()","total_count":1,"children":[]},{"name":"sdRtByCondition()","total_count":1,"children":[]},{"name":"STROOP_COLORS","total_count":1,"children":[]},{"name":"STROOP_KEYS","total_count":1,"children":[]},{"name":"StroopColor","total_count":1,"children":[]},{"name":"StroopKey","total_count":1,"children":[]},{"name":"StroopParams","total_count":1,"children":[]},{"name":"StroopStimulus","total_count":1,"children":[]},{"name":"stroopStimulusLabel()","total_count":1,"children":[]},{"name":"StroopVariant","total_count":1,"children":[]},{"name":"violatesRun()","total_count":1,"children":[]}]},{"name":"wcst.test.ts","total_count":2,"children":[{"name":"makeTrialMeta()","total_count":1,"children":[]},{"name":"PARAMS","total_count":1,"children":[]}]},{"name":"wcst.ts","total_count":18,"children":[{"name":"ALL_COLORS","total_count":1,"children":[]},{"name":"ALL_NUMBERS","total_count":1,"children":[]},{"name":"ALL_SHAPES","total_count":1,"children":[]},{"name":"buildDeck()","total_count":1,"children":[]},{"name":"matchesOn()","total_count":1,"children":[]},{"name":"matchingDims()","total_count":1,"children":[]},{"name":"round1()","total_count":1,"children":[]},{"name":"ruleForCategory()","total_count":1,"children":[]},{"name":"scoreWcst()","total_count":1,"children":[]},{"name":"WCST_RULE_ORDER","total_count":1,"children":[]},{"name":"WCST_STIMULUS_CARDS","total_count":1,"children":[]},{"name":"WcstCard","total_count":1,"children":[]},{"name":"WcstColor","total_count":1,"children":[]},{"name":"WcstDim","total_count":1,"children":[]},{"name":"WcstNumber","total_count":1,"children":[]},{"name":"WcstParams","total_count":1,"children":[]},{"name":"WcstShape","total_count":1,"children":[]},{"name":"WcstTrialMeta","total_count":1,"children":[]}]}]},{"name":"types.ts","total_count":6,"children":[{"name":"Phase","total_count":1,"children":[]},{"name":"SummaryMetric","total_count":1,"children":[]},{"name":"TestId","total_count":1,"children":[]},{"name":"TestResult","total_count":1,"children":[]},{"name":"TrialResult","total_count":1,"children":[]},{"name":"ValidationFlag","total_count":1,"children":[]}]},{"name":"validation.test.ts","total_count":1,"children":[{"name":"makeTrial()","total_count":1,"children":[]}]},{"name":"validation.ts","total_count":8,"children":[{"name":"ANTICIPATION_CUTOFF_MS","total_count":1,"children":[]},{"name":"classifyRt()","total_count":1,"children":[]},{"name":"countFlag()","total_count":1,"children":[]},{"name":"mean()","total_count":1,"children":[]},{"name":"meanRtOfValidCorrect()","total_count":1,"children":[]},{"name":"sdRtOfValidCorrect()","total_count":1,"children":[]},{"name":"standardDeviation()","total_count":1,"children":[]},{"name":"validCorrectRts()","total_count":1,"children":[]}]},{"name":"clock.test.ts","total_count":1,"children":[]},{"name":"rng.test.ts","total_count":1,"children":[]},{"name":"session.test.ts","total_count":1,"children":[]},{"name":"types.test.ts","total_count":1,"children":[]}]},{"name":"main.tsx","total_count":1,"children":[{"name":"rootElement","total_count":1,"children":[]}]},{"name":"test","total_count":1,"children":[{"name":"setup.ts","total_count":1,"children":[]}]},{"name":"ui","total_count":171,"children":[{"name":"components","total_count":7,"children":[{"name":"Button.tsx","total_count":3,"children":[{"name":"Button()","total_count":1,"children":[]},{"name":"ButtonProps","total_count":1,"children":[]},{"name":"STYLES","total_count":1,"children":[]}]},{"name":"Header.tsx","total_count":2,"children":[{"name":"Header()","total_count":1,"children":[]},{"name":"HeaderProps","total_count":1,"children":[]}]},{"name":"TestCard.tsx","total_count":2,"children":[{"name":"TestCard()","total_count":1,"children":[]},{"name":"TestCardProps","total_count":1,"children":[]}]}]},{"name":"content","total_count":2,"children":[{"name":"instructions.ts","total_count":2,"children":[{"name":"Instruction","total_count":1,"children":[]},{"name":"INSTRUCTIONS","total_count":1,"children":[]}]}]},{"name":"download.ts","total_count":1,"children":[{"name":"triggerDownload()","total_count":1,"children":[]}]},{"name":"params","total_count":4,"children":[{"name":"paramFields.ts","total_count":4,"children":[{"name":"FieldDesc","total_count":1,"children":[]},{"name":"PARAM_SECTIONS","total_count":1,"children":[]},{"name":"paramSectionFor()","total_count":1,"children":[]},{"name":"SectionDesc","total_count":1,"children":[]}]}]},{"name":"preferences.ts","total_count":4,"children":[{"name":"DEFAULT_PREFERENCES","total_count":1,"children":[]},{"name":"loadPreferences()","total_count":1,"children":[]},{"name":"Preferences","total_count":1,"children":[]},{"name":"savePreferences()","total_count":1,"children":[]}]},{"name":"router.ts","total_count":3,"children":[{"name":"Route","total_count":1,"children":[]},{"name":"TEST_CATALOG","total_count":1,"children":[]},{"name":"TestMeta","total_count":1,"children":[]}]},{"name":"runtime","total_count":29,"children":[{"name":"RtTestRunner.tsx","total_count":8,"children":[{"name":"onInterrupt()","total_count":1,"children":[]},{"name":"onKeyDown()","total_count":1,"children":[]},{"name":"RtTestPlan","total_count":1,"children":[]},{"name":"RtTestRunner()","total_count":1,"children":[]},{"name":"RtTestRunnerProps","total_count":1,"children":[]},{"name":"RtTiming","total_count":1,"children":[]},{"name":"skipPractice()","total_count":1,"children":[]},{"name":"Stage","total_count":1,"children":[]}]},{"name":"sequencer.test.ts","total_count":3,"children":[{"name":".advance()","total_count":1,"children":[]},{"name":"baseConfig()","total_count":1,"children":[]},{"name":"FakeEnv","total_count":1,"children":[]}]},{"name":"sequencer.ts","total_count":16,"children":[{"name":"cancel()","total_count":1,"children":[]},{"name":"clearTimers()","total_count":1,"children":[]},{"name":"closeTrial()","total_count":1,"children":[]},{"name":"computeFlag()","total_count":1,"children":[]},{"name":"createSequencer()","total_count":1,"children":[]},{"name":"emit()","total_count":1,"children":[]},{"name":"handleInterrupt()","total_count":1,"children":[]},{"name":"handleKey()","total_count":1,"children":[]},{"name":"nextTrial()","total_count":1,"children":[]},{"name":"SequencerConfig","total_count":1,"children":[]},{"name":"SequencerPhase","total_count":1,"children":[]},{"name":"SequencerState","total_count":1,"children":[]},{"name":"start()","total_count":1,"children":[]},{"name":"startIsi()","total_count":1,"children":[]},{"name":"startStimulus()","total_count":1,"children":[]},{"name":"TrialSpec","total_count":1,"children":[]}]},{"name":"StimulusStage.tsx","total_count":2,"children":[{"name":"StimulusStage()","total_count":1,"children":[]},{"name":"StimulusStageProps","total_count":1,"children":[]}]}]},{"name":"screens","total_count":18,"children":[{"name":"Home.tsx","total_count":2,"children":[{"name":"Home()","total_count":1,"children":[]},{"name":"HomeProps","total_count":1,"children":[]}]},{"name":"Instructions.tsx","total_count":2,"children":[{"name":"Instructions()","total_count":1,"children":[]},{"name":"InstructionsProps","total_count":1,"children":[]}]},{"name":"Results.test.tsx","total_count":1,"children":[{"name":"result","total_count":1,"children":[]}]},{"name":"Results.tsx","total_count":4,"children":[{"name":"downloadCsv()","total_count":1,"children":[]},{"name":"downloadJson()","total_count":1,"children":[]},{"name":"Results()","total_count":1,"children":[]},{"name":"ResultsProps","total_count":1,"children":[]}]},{"name":"Settings.tsx","total_count":5,"children":[{"name":"resetAll()","total_count":1,"children":[]},{"name":"resetTest()","total_count":1,"children":[]},{"name":"setField()","total_count":1,"children":[]},{"name":"Settings()","total_count":1,"children":[]},{"name":"SettingsProps","total_count":1,"children":[]}]},{"name":"TestRunner.tsx","total_count":3,"children":[{"name":"requestFullscreen()","total_count":1,"children":[]},{"name":"TestRunner()","total_count":1,"children":[]},{"name":"TestRunnerProps","total_count":1,"children":[]}]},{"name":"Home.test.tsx","total_count":1,"children":[]}]},{"name":"session","total_count":72,"children":[{"name":"alert.ts","total_count":3,"children":[{"name":"AudioCtor","total_count":1,"children":[]},{"name":"getAudioContext()","total_count":1,"children":[]},{"name":"playAlert()","total_count":1,"children":[]}]},{"name":"BatteryEditor.tsx","total_count":9,"children":[{"name":"addTest()","total_count":1,"children":[]},{"name":"BatteryEditor()","total_count":1,"children":[]},{"name":"BatteryEditorProps","total_count":1,"children":[]},{"name":"defaultParamsFor()","total_count":1,"children":[]},{"name":"move()","total_count":1,"children":[]},{"name":"removeAt()","total_count":1,"children":[]},{"name":"setParam()","total_count":1,"children":[]},{"name":"setPractice()","total_count":1,"children":[]},{"name":"testTitle()","total_count":1,"children":[]}]},{"name":"BatteryReady.tsx","total_count":2,"children":[{"name":"BatteryReady()","total_count":1,"children":[]},{"name":"BatteryReadyProps","total_count":1,"children":[]}]},{"name":"DurationInput.tsx","total_count":3,"children":[{"name":"DurationInput()","total_count":1,"children":[]},{"name":"DurationInputProps","total_count":1,"children":[]},{"name":"split()","total_count":1,"children":[]}]},{"name":"SessionBuilder.test.tsx","total_count":1,"children":[{"name":"tpl()","total_count":1,"children":[]}]},{"name":"SessionBuilder.tsx","total_count":9,"children":[{"name":"doExport()","total_count":1,"children":[]},{"name":"emptyTemplate()","total_count":1,"children":[]},{"name":"fmtMs()","total_count":1,"children":[]},{"name":"onImportFile()","total_count":1,"children":[]},{"name":"SessionBuilder()","total_count":1,"children":[]},{"name":"SessionBuilderProps","total_count":1,"children":[]},{"name":"testTitle()","total_count":1,"children":[]},{"name":"update()","total_count":1,"children":[]},{"name":"validateTemplate()","total_count":1,"children":[]}]},{"name":"SessionMenu.tsx","total_count":2,"children":[{"name":"SessionMenu()","total_count":1,"children":[]},{"name":"SessionMenuProps","total_count":1,"children":[]}]},{"name":"SessionResults.test.tsx","total_count":2,"children":[{"name":"result()","total_count":1,"children":[]},{"name":"run()","total_count":1,"children":[]}]},{"name":"SessionResults.tsx","total_count":6,"children":[{"name":"downloadCsv()","total_count":1,"children":[]},{"name":"downloadJson()","total_count":1,"children":[]},{"name":"fmtOffset()","total_count":1,"children":[]},{"name":"SessionResults()","total_count":1,"children":[]},{"name":"SessionResultsProps","total_count":1,"children":[]},{"name":"testTitle()","total_count":1,"children":[]}]},{"name":"SessionRunner.tsx","total_count":10,"children":[{"name":"ActiveContext","total_count":1,"children":[]},{"name":"exitToMenu()","total_count":1,"children":[]},{"name":"Mode","total_count":1,"children":[]},{"name":"now()","total_count":1,"children":[]},{"name":"onTestComplete()","total_count":1,"children":[]},{"name":"persist()","total_count":1,"children":[]},{"name":"prepareTest()","total_count":1,"children":[]},{"name":"SessionRunner()","total_count":1,"children":[]},{"name":"SessionRunnerProps","total_count":1,"children":[]},{"name":"startBattery()","total_count":1,"children":[]}]},{"name":"SessionTimeline.tsx","total_count":11,"children":[{"name":"beginDrag()","total_count":1,"children":[]},{"name":"duringDrag()","total_count":1,"children":[]},{"name":"endDrag()","total_count":1,"children":[]},{"name":"fmt()","total_count":1,"children":[]},{"name":"locate()","total_count":1,"children":[]},{"name":"offsetFromClientX()","total_count":1,"children":[]},{"name":"onTrackClick()","total_count":1,"children":[]},{"name":"PHASE_TINTS","total_count":1,"children":[]},{"name":"SessionTimeline()","total_count":1,"children":[]},{"name":"SessionTimelineProps","total_count":1,"children":[]},{"name":"snapStepMs()","total_count":1,"children":[]}]},{"name":"storage.test.ts","total_count":1,"children":[{"name":"tpl()","total_count":1,"children":[]}]},{"name":"storage.ts","total_count":8,"children":[{"name":"clearRun()","total_count":1,"children":[]},{"name":"deleteTemplate()","total_count":1,"children":[]},{"name":"exportTemplateJson()","total_count":1,"children":[]},{"name":"importTemplateJson()","total_count":1,"children":[]},{"name":"loadRun()","total_count":1,"children":[]},{"name":"loadTemplates()","total_count":1,"children":[]},{"name":"saveRun()","total_count":1,"children":[]},{"name":"saveTemplate()","total_count":1,"children":[]}]},{"name":"WaitScreen.test.tsx","total_count":1,"children":[{"name":"state()","total_count":1,"children":[]}]},{"name":"WaitScreen.tsx","total_count":4,"children":[{"name":"fmt()","total_count":1,"children":[]},{"name":"testTitle()","total_count":1,"children":[]},{"name":"WaitScreen()","total_count":1,"children":[]},{"name":"WaitScreenProps","total_count":1,"children":[]}]}]},{"name":"storage.ts","total_count":5,"children":[{"name":"loadSettings()","total_count":1,"children":[]},{"name":"mergeWithDefaults()","total_count":1,"children":[]},{"name":"resetSettings()","total_count":1,"children":[]},{"name":"saveSettings()","total_count":1,"children":[]},{"name":"structuredCloneSafe()","total_count":1,"children":[]}]},{"name":"tests","total_count":23,"children":[{"name":"CorsiView.tsx","total_count":5,"children":[{"name":"CorsiView()","total_count":1,"children":[]},{"name":"CorsiViewProps","total_count":1,"children":[]},{"name":"handleBlockClick()","total_count":1,"children":[]},{"name":"Phase","total_count":1,"children":[]},{"name":"PlannedTrial","total_count":1,"children":[]}]},{"name":"GoNoGoView.tsx","total_count":3,"children":[{"name":"GoNoGoView()","total_count":1,"children":[]},{"name":"GoNoGoViewProps","total_count":1,"children":[]},{"name":"toSpec()","total_count":1,"children":[]}]},{"name":"NBackView.tsx","total_count":3,"children":[{"name":"NBackView()","total_count":1,"children":[]},{"name":"NBackViewProps","total_count":1,"children":[]},{"name":"toSpec()","total_count":1,"children":[]}]},{"name":"StroopView.tsx","total_count":3,"children":[{"name":"StroopView()","total_count":1,"children":[]},{"name":"StroopViewProps","total_count":1,"children":[]},{"name":"toSpec()","total_count":1,"children":[]}]},{"name":"TestHost.tsx","total_count":2,"children":[{"name":"TestHost()","total_count":1,"children":[]},{"name":"TestHostProps","total_count":1,"children":[]}]},{"name":"views.smoke.test.tsx","total_count":1,"children":[{"name":"common","total_count":1,"children":[]}]},{"name":"WcstCard.tsx","total_count":4,"children":[{"name":"CardFace()","total_count":1,"children":[]},{"name":"CardFaceProps","total_count":1,"children":[]},{"name":"COLOR_HEX","total_count":1,"children":[]},{"name":"ShapeGlyph()","total_count":1,"children":[]}]},{"name":"WcstView.tsx","total_count":2,"children":[{"name":"WcstView()","total_count":1,"children":[]},{"name":"WcstViewProps","total_count":1,"children":[]}]}]},{"name":"theme.ts","total_count":2,"children":[{"name":"STIMULUS_COLORS","total_count":1,"children":[]},{"name":"UI_COLORS","total_count":1,"children":[]}]},{"name":"storage.test.ts","total_count":1,"children":[]}]},{"name":"vite-env.d.ts","total_count":1,"children":[]}]},{"name":"stroop.md","total_count":3,"children":[{"name":"Coefficient of Variation (CV) of RT (Stroop)","total_count":1,"children":[]},{"name":"Interference Effect (Stroop Effect)","total_count":1,"children":[]},{"name":"Stroop Task (Color-Word Interference)","total_count":1,"children":[]}]},{"name":"tsconfig.json","total_count":20,"children":[{"name":"allowImportingTsExtensions","total_count":1,"children":[]},{"name":"compilerOptions","total_count":1,"children":[]},{"name":"include","total_count":1,"children":[]},{"name":"isolatedModules","total_count":1,"children":[]},{"name":"jsx","total_count":1,"children":[]},{"name":"lib","total_count":1,"children":[]},{"name":"module","total_count":1,"children":[]},{"name":"moduleResolution","total_count":1,"children":[]},{"name":"noEmit","total_count":1,"children":[]},{"name":"noFallthroughCasesInSwitch","total_count":1,"children":[]},{"name":"noUncheckedIndexedAccess","total_count":1,"children":[]},{"name":"noUnusedLocals","total_count":1,"children":[]},{"name":"noUnusedParameters","total_count":1,"children":[]},{"name":"references","total_count":1,"children":[]},{"name":"resolveJsonModule","total_count":1,"children":[]},{"name":"skipLibCheck","total_count":1,"children":[]},{"name":"strict","total_count":1,"children":[]},{"name":"target","total_count":1,"children":[]},{"name":"types","total_count":1,"children":[]},{"name":"useDefineForClassFields","total_count":1,"children":[]}]},{"name":"tsconfig.node.json","total_count":8,"children":[{"name":"allowSyntheticDefaultImports","total_count":1,"children":[]},{"name":"compilerOptions","total_count":1,"children":[]},{"name":"composite","total_count":1,"children":[]},{"name":"include","total_count":1,"children":[]},{"name":"module","total_count":1,"children":[]},{"name":"moduleResolution","total_count":1,"children":[]},{"name":"skipLibCheck","total_count":1,"children":[]},{"name":"strict","total_count":1,"children":[]}]},{"name":"validazione-rt.md","total_count":4,"children":[{"name":"Anticipation Filter (RT \u003c 150ms)","total_count":1,"children":[]},{"name":"Omission Filter (No Response Within Window)","total_count":1,"children":[]},{"name":"Raw Data Preservation Principle (Flag-Dont-Delete)","total_count":1,"children":[]},{"name":"Reaction Time Validation Pipeline","total_count":1,"children":[]}]},{"name":"wcst.md","total_count":5,"children":[{"name":"Conceptual Level Responses (CLR, WCST)","total_count":1,"children":[]},{"name":"Failure to Maintain Set (WCST)","total_count":1,"children":[]},{"name":"Heaton Scoring (WCST)","total_count":1,"children":[]},{"name":"Perseveration (WCST Perseverative Errors)","total_count":1,"children":[]},{"name":"Wisconsin Card Sorting Test","total_count":1,"children":[]}]},{"name":"postcss.config.js","total_count":1,"children":[]},{"name":"tailwind.config.js","total_count":1,"children":[]},{"name":"tailwindcss","total_count":1,"children":[]},{"name":"vite.config.ts","total_count":1,"children":[]}]};
+
+    function transformData(jsonData) {
+        // Helper function to recursively build the children structure
+        function processNode(node, parentL1StageName) {
+            let displayName = node.name;
+            // Append total_count if it exists and is not already in the name
+            if (node.total_count !== undefined) {
+                if (!/\(Total Count: \d+\)$/.test(displayName)) {
+                    displayName += ` (Total Count: ${node.total_count})`;
+                }
+            }
+
+            const newNode = { name: displayName };
+
+            if (parentL1StageName === "Root") {
+                 newNode.originalStageName = node.name;
+            } else {
+                newNode.originalStageName = parentL1StageName;
+            }
+
+            if (node.children && node.children.length > 0) {
+                const stageNameToPass = (parentL1StageName === "Root") ? node.name : parentL1StageName;
+                newNode.children = node.children.map(child => processNode(child, stageNameToPass));
+            }
+
+            return newNode;
+        }
+
+        let rootDisplayName = jsonData.name;
+        if (jsonData.total_count !== undefined && !/\(Total Count: \d+\)$/.test(rootDisplayName)) {
+            rootDisplayName += ` (Total Count: ${jsonData.total_count})`;
+        }
+
+        return {
+            name: rootDisplayName,
+            originalStageName: "Root",
+            children: (jsonData.children || []).map(child => processNode(child, "Root"))
+        };
+    }
+
+    const treeData = transformData(initialJsonData);
+
+    // Auto-populated phaseColors: every depth-1 child of the root gets
+    // a stable colour from a bigger palette so all top-level dirs are
+    // distinguishable.
+    const PALETTE = [
+      ["#3498DB","#2980B9","#AED6F1"], ["#2ECC71","#27AE60","#A9DFBF"],
+      ["#E74C3C","#C0392B","#F5B7B1"], ["#9B59B6","#8E44AD","#D7BDE2"],
+      ["#F39C12","#D68910","#FAD7A0"], ["#1ABC9C","#117864","#A2D9CE"],
+      ["#34495E","#1B2631","#ABB2B9"], ["#E67E22","#BA4A00","#F5CBA7"],
+      ["#16A085","#0E6655","#A2D9CE"], ["#D35400","#A04000","#EDBB99"],
+      ["#7F8C8D","#566573","#D5DBDB"], ["#C0392B","#7B241C","#F5B7B1"],
+      ["#2E86C1","#1B4F72","#A9CCE3"], ["#28B463","#196F3D","#A9DFBF"],
+      ["#AF7AC5","#6C3483","#D2B4DE"],
+    ];
+    const phaseColors = { "Root": { fill: "#4A4A4A", stroke: "#333333", collapsedFill: "#6C757D" },
+                          "Default": { fill: "#BDC3C7", stroke: "#95A5A6", collapsedFill: "#ECF0F1" } };
+    (initialJsonData.children || []).forEach((c, i) => {
+      const pal = PALETTE[i % PALETTE.length];
+      phaseColors[c.name] = { fill: pal[0], stroke: pal[1], collapsedFill: pal[2] };
+    });
+
+    const levelSpecificPalettes = {
+      0: { fill: "#4A4A4A", stroke: "#333333", collapsedFill: "#6C757D" },
+      2: { fill: "#6ab04c", stroke: "#508a38", collapsedFill: "#a3d391" },
+      3: { fill: "#f0932b", stroke: "#d0730f", collapsedFill: "#f6c07e" },
+      4: { fill: "#be2edd", stroke: "#a01cb3", collapsedFill: "#e08bf2" },
+      5: { fill: "#00a8ff", stroke: "#007ac1", collapsedFill: "#74d2ff" },
+      6: { fill: "#e55039", stroke: "#c23620", collapsedFill: "#f09a8d" },
+      default: { fill: "#747d8c", stroke: "#57606f", collapsedFill: "#a4b0be" }
+    };
+
+    const svgElement = d3.select("#tree-svg");
+    const initialSvgWidth = +svgElement.attr("width");
+    const initialSvgHeight = +svgElement.attr("height");
+    const margin = { top: 40, right: 120, bottom: 80, left: 450 };
+    let width = initialSvgWidth - margin.left - margin.right;
+    let height = initialSvgHeight - margin.top - margin.bottom;
+    const duration = 500;
+    let nodeCounter = 0;
+    const g = svgElement.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const treemap = d3.tree().nodeSize([40, 0]);
+    let rootNode = d3.hierarchy(treeData, d => d.children);
+    rootNode.x0 = 0;
+    rootNode.y0 = 0;
+
+    if (rootNode.children) {
+      rootNode.children.forEach(d_child => {
+        if (d_child.children) { collapseBranch(d_child); }
+      });
+    }
+    updateTree(rootNode);
+
+    function collapseBranch(d) { if (d.children) { d._children = d.children; d._children.forEach(collapseBranch); d.children = null; } }
+    function expandBranch(d) { if (d._children) { d.children = d._children; d._children = null; } if (d.children) { d.children.forEach(expandBranch); } }
+    window.expandAll = () => { expandBranch(rootNode); updateTree(rootNode); };
+    window.collapseAll = () => { if (rootNode.children) { rootNode.children.forEach(collapseBranch); } updateTree(rootNode); };
+    window.resetView = () => { if (rootNode.children) { rootNode.children.forEach(d_child => { if (d_child.children || d_child._children) { collapseBranch(d_child); } }); } if (rootNode._children && !rootNode.children) { rootNode.children = rootNode._children; rootNode._children = null; } updateTree(rootNode); };
+
+    function updateTree(source) {
+      const treeLayoutData = treemap(rootNode);
+      let nodes = treeLayoutData.descendants();
+      let links = treeLayoutData.descendants().slice(1);
+
+      let minX = 0;
+      let maxX = 0;
+      if (nodes.length > 0) {
+        minX = d3.min(nodes, d => d.x);
+        maxX = d3.max(nodes, d => d.x);
+      }
+
+      let neededHeight = Math.max(initialSvgHeight, maxX - minX + margin.top + margin.bottom + 100);
+      svgElement.transition().duration(duration / 2).attr("height", neededHeight);
+      g.transition().duration(duration / 2).attr("transform", `translate(${margin.left},${margin.top - minX + 40})`);
+
+      nodes.forEach(d => { d.y = d.depth * 400; }); // Adjust horizontal separation if needed
+
+      const node = g.selectAll('g.node').data(nodes, d => d.id || (d.id = ++nodeCounter));
+      const nodeEnter = node.enter().append('g')
+        .attr('class', d => "node" + (d.children || d._children ? " node--internal" : " node--leaf") + (d._children ? " _children" : ""))
+        .attr('transform', d => `translate(${source.y0},${source.x0})`)
+        .on('click', (event, d) => { if (d.children) { d._children = d.children; d.children = null; } else if (d._children) { d.children = d._children; d._children = null; } updateTree(d); })
+        .style('cursor', d => (d.children || d._children) ? 'pointer' : 'default');
+
+      nodeEnter.append('circle').attr('r', 1e-6);
+
+      nodeEnter.append('text')
+        .attr('dy', '.35em')
+        .attr('x', d => d.children || d._children ? -14 : 14)
+        .attr('text-anchor', d => d.children || d._children ? 'end' : 'start')
+        .style("fill-opacity", 1e-6)
+        .call(wrapText, 380);
+
+      const nodeUpdate = nodeEnter.merge(node);
+      nodeUpdate.transition().duration(duration)
+        .attr('transform', d => `translate(${d.y},${d.x})`)
+        .attr('class', d => "node" + (d.children ? " node--internal" : " node--leaf") + (d._children ? " node--internal _children" : ""));
+
+      nodeUpdate.select('circle').attr('r', 8.5)
+        .style('fill', d => {
+            let palette;
+            if (d.depth === 0) {
+                palette = levelSpecificPalettes[0];
+            } else if (d.depth === 1) {
+                palette = phaseColors[d.data.originalStageName] || phaseColors.Default;
+            } else {
+                palette = levelSpecificPalettes[d.depth] || levelSpecificPalettes.default;
+            }
+            if (d._children) return palette.collapsedFill;
+            if (d.children) return palette.fill;
+            return "#fff";
+        })
+        .style('stroke', d => {
+            let palette;
+            if (d.depth === 0) {
+                palette = levelSpecificPalettes[0];
+            } else if (d.depth === 1) {
+                palette = phaseColors[d.data.originalStageName] || phaseColors.Default;
+            } else {
+                palette = levelSpecificPalettes[d.depth] || levelSpecificPalettes.default;
+            }
+            return palette.stroke;
+        });
+      nodeUpdate.select('text').style("fill-opacity", 1).call(wrapText, 380);
+
+      const nodeExit = node.exit().transition().duration(duration).attr('transform', d => `translate(${source.y},${source.x})`).remove();
+      nodeExit.select('circle').attr('r', 1e-6);
+      nodeExit.select('text').style('fill-opacity', 1e-6);
+
+      const link = g.selectAll('path.link').data(links, d => d.id);
+      const linkEnter = link.enter().insert('path', "g").attr('class', 'link').attr('d', d => { const o = { x: source.x0, y: source.y0 }; return diagonal(o, o); });
+
+      linkEnter.merge(link).transition().duration(duration).attr('d', d => diagonal(d, d.parent))
+        .style('stroke', d => {
+            const sourceNode = d.parent;
+            if (!sourceNode) return phaseColors.Default.stroke;
+            const l1AncestorName = sourceNode.data.originalStageName;
+            const colorPalette = phaseColors[l1AncestorName] || phaseColors.Default;
+            return colorPalette.stroke;
+        });
+      link.exit().transition().duration(duration).attr('d', d => { const o = { x: source.x, y: source.y }; return diagonal(o, o); }).remove();
+      nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+    }
+
+    function diagonal(s, d) { return `M ${s.y} ${s.x} C ${(s.y + d.y) / 2} ${s.x}, ${(s.y + d.y) / 2} ${d.x}, ${d.y} ${d.x}`; }
+
+    function wrapText(textElements, maxWidth) {
+        const textPartColors = {
+            name: '#343a40',
+            count: '#0056b3'
+        };
+        const countRegex = /(\s\(Total Count: \d+\))$/;
+
+        textElements.each(function () {
+            const textD3 = d3.select(this);
+            const originalNodeText = textD3.datum().data.name;
+            const x = parseFloat(textD3.attr("x") || 0);
+            const initialDy = textD3.attr("dy");
+            const textAnchor = textD3.attr("text-anchor");
+            const lineHeight = 1.1;
+
+            textD3.text(null);
+
+            let namePart = originalNodeText;
+            let countPartText = "";
+
+            const countMatch = originalNodeText.match(countRegex);
+            if (countMatch && originalNodeText.endsWith(countMatch[0])) {
+                namePart = originalNodeText.substring(0, originalNodeText.length - countMatch[0].length).trim();
+                countPartText = countMatch[0].trim();
+            }
+
+            const tokens = [];
+            namePart.split(/\s+/).filter(Boolean).forEach(word => {
+                tokens.push({ text: word, type: 'name' });
+            });
+            if (countPartText) {
+                tokens.push({ text: countPartText, type: 'count' });
+            }
+
+            if (tokens.length === 0 && originalNodeText) {
+                tokens.push({ text: originalNodeText, type: 'name' });
+            }
+
+            let currentTspan = textD3.append("tspan").attr("x", x).attr("dy", initialDy);
+            if (textAnchor === "end") currentTspan.attr("text-anchor", "end");
+
+            let lineTokens = [];
+
+            for (let i = 0; i < tokens.length; i++) {
+                const tokenObj = tokens[i];
+
+                lineTokens.push(tokenObj);
+                currentTspan.text(lineTokens.map(t => t.text).join(" "));
+
+                if (currentTspan.node().getComputedTextLength() > maxWidth && lineTokens.length > 1) {
+                    lineTokens.pop();
+
+                    currentTspan.text(null);
+                    lineTokens.forEach((prevToken, idx) => {
+                        currentTspan.append("tspan")
+                            .text((idx > 0 ? " " : "") + prevToken.text)
+                            .style("fill", textPartColors[prevToken.type] || textPartColors.name)
+                            .style("font-weight", prevToken.type === 'count' ? "bold" : "normal");
+                    });
+
+                    lineTokens = [tokenObj];
+                    currentTspan = textD3.append("tspan").attr("x", x).attr("dy", lineHeight + "em");
+                    if (textAnchor === "end") currentTspan.attr("text-anchor", "end");
+                }
+            }
+
+            currentTspan.text(null);
+            lineTokens.forEach((token, idx) => {
+                currentTspan.append("tspan")
+                    .text((idx > 0 ? " " : "") + token.text)
+                    .style("fill", textPartColors[token.type] || textPartColors.name)
+                    .style("font-weight", token.type === 'count' ? "bold" : "normal");
+            });
+
+            if (textD3.selectAll("tspan > tspan").empty() && textD3.select("tspan").text().length === 0 && originalNodeText) {
+                let t = textD3.select("tspan");
+                let displayText = originalNodeText;
+                t.text(displayText).style("fill", textPartColors.name);
+                if (t.node() && t.node().getComputedTextLength() > maxWidth && displayText.length > 20) {
+                    let estimatedChars = Math.floor(maxWidth / (t.node().getComputedTextLength()/displayText.length) );
+                    displayText = displayText.substring(0, Math.max(0, estimatedChars - 3)) + "...";
+                    t.text(displayText);
+                }
+            }
+        });
+    }
+  </script>
+</body>
+</html>
