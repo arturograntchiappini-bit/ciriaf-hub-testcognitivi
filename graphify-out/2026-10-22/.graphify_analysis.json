@@ -766,19 +766,14 @@
       "degree": 30
     },
     {
-      "id": "src_app_app",
-      "label": "App()",
-      "degree": 25
-    },
-    {
       "id": "src_engine_types_trialresult",
       "label": "TrialResult",
       "degree": 25
     },
     {
-      "id": "ref_vitest",
-      "label": "vitest",
-      "degree": 24
+      "id": "src_app_app",
+      "label": "App()",
+      "degree": 25
     },
     {
       "id": "src_engine_types_testid",
@@ -788,6 +783,11 @@
     {
       "id": "src_ui_session_sessionbuilder_sessionbuilder",
       "label": "SessionBuilder()",
+      "degree": 24
+    },
+    {
+      "id": "ref_vitest",
+      "label": "vitest",
       "degree": 24
     },
     {
@@ -821,7 +821,7 @@
       ],
       "confidence": "INFERRED",
       "relation": "conceptually_related_to",
-      "why": "inferred connection - not explicitly stated in source; crosses file types (image ↔ doc); peripheral node `CIRIAF Favicon (Blue Rounded Square with Triangles)` unexpectedly reaches hub `CIRIAF COLAB/NEXTROOM Cognitive Testing Hub`"
+      "why": "inferred connection - not explicitly stated in source; crosses file types (doc ↔ image); peripheral node `CIRIAF Favicon (Blue Rounded Square with Triangles)` unexpectedly reaches hub `CIRIAF COLAB/NEXTROOM Cognitive Testing Hub`"
     },
     {
       "source": "d-prime (Sensitivity)",
@@ -846,62 +846,62 @@
       "why": "inferred connection - not explicitly stated in source; bridges separate communities; semantically similar concepts with no structural link"
     },
     {
-      "source": "CIRIAF Hub HTML Entry Point",
-      "target": "CIRIAF COLAB/NEXTROOM Cognitive Testing Hub",
+      "source": "SessionTestResult",
+      "target": "TestResult",
       "source_files": [
-        "C:/Users/artur/Desktop/CIRIAF-HUB/ciriaf-hub-testcognitivi/index.html",
-        "C:/Users/artur/Desktop/CIRIAF-HUB/ciriaf-hub-testcognitivi/README.md"
+        "src/engine/session/model.ts",
+        "src/engine/types.ts"
       ],
-      "confidence": "INFERRED",
-      "relation": "conceptually_related_to",
-      "why": "inferred connection - not explicitly stated in source; peripheral node `CIRIAF Hub HTML Entry Point` unexpectedly reaches hub `CIRIAF COLAB/NEXTROOM Cognitive Testing Hub`"
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities; peripheral node `SessionTestResult` unexpectedly reaches hub `TestResult`"
     },
     {
-      "source": "Engine Review Copies (Standalone Scripts)",
-      "target": "Corsi Block-Tapping Task",
+      "source": "RtTestRunnerProps",
+      "target": "TestResult",
       "source_files": [
-        "C:/Users/artur/Desktop/CIRIAF-HUB/ciriaf-hub-testcognitivi/revisione-motore/README.md",
-        "C:/Users/artur/Desktop/CIRIAF-HUB/ciriaf-hub-testcognitivi/docs/scientific/corsi.md"
+        "src/ui/runtime/RtTestRunner.tsx",
+        "src/engine/types.ts"
       ],
-      "confidence": "INFERRED",
-      "relation": "conceptually_related_to",
-      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities; peripheral node `RtTestRunnerProps` unexpectedly reaches hub `TestResult`"
     }
   ],
   "questions": [
     {
       "type": "bridge_node",
-      "question": "Why does `vitest` connect `Community 0` to `Community 1`, `Community 2`, `Community 4`, `Community 5`, `Community 6`, `Community 13`, `Community 14`, `Community 19`, `Community 20`, `Community 22`?",
+      "question": "Why does `vitest` connect `Testing & CSV Export` to `Shared RNG & Utility Functions`, `WCST Deck Building`, `Test Catalog & Navigation`, `Project Dependencies (package.json)`, `N-Back Generator & Signal Detection`, `Test Configuration Defaults`, `Core Engine Types (Clock, Validation)`, `Session Model Logic`, `UI Header & Duration Components`, `Session Template CRUD & Export`?",
       "why": "High betweenness centrality (0.061) - this node is a cross-community bridge."
     },
     {
       "type": "isolated_nodes",
-      "question": "What connects `CIRIAF Hub HTML Entry Point`, `CIRIAF Favicon (Blue Rounded Square with Triangles)`, `autoprefixer` to the rest of the system?",
+      "question": "What connects `autoprefixer`, `@fontsource/inter`, `jsdom` to the rest of the system?",
       "why": "30 weakly-connected nodes found - possible documentation gaps or missing edges."
     },
     {
       "type": "low_cohesion",
-      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "question": "Should `Testing & CSV Export` be split into smaller, more focused modules?",
       "why": "Cohesion score 0.1011764705882353 - nodes in this community are weakly interconnected."
     },
     {
       "type": "bridge_node",
-      "question": "Why does `react` connect `Community 3` to `Community 1`, `Community 2`, `Community 5`, `Community 13`, `Community 14`, `Community 20`, `Community 21`, `Community 23`, `Community 24`?",
+      "question": "Why does `react` connect `App Shell & React Bootstrap` to `Shared RNG & Utility Functions`, `WCST Deck Building`, `Project Dependencies (package.json)`, `Test Configuration Defaults`, `Core Engine Types (Clock, Validation)`, `UI Header & Duration Components`, `Session Runner & Audio Feedback`, `Session Timeline Interactive UI`, `Session Builder & Menu Components`?",
       "why": "High betweenness centrality (0.053) - this node is a cross-community bridge."
     },
     {
       "type": "low_cohesion",
-      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "question": "Should `Shared RNG & Utility Functions` be split into smaller, more focused modules?",
       "why": "Cohesion score 0.05613951266125179 - nodes in this community are weakly interconnected."
     },
     {
       "type": "low_cohesion",
-      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "question": "Should `WCST Deck Building` be split into smaller, more focused modules?",
       "why": "Cohesion score 0.1268939393939394 - nodes in this community are weakly interconnected."
     },
     {
       "type": "low_cohesion",
-      "question": "Should `Community 4` be split into smaller, more focused modules?",
+      "question": "Should `Test Catalog & Navigation` be split into smaller, more focused modules?",
       "why": "Cohesion score 0.13054187192118227 - nodes in this community are weakly interconnected."
     }
   ]
