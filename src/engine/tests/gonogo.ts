@@ -102,8 +102,11 @@ function deterministicArrange(nGo: number, nNoGo: number): GoNoGoKind[] {
   return seq;
 }
 
-/** Un trial è «risposto» se il partecipante ha premuto (anche in anticipo) e il trial non è stato interrotto. */
-const isResponded = (t: TrialResult): boolean => t.flag !== 'OMISSION' && t.flag !== 'INTERRUPTED';
+/**
+ * Il partecipante ha premuto (anche in anticipo). Si guarda la risposta registrata, non il flag: il
+ * sequencer marca VALID anche un No-Go correttamente trattenuto (nessuna risposta).
+ */
+const isResponded = (t: TrialResult): boolean => t.response !== null && t.flag !== 'INTERRUPTED';
 const isValidTrial = (t: TrialResult): boolean => t.flag !== 'INTERRUPTED';
 
 /**

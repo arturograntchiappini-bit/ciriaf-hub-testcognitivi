@@ -67,10 +67,19 @@ describe('scoreGoNoGo', () => {
   it('conta errori di commissione (risposta su No-Go)', () => {
     const trials: TrialResult[] = [
       trial({ condition: 'nogo', stimulus: 'nogo', correct: false, response: 'space', flag: 'VALID', rtMs: 300 }),
-      trial({ condition: 'nogo', stimulus: 'nogo', correct: true, response: null, rtMs: null, flag: 'OMISSION' }),
+      trial({ condition: 'nogo', stimulus: 'nogo', correct: true, response: null, rtMs: null, flag: 'VALID' }),
     ];
     const summary = scoreGoNoGo(trials);
     expect(summary.find((m) => m.label === 'Errori di commissione (No-Go)')?.value).toBe(1);
+  });
+
+  it('non conta come commissione un No-Go correttamente trattenuto (VALID senza risposta, come lo registra il sequencer)', () => {
+    const rejections = Array.from({ length: 5 }, () =>
+      trial({ condition: 'nogo', stimulus: 'nogo', correct: true, response: null, rtMs: null, flag: 'VALID' }),
+    );
+    const summary = scoreGoNoGo(rejections);
+    expect(summary.find((m) => m.label === 'Errori di commissione (No-Go)')?.value).toBe(0);
+    expect(summary.find((m) => m.label === 'Tasso di commissione')?.value).toBe(0);
   });
 
   it('conta errori di omissione sui Go e calcola RT medio dei Go corretti', () => {
@@ -106,7 +115,7 @@ describe('scoreGoNoGo', () => {
     const misses = [trial({ condition: 'go', correct: false, response: null, rtMs: null, flag: 'OMISSION' })];
     const falseAlarm = [trial({ condition: 'nogo', stimulus: 'nogo', correct: false, rtMs: 300 })];
     const rejections = Array.from({ length: 3 }, () =>
-      trial({ condition: 'nogo', stimulus: 'nogo', correct: true, response: null, rtMs: null, flag: 'OMISSION' }),
+      trial({ condition: 'nogo', stimulus: 'nogo', correct: true, response: null, rtMs: null, flag: 'VALID' }),
     );
     const summary = scoreGoNoGo([...hits, ...misses, ...falseAlarm, ...rejections]);
     expect(summary.find((m) => m.label === "Sensibilità d'")?.value).toBeCloseTo(Math.round(dPrime(9, 10, 1, 4) * 100) / 100, 2);

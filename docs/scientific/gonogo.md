@@ -118,6 +118,7 @@ Punti da conoscere:
 - Una pressione su un No-Go **con RT < 150 ms** è comunque un errore di commissione (e viene anche contata come
   anticipazione): il partecipante ha risposto.
 - Una risposta anticipata su un Go **conta come hit** nel calcolo di d′ ma non entra negli RT (§5).
+- Una risposta si riconosce dalla **risposta registrata**, non dal flag: il sequencer marca `VALID` anche un No-Go correttamente trattenuto (nessuna pressione), che non è una commissione.
 - I trial interrotti (perdita di focus o visibilità della pagina) restano nei dati grezzi col flag `INTERRUPTED` ma sono
   esclusi da numeratori e denominatori.
 
@@ -186,6 +187,9 @@ risposta; le metriche §5.1–5.4 restano quelle di riferimento. Il calcolo è c
 
 ## Cronologia delle revisioni
 
+- **2026-10 (correzione).** Le commissioni e le omissioni erano dedotte dal flag di validazione, così un No-Go
+  correttamente trattenuto (`VALID` senza risposta) veniva contato come commissione. Ora si usa la risposta registrata;
+  aggiunto un test di regressione con i dati come li produce il sequencer.
 - **Revisione scientifica 2026-10.** Citazione di Hasegawa et al. (2021) corretta (autori, fascicolo, pagine) e
   affermazioni non verificate rimosse; soglia di anticipazione allineata a 150 ms; metriche di commissione e omissione
   calcolate escludendo i trial interrotti; aggiunti $d'$ e criterio $c$; aggiunta la nota sul daltonismo rosso-verde.
