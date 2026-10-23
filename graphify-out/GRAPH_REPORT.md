@@ -1,16 +1,16 @@
 # Graph Report - ciriaf-hub-testcognitivi  (2026-10-23)
 
 ## Corpus Check
-- 150 files · ~117,475 words
+- 161 files · ~130,075 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1178 nodes · 2219 edges · 66 communities (65 shown, 1 thin omitted)
+- 1354 nodes · 2542 edges · 78 communities
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 15 edges (avg confidence: 0.83)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d3ab5842`
+- Built from commit: `b08f31bf`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -71,21 +71,33 @@
 - [[_COMMUNITY_Community 59|Community 59]]
 - [[_COMMUNITY_Community 60|Community 60]]
 - [[_COMMUNITY_Community 61|Community 61]]
+- [[_COMMUNITY_Community 62|Community 62]]
 - [[_COMMUNITY_Community 63|Community 63]]
 - [[_COMMUNITY_Community 64|Community 64]]
 - [[_COMMUNITY_Community 65|Community 65]]
+- [[_COMMUNITY_Community 66|Community 66]]
+- [[_COMMUNITY_Community 68|Community 68]]
+- [[_COMMUNITY_Community 69|Community 69]]
+- [[_COMMUNITY_Community 70|Community 70]]
+- [[_COMMUNITY_Community 71|Community 71]]
+- [[_COMMUNITY_Community 72|Community 72]]
+- [[_COMMUNITY_Community 73|Community 73]]
+- [[_COMMUNITY_Community 74|Community 74]]
+- [[_COMMUNITY_Community 75|Community 75]]
+- [[_COMMUNITY_Community 76|Community 76]]
+- [[_COMMUNITY_Community 77|Community 77]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `TestResult` - 34 edges
-2. `TestId` - 29 edges
-3. `TrialResult` - 29 edges
-4. `mulberry32()` - 24 edges
+1. `TestResult` - 36 edges
+2. `TrialResult` - 32 edges
+3. `TestId` - 29 edges
+4. `mulberry32()` - 27 edges
 5. `Sintropia — Cognitive tests Hub` - 19 edges
 6. `compilerOptions` - 18 edges
-7. `AllParams` - 16 edges
-8. `SessionRun` - 15 edges
-9. `mean()` - 14 edges
-10. `standardDeviation()` - 14 edges
+7. `AllParams` - 17 edges
+8. `shuffle()` - 16 edges
+9. `mean()` - 16 edges
+10. `standardDeviation()` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `CIRIAF Favicon (Blue Rounded Square with Triangles)` --conceptually_related_to--> `CIRIAF COLAB/NEXTROOM Cognitive Testing Hub`  [INFERRED]
@@ -107,15 +119,15 @@
 - **Session Mode Core Concepts** — docs_superpowers_specs_2026_07_07_feature_sessione_design_session_template, docs_superpowers_specs_2026_07_07_feature_sessione_design_time_pin, docs_superpowers_specs_2026_07_07_feature_sessione_design_session_phase, docs_superpowers_specs_2026_07_07_feature_sessione_design_session_state, docs_architettura_session_mode [EXTRACTED 1.00]
 - **Six Cognitive Tests of CIRIAF Hub** — docs_scientific_stroop_md_stroop_task, docs_scientific_gonogo_md_go_nogo_task, docs_scientific_corsi_md_corsi_block_task, docs_scientific_nback_md_nback_task, docs_scientific_wcst_md_wcst [EXTRACTED 1.00]
 
-## Communities (66 total, 1 thin omitted)
+## Communities (78 total, 0 thin omitted)
 
 ### Community 0 - "Testing & CSV Export"
-Cohesion: 0.09
-Nodes (22): AuthorCard(), EXTERNAL_LINK, Brand(), BrandProps, countWord(), WORDS, Hero(), HeroProps (+14 more)
+Cohesion: 0.12
+Nodes (22): AuthorCard(), EXTERNAL_LINK, TestId, FACTS, OpenSourcePanel(), DEFAULT_FOCUS, FOCUS_BY_TEST, focusFor() (+14 more)
 
 ### Community 1 - "Shared RNG & Utility Functions"
-Cohesion: 0.19
-Nodes (13): TestId, TestResult, TestIndexProps, ResultsProps, TestRunner(), TestRunnerProps, BatteryEditorProps, BatteryItem (+5 more)
+Cohesion: 0.22
+Nodes (7): FieldDesc, PARAM_SECTIONS, paramSectionFor(), SectionDesc, BatteryEditor(), BatteryEditorProps, BatteryItem
 
 ### Community 2 - "WCST Deck Building"
 Cohesion: 0.06
@@ -131,43 +143,43 @@ Nodes (30): ALL_COLORS, ALL_NUMBERS, ALL_SHAPES, buildDeck(), countPerseveration
 
 ### Community 5 - "Community 5"
 Cohesion: 0.06
-Nodes (48): SciencePanel(), SciencePanelProps, TEST_PAPERS, Block, collectLinks(), Cursor, Inline, isSafeHref() (+40 more)
+Nodes (47): SciencePanel(), SciencePanelProps, TEST_PAPERS, Block, collectLinks(), Cursor, Inline, isSafeHref() (+39 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.14
-Nodes (21): mulberry32(), CorsiView(), FlankerView(), GoNoGoView(), NBackView(), generatePvt(), median(), PvtParams (+13 more)
+Cohesion: 0.18
+Nodes (13): randInt(), generatePvt(), median(), PvtParams, PvtStimulus, round1(), round2(), scorePvt() (+5 more)
 
 ### Community 7 - "Stroop Generator & Scoring"
-Cohesion: 0.11
-Nodes (21): accuracyByCondition(), countFlag(), generateStroop(), mean(), meanRtByCondition(), round1(), scoreStroop(), sdRtByCondition() (+13 more)
+Cohesion: 0.10
+Nodes (23): accuracyByCondition(), countFlag(), generateStroop(), mean(), meanRtByCondition(), Phase, round1(), scoreStroop() (+15 more)
 
 ### Community 8 - "Corsi Sequence Generation & Scoring"
-Cohesion: 0.14
-Nodes (20): canonicalKey(), complexityOf(), CORSI_BLOCKS, CorsiParams, CorsiSequence, corsiSpan(), countCrossings(), distance() (+12 more)
+Cohesion: 0.12
+Nodes (23): canonicalKey(), complexityOf(), CORSI_BLOCKS, CorsiParams, CorsiSequence, corsiSpan(), countCrossings(), distance() (+15 more)
 
 ### Community 9 - "N-Back Metrics & Quartile Analysis"
-Cohesion: 0.14
-Nodes (21): chooseTargetPositions(), countHitsFa(), Counts, criterionC(), dPrime(), generateNBack(), mean(), NBACK_LETTERS (+13 more)
+Cohesion: 0.12
+Nodes (27): chooseLurePositions(), chooseTargetPositions(), countHitsFa(), Counts, criterionC(), dPrime(), generateNBack(), lureLags() (+19 more)
 
 ### Community 10 - "WCST Scoring & Heaton Metrics"
-Cohesion: 0.10
-Nodes (20): ALL_COLORS, ALL_NUMBERS, ALL_SHAPES, buildDeck(), matchesOn(), matchingDims(), round1(), scoreWcst() (+12 more)
+Cohesion: 0.06
+Nodes (29): ALL_COLORS, ALL_NUMBERS, ALL_SHAPES, buildDeck(), countPerseveration(), matchesOn(), matchingDims(), PerseverationCounts (+21 more)
 
 ### Community 11 - "TypeScript Compiler Configuration"
 Cohesion: 0.10
 Nodes (20): compilerOptions, allowImportingTsExtensions, isolatedModules, jsx, lib, module, moduleResolution, noEmit (+12 more)
 
 ### Community 12 - "Go/No-Go Generator & Scoring"
-Cohesion: 0.17
-Nodes (16): arrangeKinds(), countFlag(), deterministicArrange(), generateGoNoGo(), GoNoGoKind, GoNoGoParams, GoNoGoStimulus, mean() (+8 more)
+Cohesion: 0.12
+Nodes (22): arrangeKinds(), countFlag(), criterionC(), deterministicArrange(), dPrime(), generateGoNoGo(), GoNoGoKind, GoNoGoParams (+14 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.14
-Nodes (23): pick(), criterionC(), dPrime(), probit(), RtTestRunner(), PARAMS, chooseLurePositions(), chooseTargetPositions() (+15 more)
+Cohesion: 0.19
+Nodes (16): pick(), chooseLurePositions(), chooseTargetPositions(), countHitsFa(), Counts, generateNBack(), lureLags(), NBACK_LETTERS (+8 more)
 
 ### Community 14 - "Core Engine Types (Clock, Validation)"
-Cohesion: 0.16
-Nodes (24): StimulusStage(), StimulusStageProps, canonicalKey(), complexityOf(), CORSI_BLOCKS, CorsiParams, CorsiSequence, corsiSpan() (+16 more)
+Cohesion: 0.18
+Nodes (22): canonicalKey(), complexityOf(), CORSI_BLOCKS, CorsiParams, CorsiSequence, corsiSpan(), countCrossings(), distance() (+14 more)
 
 ### Community 15 - "TypeScript Strict Mode Config"
 Cohesion: 0.22
@@ -178,12 +190,12 @@ Cohesion: 0.09
 Nodes (22): 10. Riferimenti preliminari, 1. Obiettivo e contesto d'uso, 2. Architettura, 3. Documentazione ufficiale e ancoraggio scientifico, 4.1 Stroop Task 1 e 2, 4.2 Go/No-Go, 4.3 Corsi Block Task, 4.4 N-Back (variante 2-back) (+14 more)
 
 ### Community 20 - "UI Header & Duration Components"
-Cohesion: 0.17
-Nodes (19): accuracyByCondition(), correctKeyStroop(), generateStroop(), meanRtByCondition(), round1(), scoreStroop(), sdRtByCondition(), STROOP_COLORS (+11 more)
+Cohesion: 0.19
+Nodes (14): accuracyByCondition(), correctKeyStroop(), generateStroop(), meanRtByCondition(), round1(), scoreStroop(), sdRtByCondition(), STROOP_COLORS (+6 more)
 
 ### Community 21 - "Session Runner & Audio Feedback"
-Cohesion: 0.32
-Nodes (5): GoNoGoParams, GoNoGoStimulus, GoNoGoViewProps, STIMULUS_COLORS, UI_COLORS
+Cohesion: 0.23
+Nodes (9): GoNoGoParams, GoNoGoViewProps, StroopParams, stroopStimulusLabel(), StroopVariant, StroopViewProps, toSpec(), STIMULUS_COLORS (+1 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.11
@@ -246,12 +258,12 @@ Cohesion: 0.17
 Nodes (12): 1. Paradigma e citazione primaria, 2. Meccanismo cognitivo misurato, 3. Parametri adottati, 4. Mappatura implementativa, 5.1 Errori di commissione (inibizione — misura primaria), 5.2 Errori di omissione (attenzione sostenuta), 5.3 RT medio e deviazione standard dei Go corretti *validi*, 5.4 Anticipazioni (+4 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.25
-Nodes (7): 1. Logica del paradigma, 2. Generazione dello stream, 3. Teoria del segnale: d' e criterio c, 4. Metriche (`scoreNBack`), 5. Casi limite, 6. Demo, N-Back (2-back) — funzionamento tecnico
+Cohesion: 0.22
+Nodes (8): 1. Logica del paradigma, 2. Generazione dello stream, 3. Teoria del segnale: d' e criterio c, 4. Metriche (`scoreNBack`), 5. Casi limite, 6. Demo, 7. Allineamento, N-Back (2-back) — funzionamento tecnico
 
 ### Community 38 - "Community 38"
-Cohesion: 0.25
-Nodes (8): 1. Paradigma e citazione primaria, 2. Meccanismo cognitivo misurato, 3. Parametri adottati, 4. Mappatura implementativa, 6. Rilevanza per lo studio dell'ambiente fisico e limiti, Cronologia delle revisioni, PVT (Psychomotor Vigilance Task) — Riferimenti scientifici, Riferimenti
+Cohesion: 0.14
+Nodes (14): 1. Paradigma e citazione primaria, 2. Meccanismo cognitivo misurato, 3. Parametri adottati, 4. Mappatura implementativa, 5.1 Lapse (misura primaria), 5.2 Velocità di risposta (1/RT), 5.3 RT medio, mediano e SD, 5.4 Fastest 10% e slowest 10% (+6 more)
 
 ### Community 39 - "Community 39"
 Cohesion: 0.29
@@ -262,12 +274,12 @@ Cohesion: 0.29
 Nodes (6): 1. Varianti, 2. Generazione della sequenza, 3. Metriche (`scoreStroop`), 4. Note di validità, 5. Demo, Stroop Task (1 e 2) — funzionamento tecnico
 
 ### Community 41 - "Community 41"
-Cohesion: 0.29
-Nodes (6): 1. Materiali e regole, 2. Matching, 3. Scoring (`scoreWcst`) — operazionalizzazione di Heaton, 4. Note e limiti, 5. Demo, Wisconsin Card Sorting Test — funzionamento tecnico
+Cohesion: 0.25
+Nodes (7): 1. Materiali e regole, 2. Matching, 3. Scoring (`scoreWcst`) — operazionalizzazione di Heaton, 4. Note e limiti, 5. Demo, 6. Allineamento, Wisconsin Card Sorting Test — funzionamento tecnico
 
 ### Community 42 - "Community 42"
-Cohesion: 0.21
-Nodes (12): Button(), ButtonProps, STYLES, Instruction, INSTRUCTIONS, instructionsFor(), nBackInstruction(), POSITION_WORDS (+4 more)
+Cohesion: 0.25
+Nodes (11): Button(), ButtonProps, STYLES, Instruction, INSTRUCTIONS, instructionsFor(), nBackInstruction(), POSITION_WORDS (+3 more)
 
 ### Community 43 - "Community 43"
 Cohesion: 0.15
@@ -286,12 +298,12 @@ Cohesion: 0.11
 Nodes (19): Aggiungere un test, Architettura, Autore, Avvio rapido, Come citare, Come si somministra un test, Contribuire, Cos'è (+11 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.21
-Nodes (12): AllParams, DEFAULTS, STROOP_BASE, FieldDesc, PARAM_SECTIONS, paramSectionFor(), SectionDesc, loadSettings() (+4 more)
+Cohesion: 0.42
+Nodes (6): DEFAULTS, loadSettings(), mergeWithDefaults(), resetSettings(), saveSettings(), structuredCloneSafe()
 
 ### Community 50 - "Community 50"
-Cohesion: 0.20
-Nodes (9): Bibliografia, Corsi Block-Tapping Task, Flanker Task, Go / No-Go Task, N-Back Task, PVT — Psychomotor Vigilance Task, Stroop Task, Trattamento dei tempi di reazione (+1 more)
+Cohesion: 0.18
+Nodes (10): Bibliografia, Corsi Block-Tapping Task, Flanker Task, Go / No-Go Task, N-Back Task, PVT — Psychomotor Vigilance Task, SART — Sustained Attention to Response Task, Stroop Task (+2 more)
 
 ### Community 51 - "Community 51"
 Cohesion: 0.40
@@ -302,63 +314,114 @@ Cohesion: 0.07
 Nodes (31): buildBrainCloudAsync(), buildEdgeBuffers(), anchorLayout(), AttributeSpec, BASE_COLOR, BrainScene, compile(), computeLayout() (+23 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.12
-Nodes (21): randInt(), shuffle(), ValidationFlag, accuracyPercent(), arrange(), ARROW, buildArrows(), conditionCounts() (+13 more)
+Cohesion: 0.15
+Nodes (16): ValidationFlag, accuracyPercent(), arrange(), ARROW, buildArrows(), conditionCounts(), conflictAdaptation(), Draft (+8 more)
 
 ### Community 55 - "Community 55"
 Cohesion: 0.11
-Nodes (25): Settings(), SettingsProps, clearRun(), deleteTemplate(), exportTemplateJson(), importTemplateJson(), loadRun(), loadTemplates() (+17 more)
+Nodes (20): PageHeading(), PageHeadingProps, Settings(), SettingsProps, TestRunner(), App(), Results, Science (+12 more)
 
 ### Community 56 - "Community 56"
 Cohesion: 0.17
 Nodes (18): DEMO_PHASES, DEMO_PINS, DemoFrame, demoFrameAt(), DemoPhase, DemoPin, DemoStage, formatClock() (+10 more)
 
 ### Community 57 - "Community 57"
-Cohesion: 0.33
-Nodes (6): 5.1 Lapse (misura primaria), 5.2 Velocità di risposta (1/RT), 5.3 RT medio, mediano e SD, 5.4 Fastest 10% e slowest 10%, 5.5 Anticipazioni e omissioni, 5. Metriche e formule
+Cohesion: 0.14
+Nodes (22): mulberry32(), TestResult, RtTestRunner(), RtTestRunnerProps, CorsiView(), FlankerParams, FlankerView(), FlankerViewProps (+14 more)
 
 ### Community 58 - "Community 58"
-Cohesion: 0.09
-Nodes (33): Cancel, Clock, performanceClock, realScheduler(), Scheduler, CSV_HEADER, csvField(), exportFilename() (+25 more)
+Cohesion: 0.15
+Nodes (19): Cancel, Clock, performanceClock, realScheduler(), Scheduler, Phase, SummaryMetric, FakeEnv (+11 more)
 
 ### Community 59 - "Community 59"
-Cohesion: 0.12
-Nodes (31): BatteryEditor(), DurationInput(), DurationInputProps, split(), cloneTemplate(), computeSessionState(), distributePhasesEvenly(), FlatPin (+23 more)
+Cohesion: 0.25
+Nodes (15): cloneTemplate(), computeSessionState(), distributePhasesEvenly(), FlatPin, flattenPins(), makeRunId(), movePin(), movePinById() (+7 more)
 
 ### Community 60 - "Community 60"
-Cohesion: 0.18
-Nodes (12): AudioCtor, getAudioContext(), playAlert(), SessionState, TimePin, ActiveContext, Mode, SessionRunner() (+4 more)
+Cohesion: 0.16
+Nodes (13): AudioCtor, getAudioContext(), playAlert(), SessionState, TimePin, ActiveContext, Mode, SessionRunner() (+5 more)
 
 ### Community 61 - "Community 61"
 Cohesion: 0.25
 Nodes (7): 1. Paradigma e citazione primaria, 2. Meccanismo cognitivo misurato, 3. Parametri implementati e loro origine, 4. Metriche calcolate, 5. Validazione dei dati, 6. Limiti e cautele, Flanker Task (Eriksen) — Riferimenti scientifici
 
+### Community 62 - "Community 62"
+Cohesion: 0.11
+Nodes (26): arrangeDigits(), countFlag(), criterionC(), digitCounts(), dPrime(), generateSart(), mean(), Phase (+18 more)
+
 ### Community 63 - "Community 63"
-Cohesion: 0.15
-Nodes (14): Header(), PageHeading(), PageHeadingProps, Results(), result, SessionRun, SessionMenu(), SessionMenuProps (+6 more)
+Cohesion: 0.20
+Nodes (12): SESSION_CSV_HEADER, sessionFilename(), SessionJsonExport, run(), trial(), toSessionCsv(), toSessionJson(), SessionRun (+4 more)
 
 ### Community 64 - "Community 64"
-Cohesion: 0.20
-Nodes (15): classifyRt(), countFlag(), mean(), meanRtOfValidCorrect(), sdRtOfValidCorrect(), standardDeviation(), validCorrectRts(), arrangeKinds() (+7 more)
+Cohesion: 0.19
+Nodes (14): criterionC(), dPrime(), probit(), countFlag(), arrangeKinds(), deterministicArrange(), generateGoNoGo(), GoNoGoKind (+6 more)
+
+### Community 65 - "Community 65"
+Cohesion: 0.27
+Nodes (6): AllParams, STROOP_BASE, makeSessionId(), pad2(), TestRunnerProps, TestHost()
+
+### Community 66 - "Community 66"
+Cohesion: 0.10
+Nodes (23): accuracyPercent(), arrange(), ARROW, conditionCounts(), conflictAdaptation(), countFlag(), Draft, FlankerCondition (+15 more)
+
+### Community 68 - "Community 68"
+Cohesion: 0.16
+Nodes (16): shuffle(), arrangeDigits(), digitCounts(), generateSart(), rate(), reactionTimesBeforeCommissions(), round1(), round2() (+8 more)
+
+### Community 69 - "Community 69"
+Cohesion: 0.16
+Nodes (13): CSV_HEADER, csvField(), exportFilename(), JsonExport, toCsv(), toJson(), trialCsvValues(), trialToCsvRow() (+5 more)
+
+### Community 70 - "Community 70"
+Cohesion: 0.16
+Nodes (14): mean(), median(), Phase, PvtParams, PvtStimulus, round1(), round2(), scorePvt() (+6 more)
+
+### Community 71 - "Community 71"
+Cohesion: 0.14
+Nodes (14): 1. Paradigma e citazione primaria, 2. Meccanismo cognitivo misurato, 3. Parametri adottati, 4. Mappatura implementativa, 5.1 Errori di commissione (misura primaria), 5.2 Errori di omissione, 5.3 RT dei Go: media, SD e CV, 5.4 Sensibilità $d'$ e criterio $c$ (+6 more)
+
+### Community 72 - "Community 72"
+Cohesion: 0.22
+Nodes (9): DurationInput(), DurationInputProps, split(), makeLocalId(), SessionPhase, emptyTemplate(), fmtMs(), SessionBuilder() (+1 more)
+
+### Community 73 - "Community 73"
+Cohesion: 0.23
+Nodes (8): Brand(), BrandProps, Header(), countWord(), WORDS, Hero(), HeroProps, TestFocus
+
+### Community 74 - "Community 74"
+Cohesion: 0.27
+Nodes (10): COPIES, buildCopy(), collectSymbols(), ENGINES, KEEP_EXPORT_FROM, readText(), requiredSymbols(), rootDir (+2 more)
+
+### Community 75 - "Community 75"
+Cohesion: 0.25
+Nodes (9): SessionTemplate, SessionBuilderProps, SessionMenu(), SessionMenuProps, fmt(), PHASE_TINTS, SessionTimeline(), SessionTimelineProps (+1 more)
+
+### Community 76 - "Community 76"
+Cohesion: 0.36
+Nodes (8): clearRun(), deleteTemplate(), exportTemplateJson(), importTemplateJson(), loadRun(), loadTemplates(), saveRun(), saveTemplate()
+
+### Community 77 - "Community 77"
+Cohesion: 0.50
+Nodes (6): classifyRt(), mean(), meanRtOfValidCorrect(), sdRtOfValidCorrect(), standardDeviation(), validCorrectRts()
 
 ## Knowledge Gaps
-- **453 isolated node(s):** `name`, `private`, `version`, `type`, `description` (+448 more)
+- **515 isolated node(s):** `name`, `private`, `version`, `type`, `description` (+510 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `mulberry32()` connect `Community 6` to `Community 3`, `Community 4`, `Community 13`, `Core Engine Types (Clock, Validation)`, `UI Header & Duration Components`, `Community 53`, `Community 54`, `Session Runner & Audio Feedback`?**
-  _High betweenness centrality (0.022) - this node is a cross-community bridge._
-- **Why does `TestResult` connect `Shared RNG & Utility Functions` to `Community 4`, `Community 6`, `Community 13`, `Core Engine Types (Clock, Validation)`, `UI Header & Duration Components`, `Session Runner & Audio Feedback`, `Community 54`, `Community 55`, `Community 58`, `Community 59`, `Community 60`, `Community 63`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **Why does `TestId` connect `Shared RNG & Utility Functions` to `Testing & CSV Export`, `Community 5`, `Community 6`, `Community 42`, `Community 55`, `Community 58`, `Community 59`, `Community 60`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
+- **Why does `TestResult` connect `Community 57` to `Testing & CSV Export`, `Community 65`, `Community 4`, `Community 69`, `Community 6`, `Core Engine Types (Clock, Validation)`, `Session Runner & Audio Feedback`, `Community 55`, `Community 58`, `Community 59`, `Community 60`, `Community 63`?**
+  _High betweenness centrality (0.013) - this node is a cross-community bridge._
+- **Why does `mulberry32()` connect `Community 57` to `Community 64`, `Community 3`, `Community 68`, `Community 4`, `Community 6`, `Community 13`, `Core Engine Types (Clock, Validation)`, `UI Header & Duration Components`, `Community 53`, `Community 54`, `Session Runner & Audio Feedback`?**
+  _High betweenness centrality (0.013) - this node is a cross-community bridge._
+- **Why does `TrialResult` connect `Community 69` to `Community 64`, `Community 68`, `Community 4`, `Community 6`, `Community 77`, `Core Engine Types (Clock, Validation)`, `Community 13`, `UI Header & Duration Components`, `Community 54`, `Community 58`, `Community 63`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `name`, `private`, `version` to the rest of the system?**
-  _466 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _528 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Testing & CSV Export` be split into smaller, more focused modules?**
-  _Cohesion score 0.09269162210338681 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11693548387096774 - nodes in this community are weakly interconnected._
 - **Should `WCST Deck Building` be split into smaller, more focused modules?**
   _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
