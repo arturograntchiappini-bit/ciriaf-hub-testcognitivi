@@ -1,10 +1,9 @@
 # Revisione motore — copie standalone dei test cognitivi
 
-> **Stato (2026-10-23): queste copie NON sono più allineate.** La revisione scientifica ha cambiato i motori vivi di
-> Go/No-Go (d′, criterio, interrotti esclusi), Stroop (costo in accuratezza), Corsi (punteggio totale), N-Back (lure
-> inseriti, falsi allarmi sui lure), WCST (scoring perseverativo di Heaton/Howlett e Moseley) e PVT (omissioni come
-> lapse, velocità di risposta). Le copie qui sotto riflettono la versione **precedente**: per il comportamento attuale
-> vale `src/engine/tests/` e il paper in `docs/scientific/`. La risincronizzazione è in programma.
+> **Stato (2026-10-23): copie allineate.** Le copie sono **generate** dai motori vivi con
+> `node scripts/sync-revisione-motore.mjs` (core identico a `src/engine/tests/`, dipendenze estratte dai
+> moduli veri) e il test `src/engine/revisione-motore.test.ts` fallisce se divergono. Intestazione e `demo()`
+> restano scritte a mano. Le copie del PVT e del Flanker non hanno ancora un documento tecnico `.md`.
 
 Questa cartella contiene, **per ogni test cognitivo, una copia autosufficiente**
 dello script "core" del motore, pensata per la **revisione e la spiegazione**
@@ -23,13 +22,16 @@ tecnica indipendente dalla piattaforma.
   npx tsx revisione-motore/<nome>.ts
   ```
 
+  (Node ≥ 24 esegue direttamente anche `node revisione-motore/<nome>.ts`, tranne `wcst.ts` che
+  usa proprietà nel costruttore: lì servono `tsx` o `--experimental-transform-types`.)
+
 ## Allineamento con l'engine (IMPORTANTE)
 
 Il **core algoritmico** (generatori e funzioni di scoring) di ogni copia è
 **identico** a quello del file vivo corrispondente in `src/engine/tests/`. Le
 uniche differenze sono il "prelude" di dipendenze inline e la `demo()` finale.
-Ogni ottimizzazione va applicata **su entrambe le versioni** per mantenerle
-allineate.
+Dopo ogni modifica al motore: `node scripts/sync-revisione-motore.mjs` (aggiorna le
+copie) oppure `--check` (verifica senza scrivere).
 
 | Copia di revisione            | Sorgente vivo                     | Doc tecnico                    | Doc scientifico              |
 |-------------------------------|-----------------------------------|--------------------------------|------------------------------|
@@ -38,6 +40,8 @@ allineate.
 | `nback.ts`                    | `src/engine/tests/nback.ts`       | `nback.md`                     | `docs/scientific/nback.md`   |
 | `corsi.ts`                    | `src/engine/tests/corsi.ts`       | `corsi.md`                     | `docs/scientific/corsi.md`   |
 | `wcst.ts`                     | `src/engine/tests/wcst.ts`        | `wcst.md`                      | `docs/scientific/wcst.md`    |
+| `pvt.ts`                      | `src/engine/tests/pvt.ts`         | — (vedi paper)                 | `docs/scientific/pvt.md`     |
+| `flanker.ts`                  | `src/engine/tests/flanker.ts`     | — (vedi paper)                 | `docs/scientific/flanker.md` |
 
 Il doc **tecnico** (questa cartella) spiega *come funziona il codice*; il doc
 **scientifico** (`docs/scientific/`) documenta *paradigma, parametri e fonti*.

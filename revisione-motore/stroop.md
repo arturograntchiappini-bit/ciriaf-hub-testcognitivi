@@ -40,7 +40,8 @@ Calcolate **solo su trial di test, VALID e corretti** per gli RT:
   normalizzata, indice di **variabilità intra-soggetto** (aggiunto in revisione).
 - **Effetto interferenza** = RT medio incongruenti − RT medio congruenti (il
   "Stroop effect" classico).
-- Conteggi di anticipazioni e omissioni.
+- **Costo in accuratezza** (con − inc), in punti percentuali.
+- Conteggi di anticipazioni e omissioni. Omissioni = errori; i trial `INTERRUPTED` sono esclusi.
 
 ## 4. Note di validità
 

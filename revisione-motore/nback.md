@@ -20,15 +20,20 @@ fonologiche/di chunking.
 1. `chooseTargetPositions` sceglie le posizioni target tra quelle idonee
    (indice ≥ `n`), **evitando target adiacenti**; se non ne trova abbastanza,
    rilassa il vincolo di non-adiacenza.
-2. Per ogni posizione:
-   - se **target** → copia `letter[i-n]`;
-   - altrimenti `pickNonTarget` sceglie una lettera che **non** crea un target
-     accidentale (esclude `letter[i-n]`) e che **limita i lure** ai lag `n−1` e
-     `n+1` (soft-forbidden), riducendo i match parziali che favorirebbero la
-     strategia di sola familiarità. Se i vincoli saturano l'alfabeto, li rilassa
-     progressivamente.
+2. `chooseLurePositions` sceglie, tra i non-target con entrambi i lag disponibili,
+   una quota `lureRate` (default 0.20) di posizioni **lure**.
+3. Per ogni posizione:
+   - **target** → copia `letter[i-n]`;
+   - **lure** → `pickLure` ripete la lettera a lag `n−1` o `n+1` (purché diversa da
+     quella a lag `n`, altrimenti sarebbe un target): è familiare ma NON è target;
+   - **non-target semplice** → `pickNonTarget` evita sia il target accidentale sia i
+     lag `n±1`, così i lure sono esattamente quelli pianificati.
 
-`isTarget` viene ricalcolato a valle come invariante (`i ≥ n && letter[i]===letter[i-n]`).
+`isTarget` e `isLure` sono ricalcolati a valle come invarianti. I lure rendono inutile
+la sola familiarità (Kane et al., 2007): senza di essi basterebbe riconoscere una
+lettera recente per indovinare il target. *Correzione di revisione:* la versione
+precedente evitava i lure invece di inserirli, il contrario di ciò che il paper dichiarava.
+Le sessioni salvate prima dell'introduzione di `lureRate` si leggono con `lureRate ?? 0`.
 
 ## 3. Teoria del segnale: d' e criterio c
 
@@ -48,8 +53,8 @@ Contatori (`countHitsFa`): hit, target, falsi allarmi, non-target (esclusi gli
 
 ## 4. Metriche (`scoreNBack`)
 
-Hit, Miss, Falsi allarmi, **d'**, **Criterio c**, RT medio/SD dei hit validi, più
-**d' per quartile temporale** del blocco (`splitIntoChunks`), per valutare la
+Hit, Miss, Falsi allarmi, **Falsi allarmi su lure** (e relativo tasso), **d'**,
+**Criterio c**, RT medio/SD dei hit validi, più **d' per quartile temporale** del blocco (`splitIntoChunks`), per valutare la
 stabilità della traccia nel tempo (affaticamento/deriva).
 
 ## 5. Casi limite
@@ -60,4 +65,9 @@ stabilità della traccia nel tempo (affaticamento/deriva).
 ## 6. Demo
 
 `npx tsx revisione-motore/nback.ts` stampa lo stream con i target evidenziati e
-un esempio di `d'` con performance perfetta.
+i lure e un esempio di `d'` con performance perfetta.
+
+## 7. Allineamento
+
+La copia è generata da `node scripts/sync-revisione-motore.mjs`; il test
+`src/engine/revisione-motore.test.ts` fallisce se diverge dal motore vivo.

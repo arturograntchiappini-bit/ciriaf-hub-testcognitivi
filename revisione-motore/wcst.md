@@ -28,19 +28,23 @@ consecutive (default 10); il feedback è solo "Corretto/Errato".
 Il runtime fornisce, per ogni trial, `WcstTrialMeta { currentRule, matchedDims }`.
 Un trial è corretto se `matchedDims` include `currentRule`.
 
-**Principio perseverato (PP):**
+**Principio perseverato (PP)** — classe `PerseverationScanner`, procedura di Heaton et
+al. (1993) come descritta da Howlett & Moseley (2024):
 - si stabilisce al **primo errore non ambiguo** (la carta combacia su **una sola**
-  dimensione, diversa dalla regola attuale);
-- dopo il completamento di una categoria, il PP diventa la **regola appena
-  abbandonata**;
-- un errore è **perseverativo** se combacia con il PP corrente e il PP non è la
-  regola attuale.
+  dimensione, diversa dalla regola attuale); quell'errore conta come perseverativo;
+- al completamento di una categoria il PP diventa la **regola appena abbandonata**;
+- **tre errori non ambigui consecutivi** su una dimensione che non è né corretta né il
+  PP cambiano il PP (il primo dei tre non è perseverativo: lettura nostra, il testo non
+  lo esplicita);
+- una risposta **ambigua** conta come perseverativa solo se è «incastrata» tra due
+  errori non ambigui perseverativi e combacia col PP.
+Gli **errori** perseverativi sono un sottoinsieme delle **risposte** perseverative.
 
 **Metriche prodotte:**
 - Categorie completate;
 - Trial totali;
 - Errori totali;
-- Errori perseverativi **e % errori perseverativi** *(aggiunto in revisione)*;
+- Errori perseverativi, **risposte perseverative** e % errori perseverativi;
 - Errori non perseverativi;
 - **Failure to maintain set** (errore dopo 5–9 corrette consecutive);
 - **Risposte a livello concettuale (CLR, %)** *(aggiunto)* — quota di risposte
@@ -53,12 +57,18 @@ Un trial è corretto se `matchedDims` include `currentRule`.
 
 ## 4. Note e limiti
 
-- La distinzione Heaton tra *errori* e *risposte* perseverative è approssimata: si
-  contano gli **errori** perseverativi. I limiti sono documentati anche in
+- Lo scoring segue la procedura pubblicata ma **non è validato** rispetto al software
+  ufficiale PAR; il mazzo è casuale, non quello di Heaton. Limiti in
   `docs/scientific/wcst.md`.
 - Trial `INTERRUPTED` esclusi.
 
 ## 5. Demo
 
 `npx tsx revisione-motore/wcst.ts` costruisce un mazzo, mostra un esempio di
-`matchingDims` e la sequenza ciclica dei criteri.
+`matchingDims` e la sequenza ciclica dei criteri. (La classe usa proprietà nel
+costruttore: serve `tsx` o `node --experimental-transform-types`.)
+
+## 6. Allineamento
+
+La copia è generata da `node scripts/sync-revisione-motore.mjs`; il test
+`src/engine/revisione-motore.test.ts` fallisce se diverge dal motore vivo.

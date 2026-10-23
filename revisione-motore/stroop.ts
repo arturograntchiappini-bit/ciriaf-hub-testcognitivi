@@ -19,26 +19,42 @@
  * ----------------------------------------------------------------------------
  */
 
-/* ===== Dipendenze inline (nella piattaforma vivono in engine/{types,rng,validation}) ===== */
+/* ===== Dipendenze inline (nella piattaforma: engine/{types,rng,validation,sdt}) ===== */
+/* Generate da scripts/sync-revisione-motore.mjs: non modificarle a mano. */
 
 type ValidationFlag = 'VALID' | 'ANTICIPATION' | 'OMISSION' | 'INTERRUPTED';
 
-/** Sottoinsieme di TrialResult usato dallo scoring dello Stroop. */
+type Phase = 'practice' | 'test';
+
+type TestId = 'stroop1' | 'stroop2' | 'gonogo' | 'corsi' | 'nback' | 'wcst' | 'pvt' | 'flanker' | 'sart';
+
 interface TrialResult {
-  phase: 'practice' | 'test';
-  condition: string; // 'congruent' | 'incongruent'
+  testId: TestId;
+  sessionId: string;
+  trialIndex: number;
+  phase: Phase;
+  /** Etichetta della condizione sperimentale (es. 'congruent', 'go', 'target'). */
+  condition: string;
+  /** Rappresentazione serializzabile dello stimolo mostrato. */
+  stimulus: string;
+  /** Tasto/azione registrata, oppure null se nessuna risposta (omissione). */
+  response: string | null;
   correct: boolean;
+  /** Tempo di reazione in ms; null se omissione. */
   rtMs: number | null;
   flag: ValidationFlag;
+  /** performance.now() al paint dello stimolo (riferimento del cronometro). */
+  onsetTimestamp: number;
 }
 
 interface SummaryMetric {
+  /** Etichetta leggibile in italiano. */
   label: string;
   value: string | number;
+  /** Unità di misura opzionale (es. 'ms', '%'). */
   unit?: string;
 }
 
-/** Generatore pseudo-casuale deterministico (mulberry32) — solo per la demo. */
 function mulberry32(seed: number): () => number {
   let state = seed >>> 0;
   return function next(): number {
@@ -50,7 +66,6 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-/** Fisher-Yates: ritorna una NUOVA lista permutata, senza mutare l'originale. */
 function shuffle<T>(items: readonly T[], rand: () => number): T[] {
   const copy = items.slice();
   for (let i = copy.length - 1; i > 0; i--) {
@@ -68,7 +83,11 @@ function mean(values: readonly number[]): number {
   return values.reduce((sum, v) => sum + v, 0) / values.length;
 }
 
-/** Deviazione standard campionaria (denominatore n-1); 0 se n < 2. */
+/**
+ * Deviazione standard campionaria (denominatore n-1).
+ * Misura la stabilità/altalena della performance nel tempo.
+ * Ritorna 0 se n < 2.
+ */
 function standardDeviation(values: readonly number[]): number {
   const n = values.length;
   if (n < 2) return 0;
@@ -77,7 +96,6 @@ function standardDeviation(values: readonly number[]): number {
   return Math.sqrt(sumSq / (n - 1));
 }
 
-/** Conta i trial di test con un dato flag. */
 function countFlag(trials: readonly TrialResult[], flag: ValidationFlag): number {
   return trials.filter((t) => t.phase === 'test' && t.flag === flag).length;
 }
@@ -213,12 +231,14 @@ export function scoreStroop(trials: readonly TrialResult[]): SummaryMetric[] {
   const sdCon = sdRtByCondition(trials, 'congruent');
   const sdInc = sdRtByCondition(trials, 'incongruent');
   const interference = meanInc - meanCon;
+  const accuracyCon = accuracyByCondition(trials, 'congruent');
+  const accuracyInc = accuracyByCondition(trials, 'incongruent');
   // Coefficiente di variazione (dispersione normalizzata): variabilità intra-soggetto.
   const cv = (sd: number, m: number): number => (m > 0 ? (sd / m) * 100 : 0);
 
   return [
-    { label: 'Accuratezza congruenti', value: round1(accuracyByCondition(trials, 'congruent')), unit: '%' },
-    { label: 'Accuratezza incongruenti', value: round1(accuracyByCondition(trials, 'incongruent')), unit: '%' },
+    { label: 'Accuratezza congruenti', value: round1(accuracyCon), unit: '%' },
+    { label: 'Accuratezza incongruenti', value: round1(accuracyInc), unit: '%' },
     { label: 'RT medio congruenti', value: round1(meanCon), unit: 'ms' },
     { label: 'RT medio incongruenti', value: round1(meanInc), unit: 'ms' },
     { label: 'SD RT congruenti', value: round1(sdCon), unit: 'ms' },
@@ -226,6 +246,7 @@ export function scoreStroop(trials: readonly TrialResult[]): SummaryMetric[] {
     { label: 'CV RT congruenti', value: round1(cv(sdCon, meanCon)), unit: '%' },
     { label: 'CV RT incongruenti', value: round1(cv(sdInc, meanInc)), unit: '%' },
     { label: 'Effetto interferenza (inc − con)', value: round1(interference), unit: 'ms' },
+    { label: 'Costo in accuratezza (con − inc)', value: round1(accuracyCon - accuracyInc), unit: 'punti %' },
     { label: 'Errori di anticipazione', value: countFlag(trials, 'ANTICIPATION') },
     { label: 'Errori di omissione', value: countFlag(trials, 'OMISSION') },
   ];

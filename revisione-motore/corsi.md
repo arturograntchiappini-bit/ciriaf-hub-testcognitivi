@@ -92,7 +92,8 @@ escursione 94–134 unità: al livello 5 un partecipante poteva percorrere in me
   - **Span Visuo-Spaziale (MBS)** — la lunghezza massima riprodotta correttamente
     (Maximum Block Span, l'indice classico di Corsi);
   - **Punteggio Corsi (Ponderato)** — `corsiSpan` sopra;
-  - **Trial totali superati**.
+  - **Trial totali superati**;
+  - **Punteggio totale (MBS × superati)** — punteggio totale di Kessels et al. (2000).
 
   La UI (`CorsiView`) passa il vero `params.startLength` allo scoring.
 

@@ -18,19 +18,39 @@
  * ----------------------------------------------------------------------------
  */
 
-/* ===== Dipendenze inline (nella piattaforma: engine/{types,rng}) ===== */
+/* ===== Dipendenze inline (nella piattaforma: engine/{types,rng,validation,sdt}) ===== */
+/* Generate da scripts/sync-revisione-motore.mjs: non modificarle a mano. */
+
+type ValidationFlag = 'VALID' | 'ANTICIPATION' | 'OMISSION' | 'INTERRUPTED';
+
+type Phase = 'practice' | 'test';
+
+type TestId = 'stroop1' | 'stroop2' | 'gonogo' | 'corsi' | 'nback' | 'wcst' | 'pvt' | 'flanker' | 'sart';
 
 interface TrialResult {
-  phase: 'practice' | 'test';
-  correct: boolean;
-  flag: 'VALID' | 'ANTICIPATION' | 'OMISSION' | 'INTERRUPTED';
-  /** Sequenza mostrata, serializzata come "i-j-k" (indici dei blocchi). */
+  testId: TestId;
+  sessionId: string;
+  trialIndex: number;
+  phase: Phase;
+  /** Etichetta della condizione sperimentale (es. 'congruent', 'go', 'target'). */
+  condition: string;
+  /** Rappresentazione serializzabile dello stimolo mostrato. */
   stimulus: string;
+  /** Tasto/azione registrata, oppure null se nessuna risposta (omissione). */
+  response: string | null;
+  correct: boolean;
+  /** Tempo di reazione in ms; null se omissione. */
+  rtMs: number | null;
+  flag: ValidationFlag;
+  /** performance.now() al paint dello stimolo (riferimento del cronometro). */
+  onsetTimestamp: number;
 }
 
 interface SummaryMetric {
+  /** Etichetta leggibile in italiano. */
   label: string;
   value: string | number;
+  /** Unità di misura opzionale (es. 'ms', '%'). */
   unit?: string;
 }
 
@@ -45,7 +65,6 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-/** Fisher-Yates: ritorna una NUOVA lista permutata, senza mutare l'originale. */
 function shuffle<T>(items: readonly T[], rand: () => number): T[] {
   const copy = items.slice();
   for (let i = copy.length - 1; i > 0; i--) {
@@ -308,6 +327,7 @@ export function shouldStop(levelResults: readonly boolean[]): boolean {
  *   sequenza riprodotta correttamente — l'indice classico di Corsi.
  * - Punteggio Corsi (Ponderato): punteggio cumulativo ancorato a `startLength`.
  * - Trial totali superati.
+ * - Punteggio totale di Kessels et al. (2000): span × numero di sequenze corrette.
  */
 export function scoreCorsi(trials: readonly TrialResult[], startLength = 2): SummaryMetric[] {
   const test = trials.filter((t) => t.phase === 'test' && t.flag !== 'INTERRUPTED');
@@ -317,6 +337,7 @@ export function scoreCorsi(trials: readonly TrialResult[], startLength = 2): Sum
     { label: 'Span Visuo-Spaziale (MBS)', value: mbs },
     { label: 'Punteggio Corsi (Ponderato)', value: corsiSpan(passed.length, startLength) },
     { label: 'Trial totali superati', value: passed.length },
+    { label: 'Punteggio totale (MBS × superati)', value: mbs * passed.length },
   ];
 }
 

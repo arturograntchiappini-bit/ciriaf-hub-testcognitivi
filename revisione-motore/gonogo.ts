@@ -17,21 +17,39 @@
  * ----------------------------------------------------------------------------
  */
 
-/* ===== Dipendenze inline (nella piattaforma: engine/{types,rng,validation}) ===== */
+/* ===== Dipendenze inline (nella piattaforma: engine/{types,rng,validation,sdt}) ===== */
+/* Generate da scripts/sync-revisione-motore.mjs: non modificarle a mano. */
 
 type ValidationFlag = 'VALID' | 'ANTICIPATION' | 'OMISSION' | 'INTERRUPTED';
 
+type Phase = 'practice' | 'test';
+
+type TestId = 'stroop1' | 'stroop2' | 'gonogo' | 'corsi' | 'nback' | 'wcst' | 'pvt' | 'flanker' | 'sart';
+
 interface TrialResult {
-  phase: 'practice' | 'test';
-  condition: string; // 'go' | 'nogo'
+  testId: TestId;
+  sessionId: string;
+  trialIndex: number;
+  phase: Phase;
+  /** Etichetta della condizione sperimentale (es. 'congruent', 'go', 'target'). */
+  condition: string;
+  /** Rappresentazione serializzabile dello stimolo mostrato. */
+  stimulus: string;
+  /** Tasto/azione registrata, oppure null se nessuna risposta (omissione). */
+  response: string | null;
   correct: boolean;
+  /** Tempo di reazione in ms; null se omissione. */
   rtMs: number | null;
   flag: ValidationFlag;
+  /** performance.now() al paint dello stimolo (riferimento del cronometro). */
+  onsetTimestamp: number;
 }
 
 interface SummaryMetric {
+  /** Etichetta leggibile in italiano. */
   label: string;
   value: string | number;
+  /** Unità di misura opzionale (es. 'ms', '%'). */
   unit?: string;
 }
 
@@ -46,7 +64,6 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-/** Intero uniforme in [min, max] inclusi. */
 function randInt(min: number, max: number, rand: () => number): number {
   return min + Math.floor(rand() * (max - min + 1));
 }
@@ -56,6 +73,11 @@ function mean(values: readonly number[]): number {
   return values.reduce((sum, v) => sum + v, 0) / values.length;
 }
 
+/**
+ * Deviazione standard campionaria (denominatore n-1).
+ * Misura la stabilità/altalena della performance nel tempo.
+ * Ritorna 0 se n < 2.
+ */
 function standardDeviation(values: readonly number[]): number {
   const n = values.length;
   if (n < 2) return 0;
@@ -66,6 +88,56 @@ function standardDeviation(values: readonly number[]): number {
 
 function countFlag(trials: readonly TrialResult[], flag: ValidationFlag): number {
   return trials.filter((t) => t.phase === 'test' && t.flag === flag).length;
+}
+
+export function probit(p: number): number {
+  if (p <= 0) return -Infinity;
+  if (p >= 1) return Infinity;
+  const a = [-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2, 1.38357751867269e2, -3.066479806614716e1, 2.506628277459239];
+  const b = [-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2, 6.680131188771972e1, -1.328068155288572e1];
+  const c = [-7.784894002430293e-3, -3.223964580411365e-1, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783];
+  const d = [7.784695709041462e-3, 3.224671290700398e-1, 2.445134137142996, 3.754408661907416];
+  const pLow = 0.02425;
+  const pHigh = 1 - pLow;
+  let q: number;
+  let r: number;
+  if (p < pLow) {
+    q = Math.sqrt(-2 * Math.log(p));
+    return (((((c[0]! * q + c[1]!) * q + c[2]!) * q + c[3]!) * q + c[4]!) * q + c[5]!) /
+      ((((d[0]! * q + d[1]!) * q + d[2]!) * q + d[3]!) * q + 1);
+  }
+  if (p <= pHigh) {
+    q = p - 0.5;
+    r = q * q;
+    return (((((a[0]! * r + a[1]!) * r + a[2]!) * r + a[3]!) * r + a[4]!) * r + a[5]!) * q /
+      (((((b[0]! * r + b[1]!) * r + b[2]!) * r + b[3]!) * r + b[4]!) * r + 1);
+  }
+  q = Math.sqrt(-2 * Math.log(1 - p));
+  return -(((((c[0]! * q + c[1]!) * q + c[2]!) * q + c[3]!) * q + c[4]!) * q + c[5]!) /
+    ((((d[0]! * q + d[1]!) * q + d[2]!) * q + d[3]!) * q + 1);
+}
+
+/**
+ * d' con correzione loglinear di Hautus (1995), applicata sempre:
+ * H = (hits+0.5)/(targets+1), F = (fa+0.5)/(nonTargets+1), d' = z(H) − z(F).
+ */
+export function dPrime(hits: number, targets: number, falseAlarms: number, nonTargets: number): number {
+  const h = (hits + 0.5) / (targets + 1);
+  const f = (falseAlarms + 0.5) / (nonTargets + 1);
+  return probit(h) - probit(f);
+}
+
+/**
+ * Criterio decisionale c (bias di risposta), con la stessa correzione loglinear
+ * di Hautus: c = −0.5·(z(H) + z(F)). c > 0 = criterio conservativo (tende a NON
+ * rispondere, favorisce i miss); c < 0 = criterio liberale (tende a rispondere,
+ * favorisce i falsi allarmi); c ≈ 0 = nessun bias. Complementa d' separando la
+ * sensibilità dalla tendenza di risposta.
+ */
+export function criterionC(hits: number, targets: number, falseAlarms: number, nonTargets: number): number {
+  const h = (hits + 0.5) / (targets + 1);
+  const f = (falseAlarms + 0.5) / (nonTargets + 1);
+  return -0.5 * (probit(h) + probit(f));
 }
 
 /* ============================ CORE DEL TEST ============================ */
@@ -163,16 +235,26 @@ function deterministicArrange(nGo: number, nNoGo: number): GoNoGoKind[] {
 }
 
 /**
+ * Il partecipante ha premuto (anche in anticipo). Si guarda la risposta registrata, non il flag: il
+ * sequencer marca VALID anche un No-Go correttamente trattenuto (nessuna risposta).
+ */
+const isResponded = (t: TrialResult): boolean => t.response !== null && t.flag !== 'INTERRUPTED';
+const isValidTrial = (t: TrialResult): boolean => t.flag !== 'INTERRUPTED';
+
+/**
  * Metriche: errori di commissione (risposte su No-Go), errori di omissione
- * (mancate risposte su Go), RT medio e SD dei Go corretti validi, anticipazioni.
+ * (mancate risposte su Go), RT medio/SD/CV dei Go corretti validi, anticipazioni,
+ * d' e criterio c (hit = risposta su Go, falso allarme = risposta su No-Go).
+ * I trial interrotti sono esclusi da numeratori e denominatori.
  */
 export function scoreGoNoGo(trials: readonly TrialResult[]): SummaryMetric[] {
   const test = trials.filter((t) => t.phase === 'test');
-  const goTrials = test.filter((t) => t.condition === 'go');
-  const noGoTrials = test.filter((t) => t.condition === 'nogo');
+  const goTrials = test.filter((t) => t.condition === 'go' && isValidTrial(t));
+  const noGoTrials = test.filter((t) => t.condition === 'nogo' && isValidTrial(t));
 
-  const commissionErrors = noGoTrials.filter((t) => t.flag !== 'INTERRUPTED' && !t.correct).length;
-  const omissionErrors = goTrials.filter((t) => t.flag === 'OMISSION').length;
+  const commissionErrors = noGoTrials.filter(isResponded).length;
+  const omissionErrors = goTrials.length - goTrials.filter(isResponded).length;
+  const hits = goTrials.filter(isResponded).length;
 
   const goRts = goTrials
     .filter((t) => t.flag === 'VALID' && t.correct && t.rtMs !== null)
@@ -184,7 +266,7 @@ export function scoreGoNoGo(trials: readonly TrialResult[]): SummaryMetric[] {
   const meanGo = mean(goRts);
   const sdGo = standardDeviation(goRts);
   // Coefficiente di variazione: dispersione normalizzata sulla media, indice
-  // robusto di variabilità intra-soggetto (lapse/instabilità attentiva).
+  // di variabilità intra-soggetto (lapse/instabilità attentiva).
   const cvGo = meanGo > 0 ? (sdGo / meanGo) * 100 : 0;
 
   return [
@@ -195,12 +277,18 @@ export function scoreGoNoGo(trials: readonly TrialResult[]): SummaryMetric[] {
     { label: 'RT medio Go corretti', value: round1(meanGo), unit: 'ms' },
     { label: 'SD RT Go corretti', value: round1(sdGo), unit: 'ms' },
     { label: 'CV RT Go corretti', value: round1(cvGo), unit: '%' },
+    { label: "Sensibilità d'", value: round2(dPrime(hits, goTrials.length, commissionErrors, noGoTrials.length)) },
+    { label: 'Criterio decisionale (c)', value: round2(criterionC(hits, goTrials.length, commissionErrors, noGoTrials.length)) },
     { label: 'Errori di anticipazione', value: countFlag(trials, 'ANTICIPATION') },
   ];
 }
 
 function round1(x: number): number {
   return Math.round(x * 10) / 10;
+}
+
+function round2(x: number): number {
+  return Math.round(x * 100) / 100;
 }
 
 /* ================================ DEMO ================================ */

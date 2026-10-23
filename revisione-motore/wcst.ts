@@ -17,16 +17,39 @@
  * ----------------------------------------------------------------------------
  */
 
-/* ===== Dipendenze inline (nella piattaforma: engine/{types,rng}) ===== */
+/* ===== Dipendenze inline (nella piattaforma: engine/{types,rng,validation,sdt}) ===== */
+/* Generate da scripts/sync-revisione-motore.mjs: non modificarle a mano. */
+
+type ValidationFlag = 'VALID' | 'ANTICIPATION' | 'OMISSION' | 'INTERRUPTED';
+
+type Phase = 'practice' | 'test';
+
+type TestId = 'stroop1' | 'stroop2' | 'gonogo' | 'corsi' | 'nback' | 'wcst' | 'pvt' | 'flanker' | 'sart';
 
 interface TrialResult {
-  phase: 'practice' | 'test';
-  flag: 'VALID' | 'ANTICIPATION' | 'OMISSION' | 'INTERRUPTED';
+  testId: TestId;
+  sessionId: string;
+  trialIndex: number;
+  phase: Phase;
+  /** Etichetta della condizione sperimentale (es. 'congruent', 'go', 'target'). */
+  condition: string;
+  /** Rappresentazione serializzabile dello stimolo mostrato. */
+  stimulus: string;
+  /** Tasto/azione registrata, oppure null se nessuna risposta (omissione). */
+  response: string | null;
+  correct: boolean;
+  /** Tempo di reazione in ms; null se omissione. */
+  rtMs: number | null;
+  flag: ValidationFlag;
+  /** performance.now() al paint dello stimolo (riferimento del cronometro). */
+  onsetTimestamp: number;
 }
 
 interface SummaryMetric {
+  /** Etichetta leggibile in italiano. */
   label: string;
   value: string | number;
+  /** Unità di misura opzionale (es. 'ms', '%'). */
   unit?: string;
 }
 
@@ -41,7 +64,6 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-/** Fisher-Yates: ritorna una NUOVA lista permutata, senza mutare l'originale. */
 function shuffle<T>(items: readonly T[], rand: () => number): T[] {
   const copy = items.slice();
   for (let i = copy.length - 1; i > 0; i--) {
@@ -134,89 +156,200 @@ export interface WcstTrialMeta {
   matchedDims: WcstDim[];
 }
 
+/** Esito di una risposta ai fini dello scoring perseverativo. */
+interface Step {
+  correct: boolean;
+  matched: readonly WcstDim[];
+}
+
+/** Conteggi perseverativi: gli errori sono un sottoinsieme delle risposte perseverative. */
+export interface PerseverationCounts {
+  errors: number;
+  responses: number;
+}
+
+const THREE_ERRORS = 3; // errori non ambigui consecutivi che cambiano il principio perseverato
+
 /**
- * Scoring secondo l'operazionalizzazione del principio perseverativo di Heaton:
- * - il "principio perseverato" (PP) si stabilisce al primo errore non ambiguo
- *   (la carta scelta combacia su UNA sola dimensione, diversa dalla regola);
- * - dopo il completamento di una categoria, il PP diventa la regola appena abbandonata;
- * - un errore è "perseverativo" se combacia col PP corrente (e il PP non è la regola attuale).
- * Vedi docs/scientific/wcst.md per la definizione completa e i limiti.
+ * Principio perseverato (PP) e regole di conteggio, secondo la procedura di Heaton et al. (1993)
+ * come descritta da Howlett & Moseley (2024):
+ * - il PP si stabilisce al primo errore non ambiguo (questo errore conta come perseverativo);
+ * - al completamento di una categoria il PP diventa il criterio appena abbandonato;
+ * - tre errori non ambigui consecutivi su una dimensione che non è né corretta né il PP cambiano il PP;
+ *   il primo dei tre non è perseverativo, il secondo e il terzo sì (lettura della regola «il nuovo PP
+ *   non vale finché non c'è il secondo errore non ambiguo»: il testo non lo esplicita);
+ * - una risposta ambigua conta come perseverativa solo se è «incastrata» tra due errori non ambigui
+ *   perseverativi e combacia col PP; subito dopo il completamento di una categoria non può esserlo.
+ * Non è validato rispetto al software ufficiale PAR: vedi docs/scientific/wcst.md.
+ */
+class PerseverationScanner {
+  private pp: WcstDim | null = null;
+  private correctRun = 0;
+  private flagged: number[] = []; // indici delle risposte perseverative
+  private candidate: { dim: WcstDim; unambiguous: number[]; between: number[] } | null = null;
+  private sandwichOpen = false; // l'ultima risposta è stata un errore non ambiguo perseverativo
+  private pending: number[] = []; // ambigue combacianti col PP dopo l'ultimo errore perseverativo
+
+  constructor(
+    private readonly steps: readonly Step[],
+    private readonly rules: readonly WcstDim[],
+    private readonly runToShift: number,
+  ) {}
+
+  run(): PerseverationCounts {
+    this.steps.forEach((_, i) => this.visit(i));
+    const flagged = new Set(this.flagged);
+    const errors = [...flagged].filter((i) => !(this.steps[i] as Step).correct).length;
+    return { errors, responses: flagged.size };
+  }
+
+  private visit(i: number): void {
+    const step = this.steps[i] as Step;
+    const rule = this.rules[i] as WcstDim;
+    const unambiguous = step.matched.length === 1;
+    const dim = step.matched[0] as WcstDim;
+
+    if (!step.correct && unambiguous && this.pp === null && dim !== rule) this.pp = dim;
+    const perseverativeError = !step.correct && unambiguous && this.pp === dim && dim !== rule;
+
+    if (perseverativeError) this.onPerseverativeError(i);
+    else this.onOtherResponse(i, step, unambiguous);
+
+    if (step.correct) this.onCorrect(rule);
+    else this.correctRun = 0;
+  }
+
+  private onPerseverativeError(i: number): void {
+    if (this.sandwichOpen) this.flagged.push(...this.pending);
+    this.flagged.push(i);
+    this.sandwichOpen = true;
+    this.pending = [];
+    this.candidate = null;
+  }
+
+  private onOtherResponse(i: number, step: Step, unambiguous: boolean): void {
+    const ambiguousOnPp = step.matched.length > 1 && this.pp !== null && step.matched.includes(this.pp);
+    if (this.sandwichOpen && ambiguousOnPp) this.pending.push(i);
+    else {
+      this.sandwichOpen = false;
+      this.pending = [];
+    }
+    this.trackThreeErrors(i, step, unambiguous);
+  }
+
+  /** Tre errori non ambigui consecutivi sulla stessa dimensione (né corretta né PP) spostano il PP. */
+  private trackThreeErrors(i: number, step: Step, unambiguous: boolean): void {
+    const rule = this.rules[i] as WcstDim;
+    if (step.correct) {
+      this.candidate = null;
+    } else if (unambiguous) {
+      const dim = step.matched[0] as WcstDim;
+      if (this.candidate?.dim === dim) this.candidate.unambiguous.push(i);
+      else this.candidate = { dim, unambiguous: [i], between: [] };
+      if (this.candidate.unambiguous.length >= THREE_ERRORS) this.adoptCandidate();
+    } else if (this.candidate && step.matched.includes(this.candidate.dim) && !step.matched.includes(rule)) {
+      if (this.candidate.unambiguous.length >= 2) this.candidate.between.push(i);
+    } else {
+      this.candidate = null;
+    }
+  }
+
+  private adoptCandidate(): void {
+    const c = this.candidate as NonNullable<typeof this.candidate>;
+    this.pp = c.dim;
+    this.flagged.push(c.unambiguous[1] as number, c.unambiguous[2] as number, ...c.between);
+    this.sandwichOpen = true;
+    this.pending = [];
+    this.candidate = null;
+  }
+
+  private onCorrect(rule: WcstDim): void {
+    this.correctRun++;
+    if (this.correctRun < this.runToShift) return;
+    this.pp = rule; // il criterio appena abbandonato
+    this.correctRun = 0;
+    this.candidate = null;
+    this.sandwichOpen = false;
+    this.pending = [];
+  }
+}
+
+/** Errori e risposte perseverative di una sequenza di risposte, con le regole attive per ciascuna. */
+export function countPerseveration(
+  steps: readonly Step[],
+  rules: readonly WcstDim[],
+  runToShift: number,
+): PerseverationCounts {
+  return new PerseverationScanner(steps, rules, runToShift).run();
+}
+
+/**
+ * Metriche del WCST: categorie, errori totali, errori e risposte perseverative (principio
+ * perseverato di Heaton), errori non perseverativi, failure to maintain set, risposte a livello
+ * concettuale e trial per la prima categoria. I trial interrotti sono esclusi.
  */
 export function scoreWcst(
   trials: readonly TrialResult[],
   metas: readonly WcstTrialMeta[],
   params: WcstParams,
 ): SummaryMetric[] {
-  let categories = 0;
-  let consecutiveCorrect = 0;
-  let totalErrors = 0;
-  let perseverativeErrors = 0;
-  let failureToMaintainSet = 0;
-  let perseveratedPrinciple: WcstDim | null = null;
-
-  // Indici aggiuntivi (Heaton).
-  let correctRun = 0; // corse di corrette consecutive, NON azzerate dallo shift
-  let conceptualResponses = 0; // risposte in corse di ≥3 corrette consecutive (CLR)
-  let trialsToFirstCategory: number | null = null;
-
   const test = trials.filter((t) => t.phase === 'test' && t.flag !== 'INTERRUPTED');
+  const rows = test.flatMap((_, i) => (metas[i] ? [metas[i] as WcstTrialMeta] : []));
+  const steps: Step[] = rows.map((m) => ({ correct: m.matchedDims.includes(m.currentRule), matched: m.matchedDims }));
 
-  for (let i = 0; i < test.length; i++) {
-    const meta = metas[i];
-    if (!meta) continue;
-    const correct = meta.matchedDims.includes(meta.currentRule);
-
-    if (!correct) {
-      totalErrors++;
-      // Chiudi l'eventuale corsa concettuale (≥3 corrette) prima dell'errore.
-      if (correctRun >= 3) conceptualResponses += correctRun;
-      correctRun = 0;
-      // Stabilisce il PP al primo errore non ambiguo.
-      if (perseveratedPrinciple === null && meta.matchedDims.length === 1) {
-        const only = meta.matchedDims[0] as WcstDim;
-        if (only !== meta.currentRule) perseveratedPrinciple = only;
-      }
-      // Conta come perseverativo se combacia col PP e il PP non è la regola attuale.
-      if (
-        perseveratedPrinciple !== null &&
-        meta.matchedDims.includes(perseveratedPrinciple) &&
-        perseveratedPrinciple !== meta.currentRule
-      ) {
-        perseverativeErrors++;
-      }
-      // Failure to maintain set: 5–9 corrette consecutive interrotte da un errore.
-      if (consecutiveCorrect >= 5 && consecutiveCorrect <= 9) {
-        failureToMaintainSet++;
-      }
-      consecutiveCorrect = 0;
-    } else {
-      consecutiveCorrect++;
-      correctRun++;
-      if (consecutiveCorrect >= params.runToShift) {
-        categories++;
-        if (trialsToFirstCategory === null) trialsToFirstCategory = i + 1;
-        perseveratedPrinciple = meta.currentRule; // perseverare verso la regola appena abbandonata
-        consecutiveCorrect = 0;
-      }
-    }
-  }
-  // Chiudi l'ultima corsa concettuale aperta a fine test.
-  if (correctRun >= 3) conceptualResponses += correctRun;
-
-  const nonPerseverativeErrors = totalErrors - perseverativeErrors;
+  const run = scanRuns(steps, params.runToShift);
+  const totalErrors = steps.filter((s) => !s.correct).length;
+  const perseveration = countPerseveration(steps, rows.map((m) => m.currentRule), params.runToShift);
   const pct = (n: number): number => (test.length > 0 ? round1((n / test.length) * 100) : 0);
 
   return [
-    { label: 'Categorie completate', value: categories },
+    { label: 'Categorie completate', value: run.categories },
     { label: 'Trial totali', value: test.length },
     { label: 'Errori totali', value: totalErrors },
-    { label: 'Errori perseverativi', value: perseverativeErrors },
-    { label: '% errori perseverativi', value: pct(perseverativeErrors), unit: '%' },
-    { label: 'Errori non perseverativi', value: nonPerseverativeErrors },
-    { label: 'Failure to maintain set', value: failureToMaintainSet },
-    { label: 'Risposte a livello concettuale', value: pct(conceptualResponses), unit: '%' },
-    { label: 'Trial per la 1ª categoria', value: trialsToFirstCategory ?? test.length },
+    { label: 'Errori perseverativi', value: perseveration.errors },
+    { label: '% errori perseverativi', value: pct(perseveration.errors), unit: '%' },
+    { label: 'Risposte perseverative', value: perseveration.responses },
+    { label: 'Errori non perseverativi', value: totalErrors - perseveration.errors },
+    { label: 'Failure to maintain set', value: run.failureToMaintainSet },
+    { label: 'Risposte a livello concettuale', value: pct(run.conceptualResponses), unit: '%' },
+    { label: 'Trial per la 1ª categoria', value: run.trialsToFirstCategory ?? test.length },
   ];
+}
+
+interface RunStats {
+  categories: number;
+  failureToMaintainSet: number;
+  conceptualResponses: number;
+  trialsToFirstCategory: number | null;
+}
+
+/** Categorie, failure to maintain set e corse concettuali (≥ 3 corrette consecutive, non azzerate dal cambio). */
+function scanRuns(steps: readonly Step[], runToShift: number): RunStats {
+  const stats: RunStats = { categories: 0, failureToMaintainSet: 0, conceptualResponses: 0, trialsToFirstCategory: null };
+  let consecutiveCorrect = 0; // si azzera anche al cambio di categoria
+  let correctRun = 0; // corsa concettuale: NON si azzera al cambio di categoria
+  const closeRun = (): void => {
+    if (correctRun >= 3) stats.conceptualResponses += correctRun;
+    correctRun = 0;
+  };
+
+  steps.forEach((step, i) => {
+    if (!step.correct) {
+      closeRun();
+      if (consecutiveCorrect >= 5 && consecutiveCorrect < runToShift) stats.failureToMaintainSet++;
+      consecutiveCorrect = 0;
+      return;
+    }
+    consecutiveCorrect++;
+    correctRun++;
+    if (consecutiveCorrect >= runToShift) {
+      stats.categories++;
+      stats.trialsToFirstCategory ??= i + 1;
+      consecutiveCorrect = 0;
+    }
+  });
+  closeRun();
+  return stats;
 }
 
 function round1(x: number): number {
