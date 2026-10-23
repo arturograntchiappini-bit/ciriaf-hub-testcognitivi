@@ -1,0 +1,49 @@
+{
+  "test": "stroop",
+  "toleranceAbsolute": 1e-9,
+  "fixtureCases": {
+    "generation": 28,
+    "scoring": 36
+  },
+  "exactComparisons": 4212,
+  "floatComparisons": 432,
+  "maxAbsoluteDeviation": 0.0,
+  "maxAbsoluteDeviationAt": "nessuna deviazione (tutti i float identici bit a bit)",
+  "seeds": [
+    1,
+    42,
+    2026,
+    123456789
+  ],
+  "parameterVariants": [
+    "default",
+    "n-0",
+    "n-1",
+    "n-2",
+    "n-96",
+    "n-dispari-49",
+    "n-dispari-7"
+  ],
+  "edgeCases": [
+    "lista-vuota",
+    "solo-pratica",
+    "tutti-interrotti",
+    "omissioni-pure",
+    "anticipazioni-corrette-non-valide",
+    "soglia-anticipazione-150-valida",
+    "una-sola-condizione",
+    "un-solo-rt-sd-zero",
+    "solo-errori",
+    "errori-con-interrotti-esclusi",
+    "arrotondamento-meta-decimale",
+    "condizione-sconosciuta-ignorata"
+  ],
+  "expectedDivergences": [],
+  "proptestCases": {
+    "run_massimi_colore_parola": 256,
+    "determinismo_a_parita_di_seme": 256,
+    "bilanciamento_congruenti_incongruenti": 256,
+    "colori_equamente_rappresentati": 256,
+    "coppie_incongruenti_bilanciate": 256
+  }
+}

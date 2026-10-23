@@ -1,0 +1,61 @@
+{
+  "test": "gonogo",
+  "toleranceAbsolute": 1e-9,
+  "fixtureCases": {
+    "generation": 48,
+    "scoring": 28
+  },
+  "exactComparisons": 8589,
+  "floatComparisons": 280,
+  "maxAbsoluteDeviation": 0.0,
+  "maxAbsoluteDeviationAt": "nessuna deviazione (tutti i float identici bit a bit)",
+  "seeds": [
+    1,
+    42,
+    2026,
+    123456789
+  ],
+  "parameterVariants": [
+    "default",
+    "isi-fisso",
+    "n-0",
+    "n-1",
+    "n-120",
+    "n-dispari-7",
+    "n-dispari-81",
+    "rapporto-0.5",
+    "rapporto-0.6-n-dispari",
+    "rapporto-0.9",
+    "rapporto-0.99",
+    "rapporto-1.0-nessun-nogo"
+  ],
+  "edgeCases": [
+    "lista-vuota",
+    "solo-pratica",
+    "tutti-interrotti",
+    "nessuna-commissione-nogo-trattenuti",
+    "commissioni-su-tutti-i-nogo",
+    "omissioni-su-go",
+    "anticipazione-su-go",
+    "commissione-anticipata-conta-come-risposta",
+    "solo-go",
+    "solo-nogo",
+    "nessun-rt-valido-solo-omissioni",
+    "interrotti-esclusi-dai-denominatori",
+    "go-sbagliato-non-contribuisce-agli-rt",
+    "hit-perfetti-correzione-loglineare",
+    "un-solo-rt-sd-zero",
+    "arrotondamento-meta-decimale"
+  ],
+  "expectedDivergences": [
+    "rapporto-0.5@1",
+    "rapporto-0.5@42",
+    "rapporto-0.5@2026"
+  ],
+  "proptestCases": {
+    "isi_nell_intervallo": 256,
+    "primo_go_e_run_nogo_max_2": 256,
+    "conteggi_go_nogo_esatti": 256,
+    "determinismo_a_parita_di_seme": 256
+  }
+}

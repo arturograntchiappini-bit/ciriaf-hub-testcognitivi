@@ -1,0 +1,58 @@
+{
+  "test": "sart",
+  "toleranceAbsolute": 1e-9,
+  "fixtureCases": {
+    "generation": 44,
+    "scoring": 30
+  },
+  "exactComparisons": 13525,
+  "floatComparisons": 1295,
+  "maxAbsoluteDeviation": 0.0,
+  "maxAbsoluteDeviationAt": "nessuna deviazione (tutti i float identici bit a bit)",
+  "seeds": [
+    1,
+    42,
+    2026,
+    123456789
+  ],
+  "parameterVariants": [
+    "bersaglio-9",
+    "default",
+    "n-0",
+    "n-1",
+    "n-10-resto-1",
+    "n-17-resto-8",
+    "n-18-due-per-cifra",
+    "n-2",
+    "n-450",
+    "n-9",
+    "n-dispari-226"
+  ],
+  "edgeCases": [
+    "lista-vuota",
+    "solo-pratica",
+    "tutti-interrotti",
+    "nessuna-commissione-bersagli-trattenuti",
+    "commissione-con-go-precedenti",
+    "commissione-all-inizio-finestra-corta",
+    "commissione-senza-go-utilizzabili-prima",
+    "commissioni-vicine-trial-contato-una-volta",
+    "commissioni-a-distanza-finestre-disgiunte",
+    "go-omessi-e-anticipati-nella-finestra",
+    "commissione-anticipata-conta",
+    "commissione-interrotta-non-conta",
+    "solo-go",
+    "solo-bersagli",
+    "omissioni-su-go",
+    "go-sbagliato-non-utilizzabile",
+    "un-solo-rt-sd-zero",
+    "arrotondamento-meta-decimale"
+  ],
+  "expectedDivergences": [],
+  "proptestCases": {
+    "nessuna_ripetizione_immediata": 256,
+    "bersagli_nel_numero_atteso": 256,
+    "determinismo_a_parita_di_seme": 256,
+    "cifre_bilanciate": 256
+  }
+}

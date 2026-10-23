@@ -26,6 +26,14 @@ export function Hero({ focus, onOpenSession, onOpenSettings, onOpenScience }: He
           <span className="hidden sm:inline">Fondamenti scientifici</span>
           <span className="sm:hidden">Paper</span>
         </button>
+        <a
+          href="#app-desktop"
+          className="inline-flex min-h-[44px] items-center justify-center gap-2 border border-line px-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted transition-colors duration-200 hover:border-accent hover:text-ink"
+        >
+          <span aria-hidden>↓</span>
+          <span className="hidden sm:inline">App Windows</span>
+          <span className="sm:hidden">App</span>
+        </a>
         <button
           onClick={onOpenSettings}
           aria-label="Impostazioni"

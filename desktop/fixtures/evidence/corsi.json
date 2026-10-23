@@ -1,0 +1,41 @@
+{
+  "test": "corsi",
+  "toleranceAbsolute": 1e-9,
+  "fixtureCases": {
+    "generation": 16,
+    "geometry": 9,
+    "scoring": 8
+  },
+  "exactComparisons": 813,
+  "floatComparisons": 466,
+  "maxAbsoluteDeviation": 5.684341886080804e-14,
+  "maxAbsoluteDeviationAt": "tol8@42.L9[0].pathLength",
+  "seeds": [
+    1,
+    42,
+    2026,
+    123456789
+  ],
+  "parameterVariants": [
+    "complexityTolerance=0.5",
+    "complexityTolerance=100",
+    "complexityTolerance=2",
+    "complexityTolerance=8"
+  ],
+  "edgeCases": [
+    "empty",
+    "none_passed",
+    "interrupted_excluded",
+    "practice_excluded",
+    "omission_failed"
+  ],
+  "expectedDivergences": [],
+  "proptestCases": {
+    "sequenze_valide_blocchi_distinti_nel_layout": 128,
+    "due_sequenze_distinte_anche_per_rovescio": 128,
+    "determinismo_a_parita_di_seme": 128,
+    "pari_incroci_con_banda_ampia": 128,
+    "entro_la_tolleranza_dal_bersaglio_nel_caso_normale": 128,
+    "percorso_invariante_per_rovescio": 128
+  }
+}

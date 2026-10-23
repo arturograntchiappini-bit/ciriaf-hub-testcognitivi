@@ -10,3 +10,8 @@ coverage
 # artefatti di test/verifica
 .playwright-mcp/
 *.png
+
+# Artefatti di build dell app desktop
+dist-desktop/
+desktop/target/
+*.msi

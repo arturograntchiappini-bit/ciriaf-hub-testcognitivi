@@ -1,5 +1,6 @@
 import { TEST_CATALOG } from '../router';
 import { AuthorCard, REPOSITORY_URL } from '../components/AuthorCard';
+import { DesktopDownload } from './DesktopDownload';
 
 const FACTS: ReadonlyArray<{ value: string; unit: string; label: string }> = [
   { value: String(TEST_CATALOG.length), unit: 'test', label: 'paradigmi con fonti peer-reviewed' },
@@ -38,6 +39,8 @@ export function OpenSourcePanel(): JSX.Element {
           </a>
           .
         </p>
+
+        <DesktopDownload />
 
         <div className="reveal mt-20">
           <AuthorCard />

@@ -1,0 +1,768 @@
+{
+ "sections": [
+  {
+   "testKey": "stroop1",
+   "title": "Stroop 1 — Focus Parola",
+   "fields": [
+    {
+     "key": "nTrials",
+     "label": "Numero di trial",
+     "unit": "trial",
+     "min": 4,
+     "max": 400,
+     "step": 2
+    },
+    {
+     "key": "fixationMs",
+     "label": "Durata fissazione",
+     "unit": "ms",
+     "min": 0,
+     "max": 2000,
+     "step": 50
+    },
+    {
+     "key": "timeoutMs",
+     "label": "Timeout risposta",
+     "unit": "ms",
+     "min": 500,
+     "max": 8000,
+     "step": 100
+    },
+    {
+     "key": "isiMs",
+     "label": "Intervallo tra stimoli (ISI)",
+     "unit": "ms",
+     "min": 0,
+     "max": 3000,
+     "step": 50
+    },
+    {
+     "key": "practiceTrials",
+     "label": "Trial di pratica",
+     "unit": "trial",
+     "min": 0,
+     "max": 40,
+     "step": 1
+    }
+   ]
+  },
+  {
+   "testKey": "stroop2",
+   "title": "Stroop 2 — Focus Colore",
+   "fields": [
+    {
+     "key": "nTrials",
+     "label": "Numero di trial",
+     "unit": "trial",
+     "min": 4,
+     "max": 400,
+     "step": 2
+    },
+    {
+     "key": "fixationMs",
+     "label": "Durata fissazione",
+     "unit": "ms",
+     "min": 0,
+     "max": 2000,
+     "step": 50
+    },
+    {
+     "key": "timeoutMs",
+     "label": "Timeout risposta",
+     "unit": "ms",
+     "min": 500,
+     "max": 8000,
+     "step": 100
+    },
+    {
+     "key": "isiMs",
+     "label": "Intervallo tra stimoli (ISI)",
+     "unit": "ms",
+     "min": 0,
+     "max": 3000,
+     "step": 50
+    },
+    {
+     "key": "practiceTrials",
+     "label": "Trial di pratica",
+     "unit": "trial",
+     "min": 0,
+     "max": 40,
+     "step": 1
+    }
+   ]
+  },
+  {
+   "testKey": "gonogo",
+   "title": "Go / No-Go",
+   "fields": [
+    {
+     "key": "nTrials",
+     "label": "Numero di trial",
+     "unit": "trial",
+     "min": 8,
+     "max": 400,
+     "step": 4
+    },
+    {
+     "key": "goRatio",
+     "label": "Proporzione Go",
+     "min": 0.5,
+     "max": 0.9,
+     "step": 0.05
+    },
+    {
+     "key": "stimulusMs",
+     "label": "Durata stimolo (finestra)",
+     "unit": "ms",
+     "min": 300,
+     "max": 2000,
+     "step": 50
+    },
+    {
+     "key": "isiMinMs",
+     "label": "ISI minimo",
+     "unit": "ms",
+     "min": 200,
+     "max": 2000,
+     "step": 50
+    },
+    {
+     "key": "isiMaxMs",
+     "label": "ISI massimo",
+     "unit": "ms",
+     "min": 300,
+     "max": 3000,
+     "step": 50
+    },
+    {
+     "key": "practiceTrials",
+     "label": "Trial di pratica",
+     "unit": "trial",
+     "min": 0,
+     "max": 40,
+     "step": 1
+    }
+   ]
+  },
+  {
+   "testKey": "corsi",
+   "title": "Corsi Block Task",
+   "fields": [
+    {
+     "key": "startLength",
+     "label": "Lunghezza iniziale",
+     "unit": "blocchi",
+     "min": 2,
+     "max": 6,
+     "step": 1
+    },
+    {
+     "key": "maxLength",
+     "label": "Lunghezza massima",
+     "unit": "blocchi",
+     "min": 4,
+     "max": 9,
+     "step": 1
+    },
+    {
+     "key": "trialsPerLevel",
+     "label": "Trial per livello",
+     "unit": "trial",
+     "min": 1,
+     "max": 4,
+     "step": 1
+    },
+    {
+     "key": "presentMsPerBlock",
+     "label": "Durata per blocco",
+     "unit": "ms",
+     "min": 400,
+     "max": 2000,
+     "step": 50
+    },
+    {
+     "key": "complexityTolerance",
+     "label": "Tolleranza complessità",
+     "min": 2,
+     "max": 30,
+     "step": 1
+    }
+   ]
+  },
+  {
+   "testKey": "nback",
+   "title": "N-Back (2-back)",
+   "fields": [
+    {
+     "key": "n",
+     "label": "Livello n",
+     "min": 1,
+     "max": 3,
+     "step": 1
+    },
+    {
+     "key": "letterMs",
+     "label": "Durata lettera",
+     "unit": "ms",
+     "min": 200,
+     "max": 1500,
+     "step": 50
+    },
+    {
+     "key": "blankMs",
+     "label": "Durata schermo vuoto",
+     "unit": "ms",
+     "min": 500,
+     "max": 3000,
+     "step": 50
+    },
+    {
+     "key": "nTrials",
+     "label": "Numero di trial",
+     "unit": "trial",
+     "min": 20,
+     "max": 600,
+     "step": 10
+    },
+    {
+     "key": "targetRate",
+     "label": "Proporzione target",
+     "min": 0.1,
+     "max": 0.5,
+     "step": 0.05
+    },
+    {
+     "key": "lureRate",
+     "label": "Proporzione lure (tra i non-target)",
+     "min": 0,
+     "max": 0.4,
+     "step": 0.05
+    },
+    {
+     "key": "practiceTrials",
+     "label": "Trial di pratica",
+     "unit": "trial",
+     "min": 0,
+     "max": 60,
+     "step": 5
+    }
+   ]
+  },
+  {
+   "testKey": "wcst",
+   "title": "Wisconsin Card Sorting Test",
+   "fields": [
+    {
+     "key": "deckSize",
+     "label": "Dimensione mazzo",
+     "unit": "carte",
+     "min": 32,
+     "max": 256,
+     "step": 32
+    },
+    {
+     "key": "runToShift",
+     "label": "Corrette per il cambio",
+     "unit": "risposte",
+     "min": 4,
+     "max": 20,
+     "step": 1
+    },
+    {
+     "key": "maxCategories",
+     "label": "Categorie da completare",
+     "min": 1,
+     "max": 12,
+     "step": 1
+    }
+   ]
+  },
+  {
+   "testKey": "pvt",
+   "title": "PVT — Vigilanza Psicomotoria",
+   "fields": [
+    {
+     "key": "nTrials",
+     "label": "Numero di trial",
+     "unit": "trial",
+     "min": 10,
+     "max": 400,
+     "step": 10
+    },
+    {
+     "key": "stimulusMaxMs",
+     "label": "Timeout stimolo",
+     "unit": "ms",
+     "min": 1000,
+     "max": 30000,
+     "step": 500
+    },
+    {
+     "key": "isiMinMs",
+     "label": "ISI minimo",
+     "unit": "ms",
+     "min": 500,
+     "max": 20000,
+     "step": 500
+    },
+    {
+     "key": "isiMaxMs",
+     "label": "ISI massimo",
+     "unit": "ms",
+     "min": 1000,
+     "max": 30000,
+     "step": 500
+    },
+    {
+     "key": "practiceTrials",
+     "label": "Trial di pratica",
+     "unit": "trial",
+     "min": 0,
+     "max": 40,
+     "step": 1
+    }
+   ]
+  },
+  {
+   "testKey": "flanker",
+   "title": "Flanker — Frecce di Eriksen",
+   "fields": [
+    {
+     "key": "nTrials",
+     "label": "Numero di trial",
+     "unit": "trial",
+     "min": 12,
+     "max": 400,
+     "step": 4
+    },
+    {
+     "key": "incongruentRatio",
+     "label": "Proporzione incongruenti",
+     "min": 0.2,
+     "max": 0.6,
+     "step": 0.05
+    },
+    {
+     "key": "neutralRatio",
+     "label": "Proporzione neutri",
+     "min": 0,
+     "max": 0.4,
+     "step": 0.05
+    },
+    {
+     "key": "fixationMs",
+     "label": "Durata fissazione",
+     "unit": "ms",
+     "min": 200,
+     "max": 2000,
+     "step": 100
+    },
+    {
+     "key": "responseWindowMs",
+     "label": "Finestra di risposta",
+     "unit": "ms",
+     "min": 500,
+     "max": 3000,
+     "step": 100
+    },
+    {
+     "key": "isiMinMs",
+     "label": "ISI minimo",
+     "unit": "ms",
+     "min": 300,
+     "max": 3000,
+     "step": 100
+    },
+    {
+     "key": "isiMaxMs",
+     "label": "ISI massimo",
+     "unit": "ms",
+     "min": 400,
+     "max": 4000,
+     "step": 100
+    },
+    {
+     "key": "practiceTrials",
+     "label": "Trial di pratica",
+     "unit": "trial",
+     "min": 0,
+     "max": 40,
+     "step": 1
+    }
+   ]
+  },
+  {
+   "testKey": "sart",
+   "title": "SART — Attenzione sostenuta alla risposta",
+   "fields": [
+    {
+     "key": "nTrials",
+     "label": "Numero di trial",
+     "unit": "trial",
+     "min": 18,
+     "max": 450,
+     "step": 9
+    },
+    {
+     "key": "targetDigit",
+     "label": "Cifra da non rispondere",
+     "min": 1,
+     "max": 9,
+     "step": 1
+    },
+    {
+     "key": "digitMs",
+     "label": "Durata della cifra",
+     "unit": "ms",
+     "min": 100,
+     "max": 1000,
+     "step": 50
+    },
+    {
+     "key": "maskMs",
+     "label": "Durata della maschera",
+     "unit": "ms",
+     "min": 300,
+     "max": 2000,
+     "step": 100
+    },
+    {
+     "key": "practiceTrials",
+     "label": "Trial di pratica",
+     "unit": "trial",
+     "min": 0,
+     "max": 40,
+     "step": 1
+    }
+   ]
+  },
+  {
+   "testKey": "visualSearch",
+   "title": "Visual Search — Ricerca visiva",
+   "fields": [
+    {
+     "key": "nTrials",
+     "label": "Numero di trial",
+     "unit": "trial",
+     "min": 12,
+     "max": 480,
+     "step": 12
+    },
+    {
+     "key": "fixationMs",
+     "label": "Durata fissazione",
+     "unit": "ms",
+     "min": 200,
+     "max": 2000,
+     "step": 100
+    },
+    {
+     "key": "responseWindowMs",
+     "label": "Tempo massimo",
+     "unit": "ms",
+     "min": 1000,
+     "max": 10000,
+     "step": 500
+    },
+    {
+     "key": "isiMinMs",
+     "label": "ISI minimo",
+     "unit": "ms",
+     "min": 300,
+     "max": 3000,
+     "step": 100
+    },
+    {
+     "key": "isiMaxMs",
+     "label": "ISI massimo",
+     "unit": "ms",
+     "min": 400,
+     "max": 4000,
+     "step": 100
+    },
+    {
+     "key": "practiceTrials",
+     "label": "Trial di pratica",
+     "unit": "trial",
+     "min": 0,
+     "max": 40,
+     "step": 1
+    }
+   ]
+  },
+  {
+   "testKey": "mentalRotation",
+   "title": "Mental Rotation — Rotazione mentale",
+   "fields": [
+    {
+     "key": "nTrials",
+     "label": "Numero di trial",
+     "unit": "trial",
+     "min": 14,
+     "max": 420,
+     "step": 14
+    },
+    {
+     "key": "fixationMs",
+     "label": "Durata fissazione",
+     "unit": "ms",
+     "min": 200,
+     "max": 2000,
+     "step": 100
+    },
+    {
+     "key": "responseWindowMs",
+     "label": "Tempo massimo",
+     "unit": "ms",
+     "min": 2000,
+     "max": 20000,
+     "step": 1000
+    },
+    {
+     "key": "isiMinMs",
+     "label": "ISI minimo",
+     "unit": "ms",
+     "min": 300,
+     "max": 3000,
+     "step": 100
+    },
+    {
+     "key": "isiMaxMs",
+     "label": "ISI massimo",
+     "unit": "ms",
+     "min": 400,
+     "max": 4000,
+     "step": 100
+    },
+    {
+     "key": "practiceTrials",
+     "label": "Trial di pratica",
+     "unit": "trial",
+     "min": 0,
+     "max": 40,
+     "step": 1
+    }
+   ]
+  }
+ ],
+ "defaults": {
+  "stroop1": {
+   "nTrials": 48,
+   "fixationMs": 500,
+   "timeoutMs": 3000,
+   "isiMs": 500,
+   "practiceTrials": 8
+  },
+  "stroop2": {
+   "nTrials": 48,
+   "fixationMs": 500,
+   "timeoutMs": 3000,
+   "isiMs": 500,
+   "practiceTrials": 8
+  },
+  "gonogo": {
+   "nTrials": 80,
+   "goRatio": 0.75,
+   "stimulusMs": 800,
+   "isiMinMs": 500,
+   "isiMaxMs": 1000,
+   "practiceTrials": 10
+  },
+  "corsi": {
+   "startLength": 3,
+   "maxLength": 9,
+   "trialsPerLevel": 2,
+   "presentMsPerBlock": 1000,
+   "complexityTolerance": 8
+  },
+  "nback": {
+   "n": 2,
+   "letterMs": 500,
+   "blankMs": 1500,
+   "nTrials": 360,
+   "targetRate": 0.3,
+   "lureRate": 0.2,
+   "practiceTrials": 20
+  },
+  "wcst": {
+   "deckSize": 64,
+   "runToShift": 10,
+   "maxCategories": 6
+  },
+  "pvt": {
+   "nTrials": 100,
+   "stimulusMaxMs": 10000,
+   "isiMinMs": 2000,
+   "isiMaxMs": 10000,
+   "practiceTrials": 5
+  },
+  "flanker": {
+   "nTrials": 96,
+   "incongruentRatio": 0.4,
+   "neutralRatio": 0.2,
+   "fixationMs": 500,
+   "responseWindowMs": 1500,
+   "isiMinMs": 700,
+   "isiMaxMs": 1100,
+   "practiceTrials": 12
+  },
+  "sart": {
+   "nTrials": 225,
+   "targetDigit": 3,
+   "digitMs": 250,
+   "maskMs": 900,
+   "practiceTrials": 18
+  },
+  "visualSearch": {
+   "nTrials": 96,
+   "fixationMs": 500,
+   "responseWindowMs": 4000,
+   "isiMinMs": 700,
+   "isiMaxMs": 1100,
+   "practiceTrials": 8
+  },
+  "mentalRotation": {
+   "nTrials": 84,
+   "fixationMs": 500,
+   "responseWindowMs": 8000,
+   "isiMinMs": 700,
+   "isiMaxMs": 1100,
+   "practiceTrials": 6
+  }
+ },
+ "instructions": {
+  "stroop1": {
+   "title": "Stroop 1 — Focus sulla Parola",
+   "paragraphs": [
+    "Apparirà una parola che indica un colore, scritta in un colore che può coincidere o no col suo significato.",
+    "Devi rispondere in base alla PAROLA che leggi, ignorando il colore con cui è scritta.",
+    "Premi il tasto corrispondente all’iniziale della parola, il più rapidamente e accuratamente possibile."
+   ],
+   "keyHints": [
+    "R = ROSSO",
+    "V = VERDE",
+    "B = BLU",
+    "G = GIALLO"
+   ]
+  },
+  "stroop2": {
+   "title": "Stroop 2 — Focus sul Colore",
+   "paragraphs": [
+    "Apparirà una parola che indica un colore, scritta in un colore che può coincidere o no col suo significato.",
+    "Devi rispondere in base al COLORE con cui è scritta la parola, ignorando ciò che la parola dice.",
+    "Premi il tasto corrispondente all’iniziale del colore, il più rapidamente e accuratamente possibile."
+   ],
+   "keyHints": [
+    "R = ROSSO",
+    "V = VERDE",
+    "B = BLU",
+    "G = GIALLO"
+   ]
+  },
+  "gonogo": {
+   "title": "Go / No-Go",
+   "paragraphs": [
+    "Appariranno rapidamente dei cerchi colorati.",
+    "Premi la BARRA SPAZIATRICE il più velocemente possibile quando vedi un cerchio VERDE (Go).",
+    "NON premere nulla quando vedi un cerchio ROSSO (No-Go): devi trattenere la risposta."
+   ],
+   "keyHints": [
+    "BARRA SPAZIATRICE = cerchio verde",
+    "Nessun tasto = cerchio rosso"
+   ]
+  },
+  "corsi": {
+   "title": "Corsi Block Task",
+   "paragraphs": [
+    "Vedrai una configurazione fissa di 9 blocchi. Alcuni blocchi si illumineranno in sequenza, uno dopo l’altro.",
+    "Quando la sequenza termina, riproducila cliccando i blocchi nello STESSO ordine in cui si sono illuminati.",
+    "Le sequenze si allungano progressivamente. Concentrati e memorizza l’ordine."
+   ],
+   "keyHints": [
+    "Usa il mouse per cliccare i blocchi"
+   ]
+  },
+  "nback": {
+   "title": "N-Back (2-back)",
+   "paragraphs": [
+    "Vedrai una sequenza continua di lettere, una alla volta.",
+    "Premi la BARRA SPAZIATRICE quando la lettera attuale è identica a quella comparsa DUE posizioni prima.",
+    "Non premere nulla in tutti gli altri casi. Il test è lungo: mantieni la concentrazione."
+   ],
+   "keyHints": [
+    "BARRA SPAZIATRICE = la lettera è uguale a 2 passi fa"
+   ]
+  },
+  "wcst": {
+   "title": "Wisconsin Card Sorting Test",
+   "paragraphs": [
+    "In alto vedrai una carta. Devi abbinarla a una delle 4 carte in basso cliccandola.",
+    "Puoi abbinare per colore, forma o numero dei simboli: NON ti verrà detto quale sia la regola giusta.",
+    "Dopo ogni scelta vedrai solo “Corretto” o “Errato”. Usa il feedback per scoprire la regola. Attenzione: la regola può cambiare senza preavviso."
+   ],
+   "keyHints": [
+    "Usa il mouse per cliccare la carta"
+   ]
+  },
+  "pvt": {
+   "title": "PVT — Vigilanza Psicomotoria",
+   "paragraphs": [
+    "Fissa lo schermo. A intervalli imprevedibili, comparirà un contatore che parte da 0 e conta i millisecondi.",
+    "Premi la BARRA SPAZIATRICE il più velocemente possibile NON APPENA il numero appare.",
+    "Cerca di mantenere la concentrazione: il test dura circa 10 minuti. Il numero di lapse (risposte lente) è la misura principale."
+   ],
+   "keyHints": [
+    "BARRA SPAZIATRICE = ferma il contatore il più velocemente possibile"
+   ]
+  },
+  "flanker": {
+   "title": "Flanker — Frecce di Eriksen",
+   "paragraphs": [
+    "Al centro dello schermo comparirà una fila di cinque simboli.",
+    "Rispondi alla direzione della freccia CENTRALE, ignorando i simboli ai lati.",
+    "A volte i simboli ai lati indicano la direzione opposta: ignorali. Rispondi il più rapidamente e accuratamente possibile."
+   ],
+   "keyHints": [
+    "← = freccia centrale a sinistra",
+    "→ = freccia centrale a destra"
+   ]
+  },
+  "sart": {
+   "title": "SART — Attenzione sostenuta alla risposta",
+   "paragraphs": [
+    "Sullo schermo compariranno cifre da 1 a 9, una alla volta, ciascuna seguita da un cerchio barrato.",
+    "Premi la BARRA SPAZIATRICE a ogni cifra TRANNE al 3: quando compare il 3, non premere nulla.",
+    "Rispondi in fretta ma con attenzione: gli errori sul bersaglio sono la misura principale. Il test dura circa 4–5 minuti."
+   ],
+   "keyHints": [
+    "BARRA SPAZIATRICE = qualsiasi cifra tranne il 3",
+    "Nessun tasto = 3"
+   ]
+  },
+  "mentalRotation": {
+   "title": "Mental Rotation — Rotazione mentale",
+   "paragraphs": [
+    "Compariranno due figure fatte di cubetti, affiancate.",
+    "A volte la figura di destra è la stessa di quella di sinistra, solo ruotata. Altre volte è la sua immagine speculare e non potrai mai sovrapporla.",
+    "Immagina di ruotare una figura per capire se sono uguali o diverse; rispondi il più rapidamente possibile, senza sbagliare."
+   ],
+   "keyHints": [
+    "← = figure UGUALI (solo ruotate)",
+    "→ = figure DIVERSE (speculari)"
+   ]
+  },
+  "visualSearch": {
+   "title": "Visual Search — Ricerca visiva",
+   "paragraphs": [
+    "Comparirà un campo con molte figure colorate. Il bersaglio è un CERCHIO ARANCIONE.",
+    "A volte il bersaglio c’è, a volte no. Cercalo e rispondi il più rapidamente possibile, senza sbagliare.",
+    "I distrattori cambiano: possono essere tutti diversi per colore, oppure assomigliare al bersaglio per forma o per colore."
+   ],
+   "keyHints": [
+    "← = cerchio arancione PRESENTE",
+    "→ = cerchio arancione ASSENTE"
+   ]
+  }
+ }
+}

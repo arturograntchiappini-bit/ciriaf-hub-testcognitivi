@@ -1,0 +1,46 @@
+{
+  "test": "pvt",
+  "toleranceAbsolute": 1e-9,
+  "fixtureCases": {
+    "generation": 16,
+    "scoring": 15
+  },
+  "exactComparisons": 3406,
+  "floatComparisons": 182,
+  "maxAbsoluteDeviation": 0.0,
+  "maxAbsoluteDeviationAt": "nessuna deviazione (tutti i float identici bit a bit)",
+  "seeds": [
+    1,
+    42,
+    2026,
+    123456789
+  ],
+  "parameterVariants": [
+    "default",
+    "isi-stretto",
+    "isi-uguali",
+    "zero-trial"
+  ],
+  "edgeCases": [
+    "empty",
+    "only_practice",
+    "with_lapses",
+    "lapse_exactly_at_threshold",
+    "omissions_only",
+    "anticipations_only",
+    "interrupted_only",
+    "single_valid",
+    "even_count_median",
+    "odd_count_median",
+    "valid_without_response",
+    "mixed_with_practice"
+  ],
+  "expectedDivergences": [],
+  "proptestCases": {
+    "isi_nell_intervallo_e_lunghezza": 512,
+    "determinismo_a_parita_di_seme": 256,
+    "isi_fisso_se_min_uguale_max": 128,
+    "isi_copre_gli_estremi_su_intervallo_stretto": 128,
+    "metriche_coerenti": 256
+  }
+}

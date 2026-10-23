@@ -1,0 +1,58 @@
+{
+  "test": "trail_making",
+  "toleranceAbsolute": 1e-9,
+  "fixtureCases": {
+    "generation": 56,
+    "run": 9,
+    "scoring": 17
+  },
+  "exactComparisons": 5230,
+  "floatComparisons": 4075,
+  "maxAbsoluteDeviation": 1.1102230246251563e-16,
+  "maxAbsoluteDeviationAt": "A-n3@1.stimuli[2].y",
+  "seeds": [
+    1,
+    42,
+    2026,
+    123456789
+  ],
+  "parameterVariants": [
+    "A-n0",
+    "A-n1",
+    "A-n120",
+    "A-n200",
+    "A-n25",
+    "A-n3",
+    "A-n51",
+    "A-n8",
+    "B-n0",
+    "B-n1",
+    "B-n25",
+    "B-n3",
+    "B-n51",
+    "B-n8"
+  ],
+  "edgeCases": [
+    "lista-vuota",
+    "lista-vuota-n-zero",
+    "solo-parte-a-completa",
+    "solo-parte-b-completa",
+    "parte-b-incompleta",
+    "parte-a-incompleta-b-completa",
+    "solo-errori-nessuna-parte-completa",
+    "pratica-esclusa",
+    "solo-pratica",
+    "rt-nulli-e-zero",
+    "rapporto-con-tempo-a-nullo",
+    "arrotondamento-meta-centesimo",
+    "n-targets-zero-con-clic",
+    "condizioni-estranee-ignorate"
+  ],
+  "expectedDivergences": [],
+  "proptestCases": {
+    "bilanciamento_numeri_lettere": 256,
+    "etichette_in_ordine": 256,
+    "determinismo_a_parita_di_seme": 256,
+    "distanza_minima_fra_i_centri": 256
+  }
+}

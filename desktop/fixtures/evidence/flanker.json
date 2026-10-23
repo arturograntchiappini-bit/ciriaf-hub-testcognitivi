@@ -1,0 +1,63 @@
+{
+  "test": "flanker",
+  "toleranceAbsolute": 1e-9,
+  "fixtureCases": {
+    "generation": 56,
+    "scoring": 30
+  },
+  "exactComparisons": 24727,
+  "floatComparisons": 345,
+  "maxAbsoluteDeviation": 1.1368683772161605e-13,
+  "maxAbsoluteDeviationAt": "sim-perfect@42.conflictAdaptation",
+  "seeds": [
+    1,
+    42,
+    2026,
+    123456789
+  ],
+  "parameterVariants": [
+    "default",
+    "isi-fisso",
+    "n-0",
+    "n-1",
+    "n-3",
+    "n-300",
+    "n-dispari-11",
+    "n-dispari-97",
+    "rapporti-0.5-0.5",
+    "rapporti-estremi-0.9-0.2-eccedenti",
+    "senza-neutri",
+    "solo-congruenti",
+    "solo-incongruenti",
+    "solo-neutri"
+  ],
+  "edgeCases": [
+    "lista-vuota",
+    "solo-pratica",
+    "tutti-interrotti",
+    "omissioni-pure",
+    "anticipazioni",
+    "senza-neutri-trattino",
+    "adattamento-quattro-celle-piene",
+    "adattamento-cella-vuota-null",
+    "adattamento-precedente-errato-escluso",
+    "adattamento-precedente-interrotto-escluso",
+    "adattamento-neutri-non-confrontabili",
+    "un-solo-trial",
+    "solo-errori",
+    "errori-e-interrotti-esclusi-accuratezza",
+    "arrotondamento-meta-decimale",
+    "rt-fuori-ordine-solo-test",
+    "indici-con-salti",
+    "pratica-con-stessi-indici"
+  ],
+  "expectedDivergences": [],
+  "proptestCases": {
+    "isi_nell_intervallo": 256,
+    "run_massimi_condizione_direzione": 256,
+    "frecce_coerenti_con_condizione": 256,
+    "determinismo_a_parita_di_seme": 256,
+    "conteggi_per_condizione": 256,
+    "direzioni_bilanciate_per_condizione": 256
+  }
+}
