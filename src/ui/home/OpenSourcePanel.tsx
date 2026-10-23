@@ -5,7 +5,7 @@ const FACTS: ReadonlyArray<{ value: string; unit: string; label: string }> = [
   { value: String(TEST_CATALOG.length), unit: 'test', label: 'paradigmi con fonti peer-reviewed' },
   { value: '0', unit: 'account', label: 'nessun dato personale, codice sessione anonimo' },
   { value: '0', unit: 'server', label: 'tutto gira nel browser del laboratorio' },
-  { value: '2', unit: 'formati', label: 'CSV (Excel) e JSON, trial per trial' },
+  { value: '6', unit: 'formati', label: 'CSV (Excel e internazionale), JSON, riepilogo, eventi TSV e report HTML' },
 ];
 
 /** Dati e codice aperti, con la card dell'autore in fondo alla pagina. */
