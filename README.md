@@ -4,7 +4,7 @@
 
 # Sintropia — Cognitive tests Hub
 
-**Otto test cognitivi classici, con la loro base scientifica, direttamente nel browser.**<br>
+**Nove test cognitivi classici, con la loro base scientifica, direttamente nel browser.**<br>
 Per studiare come l'ambiente fisico influisce sulla mente. Nessun account, nessun server: i dati grezzi restano tuoi.
 
 [![Licenza MIT](https://img.shields.io/badge/licenza-MIT-4a90d9?style=flat-square)](LICENSE)
@@ -78,8 +78,9 @@ Tre idee guida:
 | 6 | Wisconsin Card Sorting Test | Flessibilità cognitiva | Berg (1948); Grant & Berg (1948) | [wcst](docs/scientific/wcst.md) |
 | 7 | PVT — Vigilanza psicomotoria | Attenzione sostenuta | Dinges & Powell (1985) | [pvt](docs/scientific/pvt.md) |
 | 8 | Flanker (frecce di Eriksen) | Attenzione selettiva | Eriksen & Eriksen (1974) | [flanker](docs/scientific/flanker.md) |
+| 9 | SART — Attenzione sostenuta alla risposta | Controllo attentivo | Robertson et al. (1997) | [sart](docs/scientific/sart.md) |
 
-In arrivo: SART, Visual Search, Mental Rotation e Trail Making A/B (vedi [Roadmap](#roadmap)).
+In arrivo: Visual Search, Mental Rotation e Trail Making A/B (vedi [Roadmap](#roadmap)).
 
 > **Nota sui paper.** Motori e paper dei test sono stati rivisti nell'ottobre 2026: ogni riferimento con DOI è verificato
 > su Crossref, ciò che non si è potuto verificare (per esempio i manuali commerciali) è dichiarato come tale, e le scelte
@@ -175,7 +176,7 @@ flowchart LR
   librerie 3D), lettore dei paper.
 - **`src/config`** — parametri di default, ciascuno con la sua fonte.
 - **`docs/`** — [architettura](docs/architettura.md), paper scientifici, specifiche e piani di progetto.
-- **`revisione-motore/`** — copie autonome del motore di alcuni test, per la revisione scientifica.
+- **`revisione-motore/`** — copie autonome (generate dai motori vivi) dei test, per la revisione scientifica; `scripts/sync-revisione-motore.mjs` le rigenera.
 
 Dettagli in [`docs/architettura.md`](docs/architettura.md).
 
@@ -209,12 +210,12 @@ Dettagli in [`docs/architettura.md`](docs/architettura.md).
 
 ## Roadmap
 
-- [ ] SART — Sustained Attention to Response Task
+- [x] SART — Sustained Attention to Response Task (parametri da confrontare con l'articolo originale)
 - [ ] Visual Search (Treisman & Gelade)
 - [ ] Mental Rotation (Shepard & Metzler)
 - [ ] Trail Making A/B
 - [x] Revisione scientifica dei motori e dei paper dei test esistenti
-- [ ] Risincronizzare le copie autonome in `revisione-motore/` con i motori rivisti
+- [x] Copie autonome in `revisione-motore/` generate dai motori vivi (`node scripts/sync-revisione-motore.mjs`) e protette da un test di allineamento
 
 ## Contribuire
 

@@ -68,6 +68,13 @@ export const PAPERS: readonly PaperMeta[] = [
     summary: 'L’attenzione selettiva: interferenza dei distrattori laterali e adattamento al conflitto.',
   },
   {
+    slug: 'sart',
+    title: 'SART — Attenzione sostenuta alla risposta',
+    kind: 'test',
+    testIds: ['sart'],
+    summary: 'Cifre in sequenza e una sola da non rispondere: commissioni, tempi prima dell’errore e compromesso velocità-accuratezza.',
+  },
+  {
     slug: 'validazione-rt',
     title: 'Validazione dei tempi di reazione',
     kind: 'method',

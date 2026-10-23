@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { INSTRUCTIONS, instructionsFor, nBackInstruction } from './instructions';
+import { INSTRUCTIONS, instructionsFor, nBackInstruction, sartInstruction } from './instructions';
 
 describe('nBackInstruction', () => {
   it('segue il livello n scelto', () => {
@@ -15,10 +15,23 @@ describe('nBackInstruction', () => {
   });
 });
 
+describe('sartInstruction', () => {
+  it('segue la cifra bersaglio scelta', () => {
+    expect(sartInstruction(7).paragraphs[1]).toContain('TRANNE al 7');
+    expect(sartInstruction(7).keyHints[1]).toBe('Nessun tasto = 7');
+  });
+
+  it('ripiega su 3 con un valore non valido', () => {
+    expect(sartInstruction(Number.NaN).keyHints[1]).toBe('Nessun tasto = 3');
+    expect(sartInstruction(12).keyHints[1]).toBe('Nessun tasto = 3');
+  });
+});
+
 describe('instructionsFor', () => {
   it('adatta l’N-Back ai parametri e lascia invariati gli altri test', () => {
     expect(instructionsFor('nback', { n: 3 }).title).toBe('N-Back (3-back)');
     expect(instructionsFor('nback').title).toBe('N-Back (2-back)');
     expect(instructionsFor('flanker', { n: 3 })).toBe(INSTRUCTIONS.flanker);
+    expect(instructionsFor('sart', { targetDigit: 5 }).keyHints[1]).toBe('Nessun tasto = 5');
   });
 });

@@ -9,6 +9,7 @@ import { CorsiView } from './CorsiView';
 import { WcstView } from './WcstView';
 import { PvtView } from './PvtView';
 import { FlankerView } from './FlankerView';
+import { SartView } from './SartView';
 import type { TestId, TestResult } from '../../engine/types';
 import type { StroopParams } from '../../engine/tests/stroop';
 import type { GoNoGoParams } from '../../engine/tests/gonogo';
@@ -17,6 +18,7 @@ import type { CorsiParams } from '../../engine/tests/corsi';
 import type { WcstParams } from '../../engine/tests/wcst';
 import type { PvtParams } from '../../engine/tests/pvt';
 import type { FlankerParams } from '../../engine/tests/flanker';
+import type { SartParams } from '../../engine/tests/sart';
 
 interface TestHostProps {
   testId: TestId;
@@ -58,5 +60,7 @@ export function TestHost(props: TestHostProps): JSX.Element {
       return <PvtView params={params as unknown as PvtParams} feedbackDuringTest={feedbackDuringTest} {...common} />;
     case 'flanker':
       return <FlankerView params={params as unknown as FlankerParams} feedbackDuringTest={feedbackDuringTest} {...common} />;
+    case 'sart':
+      return <SartView params={params as unknown as SartParams} feedbackDuringTest={feedbackDuringTest} {...common} />;
   }
 }

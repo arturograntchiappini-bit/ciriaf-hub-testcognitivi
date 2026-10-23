@@ -20,6 +20,7 @@ const FOCUS_BY_TEST: Partial<Record<TestId, TestFocus>> = {
   nback: { regions: FRONTO_PARIETAL, regionLabel: 'Fronto-parietale', task: 'Di’ se lo stimolo coincide con quello di due posizioni prima.' },
   wcst: { regions: FRONTAL, regionLabel: 'Frontale', task: 'Deduci la regola di smistamento e cambiala quando cambia.' },
   flanker: { regions: FRONTAL, regionLabel: 'Frontale', task: 'Rispondi alla freccia centrale e ignora quelle ai lati.' },
+  sart: { regions: FRONTO_PARIETAL, regionLabel: 'Fronto-parietale', task: 'Premi a ogni cifra, tranne a una: trattieniti quando compare.' },
   pvt: { regions: FRONTO_PARIETAL, regionLabel: 'Fronto-parietale', task: 'Rispondi appena compare lo stimolo, a intervalli imprevedibili.' },
 };
 

@@ -64,6 +64,20 @@ sono stati consultati direttamente**.
   Cognitive Neuroscience, 14*(3), 340–347.
   https://doi.org/10.1162/089892902317361886
 
+## SART — Sustained Attention to Response Task
+
+- Robertson, I. H., Manly, T., Andrade, J., Baddeley, B. T., & Yiend, J. (1997).
+  'Oops!': Performance correlates of everyday attentional failures in traumatic
+  brain injured and normal subjects. *Neuropsychologia, 35*(6), 747–758.
+  https://doi.org/10.1016/S0028-3932(97)00015-8
+- Manly, T., Robertson, I. H., Galloway, M., & Hawkins, K. (1999). The absent mind:
+  Further investigations of sustained attention to response. *Neuropsychologia,
+  37*(6), 661–670. https://doi.org/10.1016/S0028-3932(98)00127-4
+- Dang, J. S., Figueroa, I. J., & Helton, W. S. (2018). You are measuring the
+  decision to be fast, not inattention: The Sustained Attention to Response Task
+  does not measure sustained attention. *Experimental Brain Research, 236*(8),
+  2255–2262. https://doi.org/10.1007/s00221-018-5291-6
+
 ## Corsi Block-Tapping Task
 
 - Corsi, P. M. (1972). *Human memory and the medial temporal region of the brain*

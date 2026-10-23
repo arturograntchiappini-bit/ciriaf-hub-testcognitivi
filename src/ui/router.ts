@@ -31,4 +31,5 @@ export const TEST_CATALOG: readonly TestMeta[] = [
   { id: 'wcst', title: 'Wisconsin Card Sorting Test', domain: 'Flessibilità cognitiva' },
   { id: 'pvt', title: 'PVT — Vigilanza Psicomotoria', domain: 'Attenzione sostenuta' },
   { id: 'flanker', title: 'Flanker — Frecce di Eriksen', domain: 'Attenzione selettiva' },
+  { id: 'sart', title: 'SART — Attenzione sostenuta alla risposta', domain: 'Controllo attentivo' },
 ];

@@ -28,6 +28,20 @@ export function nBackInstruction(n: number): Instruction {
   };
 }
 
+/** Istruzioni del SART per la cifra bersaglio `digit`: il testo segue il parametro, non è fisso a 3. */
+export function sartInstruction(digit: number): Instruction {
+  const target = Number.isInteger(digit) && digit >= 1 && digit <= 9 ? digit : 3;
+  return {
+    title: 'SART — Attenzione sostenuta alla risposta',
+    paragraphs: [
+      'Sullo schermo compariranno cifre da 1 a 9, una alla volta, ciascuna seguita da un cerchio barrato.',
+      `Premi la BARRA SPAZIATRICE a ogni cifra TRANNE al ${target}: quando compare il ${target}, non premere nulla.`,
+      'Rispondi in fretta ma con attenzione: gli errori sul bersaglio sono la misura principale. Il test dura circa 4–5 minuti.',
+    ],
+    keyHints: ['BARRA SPAZIATRICE = qualsiasi cifra tranne il ' + target, `Nessun tasto = ${target}`],
+  };
+}
+
 export const INSTRUCTIONS: Record<TestId, Instruction> = {
   stroop1: {
     title: 'Stroop 1 — Focus sulla Parola',
@@ -93,9 +107,12 @@ export const INSTRUCTIONS: Record<TestId, Instruction> = {
     ],
     keyHints: ['← = freccia centrale a sinistra', '→ = freccia centrale a destra'],
   },
+  sart: sartInstruction(3),
 };
 
-/** Istruzioni di un test, adattate ai parametri scelti (oggi solo il livello n dell'N-Back). */
+/** Istruzioni di un test, adattate ai parametri scelti (livello n dell'N-Back, cifra bersaglio del SART). */
 export function instructionsFor(testId: TestId, params?: Record<string, unknown>): Instruction {
-  return testId === 'nback' ? nBackInstruction(Number(params?.n)) : INSTRUCTIONS[testId];
+  if (testId === 'nback') return nBackInstruction(Number(params?.n));
+  if (testId === 'sart') return sartInstruction(Number(params?.targetDigit));
+  return INSTRUCTIONS[testId];
 }

@@ -113,6 +113,17 @@ export const PARAM_SECTIONS: SectionDesc[] = [
       { key: 'practiceTrials', label: 'Trial di pratica', unit: 'trial', min: 0, max: 40, step: 1 },
     ],
   },
+  {
+    testKey: 'sart',
+    title: 'SART — Attenzione sostenuta alla risposta',
+    fields: [
+      { key: 'nTrials', label: 'Numero di trial', unit: 'trial', min: 18, max: 450, step: 9 },
+      { key: 'targetDigit', label: 'Cifra da non rispondere', min: 1, max: 9, step: 1 },
+      { key: 'digitMs', label: 'Durata della cifra', unit: 'ms', min: 100, max: 1000, step: 50 },
+      { key: 'maskMs', label: 'Durata della maschera', unit: 'ms', min: 300, max: 2000, step: 100 },
+      { key: 'practiceTrials', label: 'Trial di pratica', unit: 'trial', min: 0, max: 40, step: 1 },
+    ],
+  },
 ];
 
 /** Sezione dei parametri per un dato test. */

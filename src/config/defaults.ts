@@ -10,6 +10,7 @@ import type { NBackParams } from '../engine/tests/nback';
 import type { WcstParams } from '../engine/tests/wcst';
 import type { PvtParams } from '../engine/tests/pvt';
 import type { FlankerParams } from '../engine/tests/flanker';
+import type { SartParams } from '../engine/tests/sart';
 
 export interface AllParams {
   stroop1: StroopParams;
@@ -20,6 +21,7 @@ export interface AllParams {
   wcst: WcstParams;
   pvt: PvtParams;
   flanker: FlankerParams;
+  sart: SartParams;
 }
 
 /**
@@ -122,5 +124,19 @@ export const DEFAULTS: AllParams = {
     isiMinMs: 700, // jitter dell'ISI: evita l'anticipazione ritmica
     isiMaxMs: 1100,
     practiceTrials: 12, // pratica con feedback
+  },
+
+  /**
+   * SART (Robertson et al., 1997): 225 cifre (25 per cifra, nessuna ripetizione immediata), cifra
+   * 250 ms seguita da maschera 900 ms (finestra di risposta 1150 ms), bersaglio 3, 18 trial di pratica.
+   * Durata, maschera e conteggi seguono i porting pubblici del compito (PsyToolkit, Inquisit);
+   * il testo originale non è stato consultato. Vedi docs/scientific/sart.md
+   */
+  sart: {
+    nTrials: 225, // 9 cifre × 25 presentazioni
+    targetDigit: 3, // la cifra da NON rispondere
+    digitMs: 250,
+    maskMs: 900,
+    practiceTrials: 18,
   },
 };

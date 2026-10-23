@@ -53,6 +53,7 @@ src/
       wcst.ts         Mazzo, matching, cambio regola, scoring di Heaton
       pvt.ts          Generatore + scorer PVT (attenzione sostenuta)
       flanker.ts      Generatore + scorer Flanker (interferenza, adattamento al conflitto)
+      sart.ts         Generatore + scorer SART (commissioni, d', RT prima dell'errore)
   config/
     defaults.ts       Parametri default, ognuno con la fonte scientifica
   ui/

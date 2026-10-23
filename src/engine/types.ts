@@ -11,7 +11,7 @@ export type ValidationFlag = 'VALID' | 'ANTICIPATION' | 'OMISSION' | 'INTERRUPTE
 export type Phase = 'practice' | 'test';
 
 /** Identificatore dei test disponibili. */
-export type TestId = 'stroop1' | 'stroop2' | 'gonogo' | 'corsi' | 'nback' | 'wcst' | 'pvt' | 'flanker';
+export type TestId = 'stroop1' | 'stroop2' | 'gonogo' | 'corsi' | 'nback' | 'wcst' | 'pvt' | 'flanker' | 'sart';
 
 /** Risultato grezzo di un singolo trial. Mai scartato: gli invalidi restano col flag. */
 export interface TrialResult {

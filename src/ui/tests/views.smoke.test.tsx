@@ -4,6 +4,7 @@ import { CorsiView } from './CorsiView';
 import { WcstView } from './WcstView';
 import { PvtView } from './PvtView';
 import { FlankerView } from './FlankerView';
+import { SartView } from './SartView';
 import { DEFAULTS } from '../../config/defaults';
 
 const common = {
@@ -29,6 +30,11 @@ describe('smoke render viste interattive', () => {
 
   it('FlankerView si monta senza errori', () => {
     render(<FlankerView params={DEFAULTS.flanker} {...common} />);
+  });
+
+  it('SartView si monta senza errori', () => {
+    render(<SartView params={DEFAULTS.sart} {...common} />);
+    expect(screen.getByText(/Pratica/)).toBeInTheDocument();
   });
 
   it('PvtView si monta senza errori', () => {
