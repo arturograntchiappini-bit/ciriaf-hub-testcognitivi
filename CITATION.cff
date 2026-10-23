@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "Se usi questo software in una ricerca, citalo come indicato qui. Cita separatamente le fonti scientifiche dei paradigmi (vedi docs/scientific)."
+title: "Sintropia - Cognitive tests Hub"
+type: software
+authors:
+  - family-names: "Grant Chiappini"
+    given-names: "Arturo"
+repository-code: "https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi"
+license: MIT
+keywords:
+  - cognitive testing
+  - experimental psychology
+  - reaction time
+  - open source
+  - environmental physics

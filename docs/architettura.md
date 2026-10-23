@@ -1,4 +1,4 @@
-# Architettura del codice — CIRIAF Cognitive Testing Hub
+# Architettura del codice — Sintropia - Cognitive tests Hub
 
 > Documento ufficiale di spiegazione del funzionamento del codice. In italiano.
 > Aggiornato insieme al codice (documentation gate per fase).
@@ -51,6 +51,8 @@ src/
       corsi.ts        Geometria, sequenze bilanciate, span, regola d'arresto
       nback.ts        Generatore, d' (loglinear), scorer con quartili
       wcst.ts         Mazzo, matching, cambio regola, scoring di Heaton
+      pvt.ts          Generatore + scorer PVT (attenzione sostenuta)
+      flanker.ts      Generatore + scorer Flanker (interferenza, adattamento al conflitto)
   config/
     defaults.ts       Parametri default, ognuno con la fonte scientifica
   ui/
@@ -65,9 +67,11 @@ src/
       RtTestRunner.tsx Orchestrazione pratica→countdown→test + tastiera/interruzioni
       StimulusStage.tsx Palcoscenico a tutto schermo per gli stimoli
     tests/
-      StroopView.tsx / GoNoGoView.tsx / NBackView.tsx   (usano il sequencer)
+      StroopView.tsx / GoNoGoView.tsx / NBackView.tsx / PvtView.tsx   (usano il sequencer)
       CorsiView.tsx / WcstView.tsx / WcstCard.tsx        (interazione a click)
     screens/          Home, Instructions, TestRunner, Results, Settings
+    science/          Paper scientifici in piattaforma: papers.ts (registro), markdown.ts (parser puro),
+                      MarkdownView.tsx (rendering React, formule con KaTeX in MathML), Science.tsx (indice e lettore)
 ```
 
 ---
@@ -154,7 +158,9 @@ Non sono compiti a tempo di reazione: hanno logica dedicata.
 1. Nel motore (`src/engine/tests/`): scrivi generatore puro + scorer puro + test
    unitari. Non importare React.
 2. Aggiungi i parametri di default in `src/config/defaults.ts` con la fonte.
-3. Documenta il razionale in `docs/scientific/<nuovo>.md`.
+3. Scrivi il paper in `docs/scientific/<nuovo>.md` e registralo in
+   `src/ui/science/papers.ts`: il paper compare in piattaforma («Fondamenti
+   scientifici») e un test del repository fallisce se un test del catalogo non ne ha uno.
 4. Nella UI: se è un test a tempo di reazione, crea una vista che costruisce un
    `RtTestPlan` (come `StroopView`); altrimenti scrivi una vista interattiva
    dedicata. Aggiungila a `TestRunner.tsx`, `router.ts` (catalogo) e
@@ -172,7 +178,7 @@ Non sono compiti a tempo di reazione: hanno logica dedicata.
   confondersi con gli stimoli.
 - Tipografia: Inter (self-hosted, nessun CDN esterno), gerarchia per peso.
 - I token sono centralizzati (`tailwind.config.js`, `src/index.css`, `theme.ts`):
-  un futuro allineamento al brand CIRIAF è una singola modifica.
+  un futuro allineamento al brand Sintropia è una singola modifica.
 
 ---
 
