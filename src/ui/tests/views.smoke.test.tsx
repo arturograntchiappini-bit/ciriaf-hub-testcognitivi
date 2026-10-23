@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { CorsiView } from './CorsiView';
 import { WcstView } from './WcstView';
+import { PvtView } from './PvtView';
+import { FlankerView } from './FlankerView';
 import { DEFAULTS } from '../../config/defaults';
 
 const common = {
@@ -23,5 +25,15 @@ describe('smoke render viste interattive', () => {
     expect(screen.getByText('Carta da smistare')).toBeInTheDocument();
     // 4 carte chiave in alto + 4 zone risposta + 1 carta da abbinare = 9 CardFace
     expect(screen.getByText(/Carta 1\//)).toBeInTheDocument();
+  });
+
+  it('FlankerView si monta senza errori', () => {
+    render(<FlankerView params={DEFAULTS.flanker} {...common} />);
+  });
+
+  it('PvtView si monta senza errori', () => {
+    render(<PvtView params={DEFAULTS.pvt} {...common} />);
+    // Il PVT usa il sequencer RT, quindi si ferma alla schermata di pratica
+    expect(screen.getByText(/Pratica/)).toBeInTheDocument();
   });
 });

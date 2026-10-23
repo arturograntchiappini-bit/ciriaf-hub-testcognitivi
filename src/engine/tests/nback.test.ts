@@ -9,6 +9,7 @@ const PARAMS: NBackParams = {
   blankMs: 1500,
   nTrials: 100,
   targetRate: 0.3,
+  lureRate: 0.2,
   practiceTrials: 20,
 };
 
@@ -38,6 +39,29 @@ describe('generateNBack', () => {
     for (let i = 0; i < PARAMS.n; i++) {
       expect(seq[i]!.isTarget).toBe(false);
     }
+  });
+
+  it('inserisce lure a lag n−1 o n+1 nella quota richiesta e nessun altro non-target ripete a quei lag', () => {
+    const seq = generateNBack({ ...PARAMS, nTrials: 360 }, mulberry32(11));
+    const lures = seq.filter((s) => s.isLure);
+    const nonTargets = seq.filter((s, i) => !s.isTarget && i >= PARAMS.n).length;
+    expect(Math.abs(lures.length / nonTargets - PARAMS.lureRate)).toBeLessThan(0.02);
+    seq.forEach((s, i) => {
+      const atLag = [1, 3].some((lag) => i - lag >= 0 && seq[i - lag]!.letter === s.letter);
+      if (!s.isTarget) expect(s.isLure).toBe(atLag);
+      if (s.isLure) expect(s.isTarget).toBe(false);
+    });
+  });
+
+  it('con lureRate 0 non genera lure e un target non è mai anche lure', () => {
+    const seq = generateNBack({ ...PARAMS, lureRate: 0 }, mulberry32(4));
+    expect(seq.some((s) => s.isLure)).toBe(false);
+  });
+
+  it('con parametri salvati senza lureRate non genera lure', () => {
+    const { lureRate: _omitted, ...legacy } = PARAMS;
+    const seq = generateNBack(legacy as NBackParams, mulberry32(6));
+    expect(seq.some((s) => s.isLure)).toBe(false);
   });
 
   it('usa solo consonanti', () => {
@@ -108,6 +132,28 @@ describe('scoreNBack', () => {
     expect(summary.find((m) => m.label === 'Hit (target rilevati)')?.value).toBe(1);
     expect(summary.find((m) => m.label === 'Miss (target mancati)')?.value).toBe(1);
     expect(summary.find((m) => m.label === 'Falsi allarmi')?.value).toBe(1);
+  });
+
+  it('conta i falsi allarmi sui lure, che restano non-target per d′', () => {
+    const trials: TrialResult[] = [
+      trial({ condition: 'target', response: 'space', rtMs: 600 }),
+      trial({ condition: 'lure', response: 'space', correct: false, rtMs: 500 }),
+      trial({ condition: 'lure', response: null }),
+      trial({ condition: 'nontarget', response: null }),
+    ];
+    const summary = scoreNBack(trials);
+    expect(summary.find((m) => m.label === 'Falsi allarmi')?.value).toBe(1);
+    expect(summary.find((m) => m.label === 'Falsi allarmi su lure')?.value).toBe(1);
+    expect(summary.find((m) => m.label === 'Tasso di falsi allarmi su lure')?.value).toBe(50);
+  });
+
+  it('esclude i trial interrotti dai conteggi', () => {
+    const trials: TrialResult[] = [
+      trial({ condition: 'target', response: 'space', rtMs: 600 }),
+      trial({ condition: 'target', response: null, correct: false, flag: 'INTERRUPTED' }),
+    ];
+    const summary = scoreNBack(trials);
+    expect(summary.find((m) => m.label === 'Miss (target mancati)')?.value).toBe(0);
   });
 
   it('include i d′ per quartile', () => {

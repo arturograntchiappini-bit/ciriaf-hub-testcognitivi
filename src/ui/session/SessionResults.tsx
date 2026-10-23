@@ -3,6 +3,7 @@
  * @see docs/superpowers/specs/2026-07-07-feature-sessione-design.md
  */
 import { Header } from '../components/Header';
+import { PageHeading } from '../components/PageHeading';
 import { Button } from '../components/Button';
 import { toSessionJson, toSessionCsv, sessionFilename } from '../../engine/session/export';
 import { triggerDownload } from '../download';
@@ -35,22 +36,21 @@ export function SessionResults({ run, partial, onExit }: SessionResultsProps): J
   return (
     <div className="min-h-full bg-paper">
       <Header />
-      <main className="mx-auto max-w-content px-6 py-10">
-        <p className="text-sm text-muted">{partial ? 'Sessione interrotta — dati parziali' : 'Sessione completata'}</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink">{run.template.name}</h1>
-        <div className="mt-4 inline-flex items-center gap-2 rounded-card border border-accent bg-accent-soft px-4 py-2">
-          <span className="text-sm text-muted">Codice sessione</span>
-          <span className="font-mono text-base font-semibold text-ink">{run.runId}</span>
+      <main className="mx-auto max-w-content px-6 py-12">
+        <PageHeading eyebrow={partial ? 'Sessione interrotta — dati parziali' : 'Sessione completata'} title={run.template.name} />
+        <div className="mt-6 inline-flex items-center gap-3 border border-accent bg-accent-soft px-5 py-3">
+          <span className="eyebrow">Codice sessione</span>
+          <span className="font-mono text-base font-medium tracking-wider text-ink">{run.runId}</span>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-card border border-line">
+        <div className="panel mt-8 overflow-hidden">
           <table className="w-full text-left text-sm">
-            <thead className="bg-accent-soft text-muted">
+            <thead className="border-b border-line">
               <tr>
-                <th className="px-4 py-2 font-medium">Fase</th>
-                <th className="px-4 py-2 font-medium">t</th>
-                <th className="px-4 py-2 font-medium">Test</th>
-                <th className="px-4 py-2 font-medium">Prima metrica</th>
+                <th className="eyebrow px-5 py-3 font-normal">Fase</th>
+                <th className="eyebrow px-5 py-3 font-normal">t</th>
+                <th className="eyebrow px-5 py-3 font-normal">Test</th>
+                <th className="eyebrow px-5 py-3 font-normal">Prima metrica</th>
               </tr>
             </thead>
             <tbody>

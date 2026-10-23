@@ -30,7 +30,7 @@ function fmt(ms: number): string {
   return `${Math.floor(total / 60)}:${(total % 60).toString().padStart(2, '0')}`;
 }
 
-const PHASE_TINTS = ['#EAF2FB', '#DCEAF9', '#EAF2FB', '#DCEAF9'];
+const PHASE_TINTS = ['rgb(var(--c-accent) / 0.10)', 'rgb(var(--c-accent) / 0.20)', 'rgb(var(--c-accent) / 0.10)', 'rgb(var(--c-accent) / 0.20)'];
 
 export function SessionTimeline({
   template,
@@ -114,7 +114,7 @@ export function SessionTimeline({
         ref={trackRef}
         data-role="track"
         onClick={onTrackClick}
-        className={`relative h-20 w-full overflow-hidden rounded-card border border-line bg-white ${
+        className={`relative h-20 w-full overflow-hidden rounded-card border border-line bg-surface ${
           editable ? 'cursor-copy' : ''
         }`}
       >
@@ -163,7 +163,7 @@ export function SessionTimeline({
                     if (loc) onSelectPin?.(loc[0], loc[1]);
                   }}
                   aria-label={`Pin a ${fmt(pin.offsetMs)}`}
-                  className={`absolute -left-2 top-1 flex h-4 w-4 items-center justify-center rounded-full border bg-white ${
+                  className={`absolute -left-2 top-1 flex h-4 w-4 items-center justify-center rounded-full border bg-paper ${
                     selected ? 'border-accent ring-2 ring-accent/40' : 'border-accent/70'
                   } ${editable ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
                 >

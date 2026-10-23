@@ -4,6 +4,7 @@
  */
 import { Header } from '../components/Header';
 import { Button } from '../components/Button';
+import { PageHeading } from '../components/PageHeading';
 import { toCsv, toJson, exportFilename } from '../../engine/export';
 import { triggerDownload } from '../download';
 import { TEST_CATALOG } from '../router';
@@ -27,30 +28,29 @@ export function Results({ result, onHome }: ResultsProps): JSX.Element {
   return (
     <div className="min-h-full bg-paper">
       <Header />
-      <main className="mx-auto max-w-content px-6 py-10">
-        <p className="text-sm text-muted">Risultati</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink">{meta?.title ?? result.testId}</h1>
+      <main className="mx-auto max-w-content px-6 py-12">
+        <PageHeading eyebrow="Risultati" title={meta?.title ?? result.testId} />
 
-        <div className="mt-4 inline-flex items-center gap-2 rounded-card border border-accent bg-accent-soft px-4 py-2">
-          <span className="text-sm text-muted">Codice sessione</span>
-          <span className="font-mono text-base font-semibold text-ink">{result.sessionId}</span>
+        <div className="mt-6 inline-flex items-center gap-3 border border-accent bg-accent-soft px-5 py-3">
+          <span className="eyebrow">Codice sessione</span>
+          <span className="font-mono text-base font-medium tracking-wider text-ink">{result.sessionId}</span>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-card border border-line">
+        <div className="panel mt-8 overflow-hidden">
           <table className="w-full text-left text-sm">
-            <thead className="bg-accent-soft text-muted">
-              <tr>
-                <th className="px-4 py-2 font-medium">Metrica</th>
-                <th className="px-4 py-2 font-medium">Valore</th>
+            <thead>
+              <tr className="border-b border-line">
+                <th className="eyebrow px-5 py-3 font-normal">Metrica</th>
+                <th className="eyebrow px-5 py-3 font-normal">Valore</th>
               </tr>
             </thead>
             <tbody>
               {result.summary.map((m, i) => (
-                <tr key={i} className="border-t border-line">
-                  <td className="px-4 py-2 text-ink">{m.label}</td>
-                  <td className="px-4 py-2 font-medium text-ink tabular-nums">
+                <tr key={i} className="border-t border-line first:border-t-0">
+                  <td className="px-5 py-3 text-ink">{m.label}</td>
+                  <td className="px-5 py-3 font-mono tabular-nums text-ink">
                     {m.value}
-                    {m.unit ? ` ${m.unit}` : ''}
+                    {m.unit ? <span className="text-muted"> {m.unit}</span> : ''}
                   </td>
                 </tr>
               ))}
@@ -67,9 +67,9 @@ export function Results({ result, onHome }: ResultsProps): JSX.Element {
             ← Torna alla home
           </Button>
         </div>
-        <p className="mt-4 text-xs text-muted">
-          Il CSV contiene una riga per trial (pratica inclusa) con i flag di validazione. Il JSON
-          include anche i parametri usati per questa sessione.
+        <p className="mt-5 max-w-2xl text-xs leading-relaxed text-muted">
+          Il CSV contiene una riga per trial (pratica inclusa) con i flag di validazione. Il JSON include anche i
+          parametri usati per questa sessione.
         </p>
       </main>
     </div>

@@ -37,7 +37,7 @@ describe('WaitScreen', () => {
         onExit={vi.fn()}
       />,
     );
-    expect(screen.getByText('⏰ È ora dei test')).toBeInTheDocument();
+    expect(screen.getByText('È ora dei test')).toBeInTheDocument();
     screen.getByText('Inizia').click();
     expect(onStart).toHaveBeenCalledOnce();
   });

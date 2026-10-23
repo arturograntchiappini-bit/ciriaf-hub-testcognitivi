@@ -80,6 +80,7 @@ export function createSequencer(config: SequencerConfig): {
   let rt: number | null = null;
   let interrupted = false;
   let trialClosed = true;
+  let stimulusPainted = false; // i tasti prima dell'onset (fissazione) non sono risposte: non hanno un RT
   let cancels: Cancel[] = [];
 
   function clearTimers(): void {
@@ -108,6 +109,7 @@ export function createSequencer(config: SequencerConfig): {
     rt = null;
     interrupted = false;
     trialClosed = false;
+    stimulusPainted = false;
 
     if (config.fixationMs > 0) {
       emit({ index, phase: 'fixation', showStimulus: false });
@@ -122,6 +124,7 @@ export function createSequencer(config: SequencerConfig): {
     cancels.push(
       config.scheduler.afterPaint((t) => {
         onset = t;
+        stimulusPainted = true;
         if (config.stimulusVisibleMs < config.responseWindowMs) {
           cancels.push(
             config.scheduler.timeout(config.stimulusVisibleMs, () => {
@@ -135,7 +138,7 @@ export function createSequencer(config: SequencerConfig): {
   }
 
   function handleKey(key: string, timestamp: number): void {
-    if (trialClosed) return;
+    if (trialClosed || !stimulusPainted) return;
     const k = key.toLowerCase();
     if (!config.responseKeys.includes(k)) return;
     if (responded) return; // una sola risposta per trial

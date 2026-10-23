@@ -11,6 +11,23 @@ export interface Instruction {
   keyHints: string[];
 }
 
+const POSITION_WORDS = ['', 'UNA posizione', 'DUE posizioni', 'TRE posizioni'] as const;
+
+/** Istruzioni dell'N-Back per il livello `n`: il testo segue il parametro, non è fisso a 2. */
+export function nBackInstruction(n: number): Instruction {
+  const level = Number.isInteger(n) && n >= 1 && n <= 3 ? n : 2;
+  const steps = level === 1 ? '1 passo fa' : `${level} passi fa`;
+  return {
+    title: `N-Back (${level}-back)`,
+    paragraphs: [
+      'Vedrai una sequenza continua di lettere, una alla volta.',
+      `Premi la BARRA SPAZIATRICE quando la lettera attuale è identica a quella comparsa ${POSITION_WORDS[level]} prima.`,
+      'Non premere nulla in tutti gli altri casi. Il test è lungo: mantieni la concentrazione.',
+    ],
+    keyHints: [`BARRA SPAZIATRICE = la lettera è uguale a ${steps}`],
+  };
+}
+
 export const INSTRUCTIONS: Record<TestId, Instruction> = {
   stroop1: {
     title: 'Stroop 1 — Focus sulla Parola',
@@ -48,15 +65,7 @@ export const INSTRUCTIONS: Record<TestId, Instruction> = {
     ],
     keyHints: ['Usa il mouse per cliccare i blocchi'],
   },
-  nback: {
-    title: 'N-Back (2-back)',
-    paragraphs: [
-      'Vedrai una sequenza continua di lettere, una alla volta.',
-      'Premi la BARRA SPAZIATRICE quando la lettera attuale è identica a quella comparsa DUE posizioni prima.',
-      'Non premere nulla in tutti gli altri casi. Il test è lungo: mantieni la concentrazione.',
-    ],
-    keyHints: ['BARRA SPAZIATRICE = la lettera è uguale a 2 passi fa'],
-  },
+  nback: nBackInstruction(2),
   wcst: {
     title: 'Wisconsin Card Sorting Test',
     paragraphs: [
@@ -66,4 +75,27 @@ export const INSTRUCTIONS: Record<TestId, Instruction> = {
     ],
     keyHints: ['Usa il mouse per cliccare la carta'],
   },
+  pvt: {
+    title: 'PVT — Vigilanza Psicomotoria',
+    paragraphs: [
+      'Fissa lo schermo. A intervalli imprevedibili, comparirà un contatore che parte da 0 e conta i millisecondi.',
+      'Premi la BARRA SPAZIATRICE il più velocemente possibile NON APPENA il numero appare.',
+      'Cerca di mantenere la concentrazione: il test dura circa 10 minuti. Il numero di lapse (risposte lente) è la misura principale.',
+    ],
+    keyHints: ['BARRA SPAZIATRICE = ferma il contatore il più velocemente possibile'],
+  },
+  flanker: {
+    title: 'Flanker — Frecce di Eriksen',
+    paragraphs: [
+      'Al centro dello schermo comparirà una fila di cinque simboli.',
+      'Rispondi alla direzione della freccia CENTRALE, ignorando i simboli ai lati.',
+      'A volte i simboli ai lati indicano la direzione opposta: ignorali. Rispondi il più rapidamente e accuratamente possibile.',
+    ],
+    keyHints: ['← = freccia centrale a sinistra', '→ = freccia centrale a destra'],
+  },
 };
+
+/** Istruzioni di un test, adattate ai parametri scelti (oggi solo il livello n dell'N-Back). */
+export function instructionsFor(testId: TestId, params?: Record<string, unknown>): Instruction {
+  return testId === 'nback' ? nBackInstruction(Number(params?.n)) : INSTRUCTIONS[testId];
+}

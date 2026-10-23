@@ -40,7 +40,7 @@ describe('Results', () => {
     render(<Results result={result} onHome={() => {}} />);
     expect(screen.getByText('AB12-1030')).toBeInTheDocument();
     expect(screen.getByText('Errori di commissione (No-Go)')).toBeInTheDocument();
-    expect(screen.getByText('415 ms')).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: '415 ms' })).toBeInTheDocument();
   });
 
   it('il download CSV crea un Blob', () => {

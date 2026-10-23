@@ -1,9 +1,19 @@
 {
-  "name": "ciriaf-cognitive-testing-hub",
+  "name": "sintropia-cognitive-tests-hub",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "CIRIAF - COLAB/NEXTROOM COGNITIVE TESTING HUB — piattaforma web di test cognitivi",
+  "description": "Sintropia - Cognitive tests Hub — piattaforma web open source di test cognitivi per la ricerca sperimentale",
+  "license": "MIT",
+  "author": "Arturo Grant Chiappini (https://www.linkedin.com/in/arturo-grant-chiappini/)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi.git"
+  },
+  "homepage": "https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi#readme",
+  "bugs": {
+    "url": "https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
@@ -13,15 +23,19 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "katex": "^0.16.22",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@fontsource/big-shoulders-display": "^5.3.0",
     "@fontsource/inter": "^5.1.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
+    "@types/katex": "^0.16.8",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^6.0.3",

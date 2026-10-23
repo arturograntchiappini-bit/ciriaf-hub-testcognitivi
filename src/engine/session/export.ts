@@ -57,7 +57,7 @@ export function toSessionJson(
   },
 ): string {
   const payload: SessionJsonExport = {
-    app: 'CIRIAF - COLAB/NEXTROOM COGNITIVE TESTING HUB',
+    app: 'Sintropia - Cognitive tests Hub',
     kind: 'session',
     runId: run.runId,
     startedAt: run.startedAtIso,

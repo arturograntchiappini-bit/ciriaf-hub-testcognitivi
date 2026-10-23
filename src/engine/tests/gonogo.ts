@@ -8,6 +8,7 @@
 import type { SummaryMetric, TrialResult } from '../types';
 import { randInt } from '../rng';
 import { mean, standardDeviation, countFlag } from '../validation';
+import { criterionC, dPrime } from '../sdt';
 
 export interface GoNoGoParams {
   nTrials: number;
@@ -101,17 +102,24 @@ function deterministicArrange(nGo: number, nNoGo: number): GoNoGoKind[] {
   return seq;
 }
 
+/** Un trial è «risposto» se il partecipante ha premuto (anche in anticipo) e il trial non è stato interrotto. */
+const isResponded = (t: TrialResult): boolean => t.flag !== 'OMISSION' && t.flag !== 'INTERRUPTED';
+const isValidTrial = (t: TrialResult): boolean => t.flag !== 'INTERRUPTED';
+
 /**
  * Metriche: errori di commissione (risposte su No-Go), errori di omissione
- * (mancate risposte su Go), RT medio e SD dei Go corretti validi, anticipazioni.
+ * (mancate risposte su Go), RT medio/SD/CV dei Go corretti validi, anticipazioni,
+ * d' e criterio c (hit = risposta su Go, falso allarme = risposta su No-Go).
+ * I trial interrotti sono esclusi da numeratori e denominatori.
  */
 export function scoreGoNoGo(trials: readonly TrialResult[]): SummaryMetric[] {
   const test = trials.filter((t) => t.phase === 'test');
-  const goTrials = test.filter((t) => t.condition === 'go');
-  const noGoTrials = test.filter((t) => t.condition === 'nogo');
+  const goTrials = test.filter((t) => t.condition === 'go' && isValidTrial(t));
+  const noGoTrials = test.filter((t) => t.condition === 'nogo' && isValidTrial(t));
 
-  const commissionErrors = noGoTrials.filter((t) => t.flag !== 'INTERRUPTED' && !t.correct).length;
-  const omissionErrors = goTrials.filter((t) => t.flag === 'OMISSION').length;
+  const commissionErrors = noGoTrials.filter(isResponded).length;
+  const omissionErrors = goTrials.length - goTrials.filter(isResponded).length;
+  const hits = goTrials.filter(isResponded).length;
 
   const goRts = goTrials
     .filter((t) => t.flag === 'VALID' && t.correct && t.rtMs !== null)
@@ -123,7 +131,7 @@ export function scoreGoNoGo(trials: readonly TrialResult[]): SummaryMetric[] {
   const meanGo = mean(goRts);
   const sdGo = standardDeviation(goRts);
   // Coefficiente di variazione: dispersione normalizzata sulla media, indice
-  // robusto di variabilità intra-soggetto (lapse/instabilità attentiva).
+  // di variabilità intra-soggetto (lapse/instabilità attentiva).
   const cvGo = meanGo > 0 ? (sdGo / meanGo) * 100 : 0;
 
   return [
@@ -134,10 +142,16 @@ export function scoreGoNoGo(trials: readonly TrialResult[]): SummaryMetric[] {
     { label: 'RT medio Go corretti', value: round1(meanGo), unit: 'ms' },
     { label: 'SD RT Go corretti', value: round1(sdGo), unit: 'ms' },
     { label: 'CV RT Go corretti', value: round1(cvGo), unit: '%' },
+    { label: "Sensibilità d'", value: round2(dPrime(hits, goTrials.length, commissionErrors, noGoTrials.length)) },
+    { label: 'Criterio decisionale (c)', value: round2(criterionC(hits, goTrials.length, commissionErrors, noGoTrials.length)) },
     { label: 'Errori di anticipazione', value: countFlag(trials, 'ANTICIPATION') },
   ];
 }
 
 function round1(x: number): number {
   return Math.round(x * 10) / 10;
+}
+
+function round2(x: number): number {
+  return Math.round(x * 100) / 100;
 }

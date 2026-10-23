@@ -47,7 +47,7 @@ export function WaitScreen({ state, elapsedMs, totalMs, onStart, onExit }: WaitS
       <div className="flex flex-1 items-center justify-center">
         {state.due ? (
           <div className="text-center">
-            <div className="text-2xl font-semibold text-accent">⏰ È ora dei test</div>
+            <div className="font-display text-[clamp(3.5rem,10vw,6.5rem)] font-extrabold uppercase leading-none text-accent-glow">È ora dei test</div>
             <p className="mt-3 text-muted">Batteria in arrivo:</p>
             <p className="mt-1 text-lg font-medium text-ink">{upcoming}</p>
             <div className="mt-8">
@@ -56,8 +56,8 @@ export function WaitScreen({ state, elapsedMs, totalMs, onStart, onExit }: WaitS
           </div>
         ) : (
           <div className="text-center">
-            <p className="text-sm uppercase tracking-wide text-muted">Prossima batteria tra</p>
-            <div className="mt-2 text-6xl font-bold tabular-nums text-ink">{fmt(state.countdownMs)}</div>
+            <p className="eyebrow">Prossima batteria tra</p>
+            <div className="mt-3 font-display text-[clamp(6rem,22vw,13rem)] font-extrabold leading-none tabular-nums text-ink">{fmt(state.countdownMs)}</div>
             <p className="mt-6 text-muted">In arrivo:</p>
             <p className="mt-1 text-base font-medium text-ink">{upcoming}</p>
             <p className="mt-8 max-w-md text-xs text-muted">

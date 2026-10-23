@@ -31,4 +31,18 @@ describe('DEFAULTS', () => {
     expect(DEFAULTS.wcst.deckSize).toBe(64);
     expect(DEFAULTS.wcst.runToShift).toBe(10);
   });
+
+  it('PVT: 100 trial, ISI 2–10 s, timeout 10 s', () => {
+    expect(DEFAULTS.pvt.nTrials).toBe(100);
+    expect(DEFAULTS.pvt.isiMinMs).toBe(2000);
+    expect(DEFAULTS.pvt.isiMaxMs).toBe(10000);
+    expect(DEFAULTS.pvt.stimulusMaxMs).toBe(10000);
+  });
+
+  it('Flanker: 96 trial con 40% incongruenti, 20% neutri e finestra di 1500 ms', () => {
+    expect(DEFAULTS.flanker.nTrials).toBe(96);
+    expect(DEFAULTS.flanker.incongruentRatio).toBe(0.4);
+    expect(DEFAULTS.flanker.neutralRatio).toBe(0.2);
+    expect(DEFAULTS.flanker.responseWindowMs).toBe(1500);
+  });
 });

@@ -262,6 +262,7 @@ export function shouldStop(levelResults: readonly boolean[]): boolean {
  *   sequenza riprodotta correttamente — l'indice classico di Corsi.
  * - Punteggio Corsi (Ponderato): punteggio cumulativo ancorato a `startLength`.
  * - Trial totali superati.
+ * - Punteggio totale di Kessels et al. (2000): span × numero di sequenze corrette.
  */
 export function scoreCorsi(trials: readonly TrialResult[], startLength = 2): SummaryMetric[] {
   const test = trials.filter((t) => t.phase === 'test' && t.flag !== 'INTERRUPTED');
@@ -271,5 +272,6 @@ export function scoreCorsi(trials: readonly TrialResult[], startLength = 2): Sum
     { label: 'Span Visuo-Spaziale (MBS)', value: mbs },
     { label: 'Punteggio Corsi (Ponderato)', value: corsiSpan(passed.length, startLength) },
     { label: 'Trial totali superati', value: passed.length },
+    { label: 'Punteggio totale (MBS × superati)', value: mbs * passed.length },
   ];
 }

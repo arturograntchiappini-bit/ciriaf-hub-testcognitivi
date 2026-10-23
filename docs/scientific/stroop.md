@@ -1,7 +1,7 @@
 # Stroop Task — Riferimenti scientifici
 
 > Documento scientifico di riferimento per l'implementazione del test di Stroop
-> sulla piattaforma sperimentale CIRIAF. Le citazioni bibliografiche sono
+> sulla piattaforma sperimentale Sintropia. Le citazioni bibliografiche sono
 > riportate in lingua originale; il testo esplicativo è in italiano.
 
 ---
@@ -82,104 +82,88 @@ della natura del meccanismo misurato.
 
 ## 3. Parametri adottati
 
-I valori sotto riportati si riferiscono a **ciascuna variante** (focus colore e
-focus parola). I default di piattaforma sono stati valutati contro la
-letteratura primaria e le implementazioni di riferimento (jsPsych, PsyToolkit);
-dove appropriato è indicata una conferma o una proposta di correzione motivata.
+I valori si riferiscono a **ciascuna variante** (focus colore e focus parola). La colonna *Origine* distingue ciò che
+viene da una fonte primaria, ciò che è prassi diffusa nei software di riferimento (jsPsych, PsyToolkit: **non
+riverificata** nelle loro versioni correnti) e ciò che è una **scelta di progetto**.
 
-| Parametro | Valore adottato | Fonte / razionale |
+| Parametro | Valore | Origine e razionale |
 |---|---|---|
-| **N. trial per variante** | **48** (24 congruenti + 24 incongruenti) | **Confermato con riserva.** Il demo PsyToolkit usa 40 trial; una versione didattica estesa usa 80 trial + 8 di pratica; jsPsych non fissa un default. 48 trial sono adeguati per una stima *screening* dell'effetto Stroop e mantengono i tempi di somministrazione contenuti. Nota di affidabilità: la reliabilità test-retest dell'effetto Stroop cresce col numero di prove; per studi che richiedono misure individuali stabili si raccomanda di elevare a ≥ 80–100 trial per condizione (MacLeod, 1991). |
-| **Proporzione congruenti / incongruenti** | **50% / 50%** (24/24) | **Confermato.** Rapporto bilanciato usato da jsPsych (`Math.random() < 0.5`) e standard nelle implementazioni computerizzate. Scelta *neutra*: la proporzione di prove incongruenti modula l'ampiezza dell'interferenza (*proportion-congruent effect*; MacLeod, 1991), quindi un rapporto 50/50 evita di gonfiare o comprimere artificialmente l'effetto. |
-| **Durata croce di fissazione** | **500 ms** | **Confermato.** Valore usato sia da jsPsych sia da PsyToolkit (fixation point 500 ms). Sufficiente a orientare l'attenzione al centro dello schermo prima dello stimolo. |
-| **Timeout risposta** | **3000 ms** | **Confermato.** PsyToolkit adotta 2000 ms; jsPsych spesso non impone timeout. Poiché i RT tipici nel compito sono ~600–1000 ms, una finestra di 3000 ms cattura la quasi totalità delle risposte valide (comprese quelle lente sotto interferenza) senza attese indefinite. Le prove senza risposta entro 3000 ms sono registrate come **omissioni**. |
-| **ISI (inter-stimulus interval)** | **500 ms** | **Confermato.** jsPsych usa un ITI di ~250 ms, PsyToolkit intervalli combinati di ~100–300 ms; 500 ms è un valore breve-moderato, entro l'intervallo di prassi. Requisito critico: l'ISI deve restare **costante** tra i trial, perché la durata dell'intervallo risposta-stimolo modula sistematicamente l'ampiezza dell'interferenza (intervalli più brevi → interferenza maggiore; Galer et al., 2014). Tenerlo fisso a 500 ms garantisce comparabilità tra prove e tra partecipanti. |
-| **N. trial di pratica** | **8** | **Confermato.** Coincide esattamente con la versione didattica PsyToolkit (8 prove di pratica). Sufficiente ad apprendere la mappatura tasto-colore senza indurre affaticamento; le prove di pratica sono **escluse** dal calcolo delle metriche. |
-| **Set di colori / parole** | **ROSSO, VERDE, BLU, GIALLO** | **Confermato.** Set canonico a 4 colori impiegato da jsPsych (`['red','green','blue','yellow']`) e diffusissimo in letteratura. Quattro alternative bilanciano difficoltà del compito e distinguibilità percettiva/cromatica. Nelle prove incongruenti la parola assume uno qualsiasi degli altri 3 colori, con il colore-inchiostro bilanciato (≈12 occorrenze per colore su 48 trial). |
-| **Mappatura tasti** | **R → Rosso, V → Verde, B → Blu, G → Giallo** | **Confermato.** Analogo alla mappatura jsPsych (`['r','g','b','y']`) ma localizzato alle iniziali italiane. Le quattro iniziali (R/V/B/G) sono univoche e non collidono. Va mostrata una legenda tasto-colore persistente e appresa nelle prove di pratica. |
+| **N. trial per variante** | **48** (24 congruenti + 24 incongruenti) | **Scelta di progetto**: stima di screening dell'effetto Stroop in tempi contenuti. L'affidabilità di una differenza tra condizioni cresce col numero di prove: per misure individuali stabili (confronti clinici, test-retest) conviene aumentare i trial per condizione dal pannello Impostazioni. |
+| **Proporzione congruenti / incongruenti** | **50% / 50%** | **Scelta di progetto**, neutra: la proporzione di prove incongruenti modula l'ampiezza dell'interferenza (*proportion-congruent effect*), quindi un rapporto 50/50 evita di gonfiarla o comprimerla artificialmente. Il fenomeno è discusso nella rassegna di MacLeod (1991). |
+| **Fissazione** | **500 ms** | **Prassi** dei software di riferimento: orienta l'attenzione al centro prima dello stimolo. |
+| **Timeout di risposta** | **3000 ms** | **Scelta di progetto**: finestra ampia, che include le risposte lente sotto interferenza. Oltre = omissione. |
+| **ISI** | **500 ms, costante** | **Scelta di progetto con vincolo di fonte.** Galer et al. (2014) hanno variato l'intervallo risposta-stimolo da 1000 a 5000 ms in bambini (8–10 anni) e adulti: l'intervallo più breve (1000 ms) ha prodotto l'interferenza maggiore in entrambi i gruppi. L'ISI di Sintropia (500 ms) è **più breve dell'intervallo studiato**, quindi l'interferenza misurata può risultare amplificata rispetto a protocolli con ISI più lunghi. Va tenuto **costante** tra trial e partecipanti, così l'effetto è comparabile. |
+| **Pratica** | **8 trial con feedback** | **Prassi**. Serve a imparare la mappatura tasto-colore; i trial di pratica sono esclusi dalle metriche. |
+| **Colori e parole** | **ROSSO, VERDE, BLU, GIALLO** | Set a 4 colori molto diffuso nella letteratura. Nelle prove incongruenti la parola è uno degli altri 3 colori. |
+| **Tasti** | **R, V, B, G** (iniziali italiane) | **Scelta di progetto**: le quattro iniziali sono univoche. Una legenda tasto-colore resta visibile e si impara in pratica. |
+| **Anti-ripetizione** | **≤ 3 ripetizioni consecutive** dello stesso colore o della stessa parola | **Scelta di progetto**: evita sequenze prevedibili. |
 
-**Sintesi della valutazione:** tutti i default di piattaforma sono coerenti con
-la letteratura primaria e con le implementazioni di riferimento e sono
-**confermati**. L'unica raccomandazione condizionale riguarda il **numero di
-trial**: 48 per variante sono adeguati per uno screening, ma per misure
-individuali ad alta affidabilità (es. confronti clinici o test-retest) si
-consiglia di prevedere una modalità estesa a ≥ 80 trial per condizione.
+**Cautela sui colori.** Rosso e verde sono confondibili per chi ha una deficienza della visione dei colori rosso-verde;
+in quel caso il compito misura anche la discriminazione cromatica e va adattato o escluso.
 
 ---
 
 ## 4. Mappatura implementativa
 
-Da completare in fase implementativa — vedi `src/engine/tests/stroop.ts`.
+Corrispondenza fra §3 e il codice (`src/engine/tests/stroop.ts`, `src/config/defaults.ts`, `src/ui/tests/StroopView.tsx`).
 
-<!--
-Placeholder per la corrispondenza tra i parametri scientifici sopra e le
-strutture dati / configurazioni del motore (config schema, generatore di
-sequenza trial bilanciata, gestione input tastiera, logging RT, timer di
-fissazione/ISI/timeout). Da compilare quando il modulo TypeScript sarà
-implementato.
--->
+| Elemento | Dove | Comportamento |
+|---|---|---|
+| Varianti | `correctKeyStroop` | Stroop 1: tasto della **parola**; Stroop 2: tasto del **colore** d'inchiostro |
+| Parametri | `DEFAULTS.stroop1` / `stroop2` | Identici: `nTrials 48`, `fixationMs 500`, `timeoutMs 3000`, `isiMs 500`, `practiceTrials 8` |
+| Congruenti | `generateStroop` | `floor(nTrials/2)` trial, colori ciclati: con 48 trial, 6 per colore |
+| Incongruenti | `generateStroop` | Le 12 coppie parola≠colore ripetute in ciclo: con 48 trial ogni coppia compare 2 volte, ogni parola e ogni colore 6 volte |
+| Bilanciamento | `generateStroop` | **Perfetto solo se** `floor(nTrials/2)` è multiplo di 12 (cioè `nTrials` multiplo di 24); altrimenti le prime coppie del ciclo compaiono una volta in più |
+| Ordine | `generateStroop` | Rimescolamento con seme; se entro 200 tentativi non soddisfa il vincolo di run (≤ 3 colore o parola uguali di seguito) si usa l'ultimo rimescolamento, quindi il vincolo è **probabile, non garantito** con valori estremi |
+| Ripetizioni esatte | — | Non vietate: lo stesso stimolo (stessa parola e stesso colore) può comparire due volte di fila |
+| Classificazione RT | `classifyRt` | `INTERRUPTED → OMISSION → ANTICIPATION (< 150 ms) → VALID` ([validazione RT](validazione-rt.md)) |
+| Metriche | `scoreStroop` | Solo trial `phase = 'test'`; formule in §5 |
 
 ---
 
 ## 5. Metriche calcolate e formule
 
-Le metriche sono calcolate **separatamente per condizione** (congruente vs
-incongruente) e **per variante** (focus colore vs focus parola). Le prove di
-pratica sono escluse. Si definisce **finestra di validità** l'intervallo
-`[RT_min, timeout]` con `RT_min = 200 ms` (soglia sotto la quale la risposta è
-considerata un'anticipazione non plausibile fisiologicamente) e
-`timeout = 3000 ms`.
+Le metriche sono calcolate **per condizione** (congruente, incongruente) e per variante (ogni variante è un test
+separato). Le prove di pratica sono escluse. La classificazione dei trial segue la validazione comune a tutta la
+piattaforma ([validazione RT](validazione-rt.md)): anticipazione se $RT < 150\,\text{ms}$, omissione se non c'è
+risposta entro il timeout di 3000 ms, trial interrotto se la pagina perde il focus.
 
-Definizioni operative dei trial per condizione *c*:
-- **Corretto valido**: risposta esatta con `200 ms ≤ RT ≤ 3000 ms`.
-- **Errore di commissione**: risposta errata (tasto sbagliato) entro la finestra.
-- **Errore di anticipazione** (*premature*): `RT < 200 ms` (risposta prima che
-  lo stimolo possa essere stato elaborato).
-- **Errore di omissione** (*miss*): nessuna risposta entro il timeout di 3000 ms.
+Definizioni operative per la condizione $c$:
+- **Corretto valido**: tasto corretto, flag `VALID` ($150\,\text{ms} \le RT \le 3000\,\text{ms}$). Solo questi trial
+  entrano negli RT.
+- **Errore**: tasto sbagliato (commissione) oppure nessuna risposta (omissione).
 
 ### 5.1 Accuratezza per condizione
 
-$$\text{Accuratezza}_c = \frac{N^{\text{corretti}}_c}{N^{\text{validi}}_c}$$
+$$\text{Accuratezza}_c = \frac{N^{\text{corretti}}_c}{N^{\text{non interrotti}}_c} \times 100$$
 
-dove `N_validi` è il numero di prove della condizione *c* con una risposta
-entro la finestra di validità (corrette + errate di commissione), escluse
-anticipazioni e omissioni.
+Il denominatore comprende **tutti i trial non interrotti** della condizione: le omissioni contano quindi come
+errori. Un tasto corretto premuto in anticipo ($RT < 150$ ms) conta come corretto per l'accuratezza ma non entra negli
+RT. Il **costo in accuratezza** è $\text{Acc}_{\text{congruenti}} - \text{Acc}_{\text{incongruenti}}$, in punti percentuali.
 
 ### 5.2 Tempo di reazione medio dei corretti validi
 
-Media dei RT sulle sole prove **corrette e valide** della condizione *c*:
+$$\overline{RT}_c = \frac{1}{N^{\text{validi}}_c} \sum_{i=1}^{N^{\text{validi}}_c} RT_i$$
 
-$$\overline{RT}_c = \frac{1}{N^{\text{corretti}}_c} \sum_{i=1}^{N^{\text{corretti}}_c} RT_i$$
+### 5.3 Deviazione standard e coefficiente di variazione
 
-### 5.3 Deviazione standard dei RT dei corretti validi
+$$SD_c = \sqrt{\frac{1}{N^{\text{validi}}_c - 1} \sum_{i=1}^{N^{\text{validi}}_c} \left(RT_i - \overline{RT}_c\right)^2}
+\qquad CV_c = 100 \cdot \frac{SD_c}{\overline{RT}_c}$$
 
-Deviazione standard campionaria (denominatore `N − 1`) sulle stesse prove:
-
-$$SD_c = \sqrt{\frac{1}{N^{\text{corretti}}_c - 1} \sum_{i=1}^{N^{\text{corretti}}_c} \left(RT_i - \overline{RT}_c\right)^2}$$
+La SD è campionaria (denominatore $N-1$); il CV normalizza la variabilità sulla velocità media.
 
 ### 5.4 Effetto di interferenza (effetto Stroop)
 
-Indice principale del compito, in millisecondi:
-
 $$\text{Interferenza} = \overline{RT}_{\text{incongruenti}} - \overline{RT}_{\text{congruenti}}$$
 
-Un valore **positivo** indica il costo di elaborazione dovuto al conflitto: più
-è elevato, minore è l'efficienza del controllo inibitorio / risoluzione del
-conflitto (MacLeod, 1991). Nella variante *focus parola* ci si attende un valore
-prossimo a zero, coerentemente con l'asimmetria dell'effetto Stroop.
+Un valore **positivo** indica il costo del conflitto: più è alto, più costosa è la risoluzione del conflitto
+(MacLeod, 1991). Nella variante *focus parola* ci si attende un valore vicino a zero, per l'asimmetria dell'effetto.
 
-### 5.5 Conteggi di errore
+### 5.5 Conteggi di qualità dei dati
 
-Per ciascuna condizione *c* si riportano:
-
-$$N^{\text{anticipazione}}_c = \#\{\, \text{trial} : RT < 200\ \text{ms} \,\}$$
-
-$$N^{\text{omissione}}_c = \#\{\, \text{trial} : \text{nessuna risposta entro } 3000\ \text{ms} \,\}$$
-
-Questi conteggi fungono da indicatori di qualità dei dati: un numero elevato di
-anticipazioni segnala risposte impulsive/anticipatorie (strategia non conforme),
-mentre un numero elevato di omissioni segnala disattenzione, affaticamento o
-difficoltà nel rispettare la finestra temporale.
+Si riportano il numero totale di **anticipazioni** ($RT < 150$ ms) e di **omissioni** nei trial di test. Molte
+anticipazioni indicano risposte impulsive, molte omissioni disattenzione, affaticamento o una finestra troppo
+stretta. Il dettaglio per condizione è nei dati grezzi (CSV/JSON, una riga per trial con condizione e flag).
 
 ---
 
@@ -205,8 +189,11 @@ difficoltà nel rispettare la finestra temporale.
   psychological experiments using Linux.* **Behavior Research Methods, 42**(4),
   1096–1104. https://doi.org/10.3758/BRM.42.4.1096
 
-## Aggiornamento metriche (revisione)
+## Cronologia delle revisioni
 
-Aggiunto il **coefficiente di variazione (CV) del RT** per condizione
-(congruente/incongruente), `SD/media · 100`: misura normalizzata della
-variabilità intra-soggetto, complementare a media e SD.
+- **Revisione scientifica 2026-10.** Verificati su Crossref tutti i riferimenti. Il paper non attribuisce più a
+  jsPsych/PsyToolkit valori non riverificati e non attribuisce a MacLeod (1991) raccomandazioni sul numero di trial.
+  Soglia di anticipazione allineata a 150 ms; definizione di accuratezza allineata al codice (omissioni = errori,
+  interrotti esclusi); aggiunto il **costo in accuratezza**; documentata la condizione di bilanciamento perfetto
+  (`nTrials` multiplo di 24) e la discussione dell'ISI alla luce di Galer et al. (2014).
+- **Coefficiente di variazione.** Aggiunto il CV del RT per condizione (`SD/media · 100`).

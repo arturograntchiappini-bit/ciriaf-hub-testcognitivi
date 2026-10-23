@@ -1,10 +1,14 @@
 # Validazione automatica dei dati (RT) — Riferimenti scientifici
 
-> Documento metodologico per la piattaforma di test cognitivi CIRIAF.
+> Documento metodologico per la piattaforma di test cognitivi Sintropia.
 > Definisce le convenzioni scientifiche adottate per il trattamento, la pulizia
 > e la validazione automatica dei tempi di reazione (Reaction Times, RT) prima
 > di qualsiasi analisi statistica. Le citazioni sono riportate in lingua
 > originale (inglese); il testo esplicativo è in italiano.
+
+> **Cautela sulle fonti.** I riferimenti (autori, titolo, rivista, anno, volume, pagine) sono stati verificati su
+> Crossref il 2026-10-23. Le **citazioni testuali** di Whelan (2008) e il loro numero di pagina sono riportate dal
+> documento originale di lavoro e **non sono state riverificate** nel testo dell'articolo.
 
 ---
 
@@ -182,9 +186,9 @@ SD = sqrt( ( Σ_{i=1..n} (x_i − mean)² ) / (n − 1) )
 suoi tempi. La media campionaria `x̄` è essa stessa stimata dagli stessi dati e
 "assorbe" un grado di libertà; dividere per `n` sottostimerebbe
 sistematicamente la varianza vera. La correzione di Bessel (`n − 1`) rende la
-stima della varianza **non distorta** (unbiased). Requisito pratico: con `n < 2`
-trial validi la SD non è definita e deve essere restituita come non calcolabile
-(`null`/non-disponibile), **mai** come `0`.
+stima della varianza **non distorta** (unbiased). Con `n < 2` trial validi la SD
+non è definita. **Limite attuale:** il motore restituisce `0` in quel caso, e i riepiloghi mostrano 0: va letto come
+«non calcolabile», non come variabilità nulla. Nei dati grezzi il numero di trial validi è sempre ricostruibile.
 
 > La deviazione standard è il classico "dispersion parameter" riportato accanto
 > alla tendenza centrale: *"report a central tendency parameter (e.g., the mean)
@@ -256,14 +260,28 @@ Ratcliff (1993), DOI: [10.1037/0033-2909.114.3.510](https://doi.org/10.1037/0033
 
 ## 6. Mappatura implementativa
 
-*Da completare — vedi `src/engine/validation.ts`.*
+Corrispondenza fra i principi di questo documento e il codice (`src/engine/validation.ts`,
+`src/ui/runtime/sequencer.ts`, `src/engine/export.ts`).
 
-Questa sezione documenterà la corrispondenza puntuale tra i principi metodologici
-sopra e la loro realizzazione nel codice: soglie configurabili (cutoff a 150 ms),
-funzione di classificazione dei flag (`VALID` / `ANTICIPATION` / `OMISSION` /
-`INTERRUPTED`), calcolo della deviazione standard intrasoggetto (divisore `n − 1`,
-gestione di `n < 2`), e struttura dei record esportati con conservazione del dato
-grezzo.
+| Principio | Dove | Comportamento |
+|---|---|---|
+| Soglia di anticipazione | `ANTICIPATION_CUTOFF_MS` | **150 ms**, costante unica per tutti i test; non è un parametro modificabile dalle Impostazioni |
+| Classificazione dei flag | `classifyRt` e `computeFlag` (sequencer) | Precedenza `INTERRUPTED → OMISSION → ANTICIPATION → VALID`; senza risposta un test che richiede risposta dà `OMISSION`, un withhold (No-Go, non-target) dà `VALID` (rifiuto corretto) |
+| Interruzione | sequencer | Perdita di focus o di visibilità della pagina durante un trial lo marca `INTERRUPTED` |
+| Onset dell'RT | sequencer | L'RT parte dal momento in cui lo stimolo è stato **dipinto** (dopo il paint, non dalla richiesta di mostrarlo) |
+| Tasti prima dell'onset | sequencer | **Ignorati**: un tasto premuto durante la fissazione o l'ISI non è una risposta e non viene registrato (difetto corretto il 2026-10: prima poteva produrre un trial con RT calcolato sull'onset del trial precedente) |
+| Una sola risposta per trial | sequencer | La seconda pressione è ignorata |
+| Omissione | `classifyRt` | RT registrato come `null`, mai come numero convenzionale |
+| SD intrasoggetto | `standardDeviation` | Divisore `n − 1`; con `n < 2` restituisce 0 (vedi §4) |
+| Conservazione del dato grezzo | export CSV / JSON | Tutti i trial, con flag, RT grezzo, condizione e parametri; le metriche filtrano a valle per `VALID` |
+
+Il filtro *VALID* è applicato nei riepiloghi di tutti i test; ogni test dichiara nel proprio paper quali trial entrano in
+ciascuna metrica.
+
+**Precisione della misura.** Gli RT sono misurati con `performance.now()` dall'istante di paint e dalla ricezione
+dell'evento `keydown`: la latenza di tastiera, la frequenza di aggiornamento dello schermo e il carico del
+computer aggiungono errore di decine di millisecondi. Effetti di quell'ordine (interferenza Stroop, effetto flanker) sono
+misurabili; valori assoluti brevi **non** sono confrontabili con laboratori a hardware dedicato senza calibrazione.
 
 ---
 
@@ -286,6 +304,10 @@ grezzo.
 - **Luce, R. D. (1986).** *Response Times: Their Role in Inferring Elementary
   Mental Organization.* New York: Oxford University Press. (Fonte primaria del
   limite fisiologico di ~100 ms; monografia, senza DOI.)
-- **Wilcox, R. R. (1998).** How many discoveries have been lost by ignoring
-  modern statistical methods? *American Psychologist*, 53(3), 300–314. (Citato in
-  Whelan, 2008, sulla perdita di potenza con dati non normali.)
+
+## Cronologia delle revisioni
+
+- **Revisione scientifica 2026-10.** Verificati su Crossref Whelan (2008), Ratcliff (1993), Ulrich e Miller (1994) e
+  Kofler et al. (2013). Scritta la mappatura implementativa e corretto il requisito sulla SD con n < 2 (il codice
+  restituisce 0). Rimosso Wilcox (1998), citato di seconda mano e non verificato. Documentata la correzione del
+  sequencer sui tasti premuti prima dell'onset.

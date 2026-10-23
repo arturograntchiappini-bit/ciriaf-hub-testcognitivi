@@ -30,8 +30,8 @@ export function DurationInput({
     onChange(((Math.max(0, nh) * 3600 + Math.max(0, nm) * 60 + Math.max(0, ns)) * 1000));
 
   const box = compact
-    ? 'w-11 rounded border border-line px-1.5 py-0.5 text-center text-sm text-ink focus:border-accent focus:outline-none'
-    : 'w-14 rounded border border-line px-2 py-1 text-center text-sm text-ink focus:border-accent focus:outline-none';
+    ? 'w-14 rounded border border-line px-1.5 py-0.5 text-center text-sm text-ink tabular-nums focus:border-accent focus:outline-none'
+    : 'w-16 rounded border border-line px-2 py-1 text-center text-sm text-ink tabular-nums focus:border-accent focus:outline-none';
   const unit = 'text-xs text-muted';
 
   return (

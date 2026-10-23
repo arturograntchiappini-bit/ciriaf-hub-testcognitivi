@@ -16,6 +16,7 @@ interface TestRunnerProps {
   feedbackDuringTest?: boolean;
   onComplete: (result: TestResult) => void;
   onBack: () => void;
+  onOpenScience?: () => void;
 }
 
 function requestFullscreen(): void {
@@ -26,7 +27,7 @@ function requestFullscreen(): void {
   }
 }
 
-export function TestRunner({ testId, settings, feedbackDuringTest, onComplete, onBack }: TestRunnerProps): JSX.Element {
+export function TestRunner({ testId, settings, feedbackDuringTest, onComplete, onBack, onOpenScience }: TestRunnerProps): JSX.Element {
   const [started, setStarted] = useState(false);
   const sessionId = useMemo(() => makeSessionId(new Date()), []);
   const startedAt = useMemo(() => new Date().toISOString(), []);
@@ -36,11 +37,13 @@ export function TestRunner({ testId, settings, feedbackDuringTest, onComplete, o
     return (
       <Instructions
         testId={testId}
+        params={settings[testId] as unknown as Record<string, unknown>}
         onStart={() => {
           requestFullscreen();
           setStarted(true);
         }}
         onBack={onBack}
+        onOpenScience={onOpenScience}
       />
     );
   }

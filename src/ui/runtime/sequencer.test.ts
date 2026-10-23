@@ -80,6 +80,33 @@ describe('createSequencer — flag di validazione', () => {
     expect(results[0]!.rtMs).toBe(200);
   });
 
+  it('un tasto premuto durante la fissazione è ignorato: non produce un trial con RT sull’onset precedente', () => {
+    const env = new FakeEnv();
+    const results: TrialResult[] = [];
+    const seq = createSequencer(
+      baseConfig(env, {
+        trials: [
+          { condition: 'x', stimulusLabel: 'X' },
+          { condition: 'x', stimulusLabel: 'Y' },
+        ],
+        onTrialResult: (r) => results.push(r),
+      }),
+    );
+    seq.start();
+    env.advance(500); // 1° stimolo, onset = 500
+    env.advance(300);
+    seq.handleKey('r', env.clock.now()); // 1° trial chiuso a RT 300
+    env.advance(500); // ISI → 2° trial: fissazione
+    env.advance(200);
+    seq.handleKey('r', env.clock.now()); // durante la fissazione del 2° trial
+    expect(results).toHaveLength(1);
+    env.advance(300); // fine fissazione → 2° stimolo
+    env.advance(250);
+    seq.handleKey('r', env.clock.now());
+    expect(results).toHaveLength(2);
+    expect(results[1]!.rtMs).toBe(250);
+  });
+
   it('nessuna risposta entro la finestra → OMISSION', () => {
     const env = new FakeEnv();
     const results: TrialResult[] = [];

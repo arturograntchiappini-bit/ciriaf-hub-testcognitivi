@@ -84,7 +84,7 @@ export function toJson(
   },
 ): string {
   const payload: JsonExport = {
-    app: 'CIRIAF - COLAB/NEXTROOM COGNITIVE TESTING HUB',
+    app: 'Sintropia - Cognitive tests Hub',
     testId: result.testId,
     sessionId: result.sessionId,
     startedAt: result.startedAt,

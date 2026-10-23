@@ -1,8 +1,9 @@
 # Wisconsin Card Sorting Test — Riferimenti scientifici
 
-> Documento di riferimento scientifico per la piattaforma sperimentale CIRIAF.
+> Documento di riferimento scientifico per la piattaforma sperimentale Sintropia.
 > Le citazioni sono riportate nella lingua originale; il testo esplicativo è in italiano.
-> Ultima verifica delle fonti: luglio 2026.
+> Riferimenti verificati su Crossref il 2026-10-23. I manuali PAR (Heaton et al., 1993; Kongs et al., 2000) **non sono
+> stati consultati direttamente**: ciò che qui è attribuito ad essi è riportato con questa cautela.
 
 ---
 
@@ -16,9 +17,8 @@ regola di ordinamento: l'unica informazione fornita dopo ogni carta è un feedba
 non annunciato dopo un numero prefissato di risposte corrette consecutive, costringendo il
 soggetto a **inibire il set precedente** e a costruirne uno nuovo per prove ed errori.
 
-Il paradigma nasce dai lavori di **Esta A. Berg** e **David A. Grant** all'Università del
-Wisconsin (1948) e viene poi standardizzato, quanto a somministrazione e scoring, dal manuale
-di **Heaton e colleghi** (1981, rev. 1993). La versione abbreviata a mazzo singolo è la
+Il paradigma nasce dai lavori di **Esta A. Berg** e **David A. Grant** del 1948 e viene poi standardizzato, quanto a somministrazione e scoring, dal manuale
+di **Heaton e colleghi** (1993 nella versione rivista). La versione abbreviata a mazzo singolo è la
 **WCST-64** di Kongs, Thompson, Iverson & Heaton (2000).
 
 Citazioni primarie (lingua originale):
@@ -48,8 +48,7 @@ sulla base di feedback esterni. Sono coinvolti tre processi distinti e dissociab
 1. **Flessibilità cognitiva / set-shifting.** Quando la regola cambia, il soggetto deve
    abbandonare il criterio finora rinforzato e passarne a uno nuovo. La difficoltà a compiere
    questo passaggio si manifesta come **perseverazione** (continuare ad applicare la regola
-   ormai errata). È il processo storicamente associato alla corteccia prefrontale
-   dorsolaterale.
+   ormai errata). È il processo tradizionalmente associato alla corteccia prefrontale.
 
 2. **Feedback learning (apprendimento per rinforzo).** L'unico segnale informativo è il
    feedback binario. Il soggetto deve usare il «sbagliato» come segnale di *shift* e il
@@ -63,159 +62,137 @@ sulla base di feedback esterni. Sono coinvolti tre processi distinti e dissociab
    distinto dalla rigidità perseverativa.
 
 La combinazione di questi tre indici permette di distinguere profili clinici diversi (es.
-rigidità frontale vs. distraibilità) a parità di numero totale di errori.
+rigidità vs. distraibilità) a parità di numero totale di errori. L'attribuzione di specifici punteggi a specifiche
+regioni prefrontali è oggetto di discussione: Nyhus e Barceló (2009) ne offrono un aggiornamento critico.
+
+> Nyhus, E., & Barceló, F. (2009). *The Wisconsin Card Sorting Test and the cognitive assessment of prefrontal
+> executive functions: A critical update.* **Brain and Cognition, 71**(3), 437–451.
+> DOI: `10.1016/j.bandc.2009.03.005`
 
 ---
 
 ## 3. Parametri adottati
 
-Valori confermati sulle fonti standard. La colonna «Fonte/razionale» indica se il valore è
-**standard di letteratura** o una **scelta di configurazione** della piattaforma.
+La colonna *Origine* distingue ciò che è **riportato dalle fonti** (con la cautela sui manuali PAR) da ciò che è una
+**scelta di progetto** di Sintropia.
 
-| Parametro | Valore | Fonte / razionale |
+| Parametro | Valore | Origine |
 |---|---|---|
-| Carte-stimolo (chiave) | 4 carte fisse: **① triangolo rosso**, **② stelle verdi**, **③ croci gialle**, **④ cerchi blu** | Berg (1948); manuale Heaton (1993). Le 4 carte sono costruite in modo che ciascuna sia univoca su ognuna delle 3 dimensioni. |
-| Dimensioni di ordinamento | 3: **Colore** (rosso, verde, giallo, blu) · **Forma** (triangolo, stella, croce, cerchio) · **Numero** (1, 2, 3, 4) | Grant & Berg (1948); Heaton (1993). |
-| Composizione mazzo-risposta | Carte che combinano le 3 dimensioni; ogni carta condivide ≥1 attributo con almeno una carta-stimolo | Heaton (1993); Kongs et al. (2000). |
-| Dimensione mazzo | **128** carte (due mazzi identici da 64) nella versione standard; **64** carte (mazzo singolo) nella **WCST-64** | Heaton (1993) = 128; Kongs et al. (2000) = 64. **Default piattaforma: 64** (WCST-64), somministrazione più breve con proprietà psicometriche equivalenti (correlazioni .7–.9 con la versione a 128). |
-| Ordine dei criteri | **Colore → Forma → Numero**, ciclico (dopo Numero si ricomincia da Colore) | Heaton (1993). Con 6 categorie la sequenza è C, F, N, C, F, N. |
-| Corrette consecutive per cambio categoria | **10** risposte corrette consecutive | Grant & Berg (1948); Heaton (1993). Valore classico e default della piattaforma. |
-| Categorie per terminare | **6** categorie completate *oppure* esaurimento del mazzo | Heaton (1993). Con mazzo da 64 il test si chiude comunque all'esaurimento delle carte se le 6 categorie non vengono raggiunte. |
-| Feedback | Segnale **binario** («corretto»/«sbagliato») dopo ogni singola risposta | Berg (1948); Heaton (1993). |
-| Durata feedback | **~1 s** (default configurabile) | **Scelta di configurazione:** l'originale cartaceo non prescrive una durata; nelle versioni computerizzate è un parametro di presentazione. Default proposto ≈ 1000 ms. |
+| Carte-stimolo | 4 carte fisse: **① un triangolo rosso**, **② due stelle verdi**, **③ tre croci gialle**, **④ quattro cerchi blu** | Configurazione classica del test (Heaton et al., 1993): ogni valore di ogni dimensione compare su una sola carta-stimolo |
+| Dimensioni | **Colore** (rosso, verde, giallo, blu) · **Forma** (triangolo, stella, croce, cerchio) · **Numero** (1, 2, 3, 4) | Grant & Berg (1948); Heaton et al. (1993) |
+| Mazzo-risposta | Le **64 combinazioni** 4 × 4 × 4, ciascuna una volta, in **ordine casuale** (con seme); se `deckSize` > 64 il mazzo si ripete in permutazioni successive | Il WCST-64 usa 64 carte (Kongs et al., 2000). **Differenza:** nel test ufficiale l'ordine delle carte è prestabilito; qui è casuale, quindi i punteggi non sono strettamente confrontabili con i dati normativi |
+| Dimensione mazzo | **64** (default); la versione completa usa 128 | Heaton et al. (1993) = 128; Kongs et al. (2000) = 64 |
+| Ordine dei criteri | **Colore → Forma → Numero**, ciclico | Heaton et al. (1993) |
+| Corrette consecutive per il cambio | **10** (`runToShift`) | Valore classico (Grant & Berg, 1948; Heaton et al., 1993) |
+| Categorie per terminare | **6** (`maxCategories`), oppure esaurimento del mazzo | Heaton et al. (1993). Con 64 carte e 10 corrette per categoria, sei categorie richiedono almeno 60 risposte corrette: il test finisce di norma per esaurimento del mazzo |
+| Feedback | Binario («Corretto» / «Errato») dopo ogni risposta, **900 ms** | Il feedback binario è del test originale; la durata è una **scelta di progetto**, fissa nel codice (non è un parametro modificabile) |
 
-**Note sulle varianti storiche.** Il *default* «shift dopo 10 corrette consecutive» e l'ordine
-Colore→Forma→Numero coincidono con Grant & Berg (1948) e con il manuale Heaton (1993): **sono
-confermati**, non richiedono correzione. L'unico parametro su cui la letteratura differisce è
-la **dimensione del mazzo**: 128 carte (standard Heaton) vs. 64 carte (WCST-64). La piattaforma
-adotta come default il mazzo da 64 (WCST-64), mantenendo invariati tutti gli altri parametri.
+Il valore predefinito del mazzo è 64 carte: la somministrazione è più breve, ma **non esiste equivalenza dimostrata** con
+la versione a 128 carte nei dati di Sintropia, e il mazzo casuale accentua la differenza dai dati normativi.
 
 ---
 
 ## 4. Mappatura implementativa
 
-*Da completare — vedi `src/engine/tests/wcst.ts`.*
+Corrispondenza fra §3, §5 e il codice (`src/engine/tests/wcst.ts`, `src/config/defaults.ts`, `src/ui/tests/WcstView.tsx`).
 
-Questa sezione mapperà i parametri della Sezione 3 e le formule della Sezione 5 sulle
-strutture dati e sulle funzioni del motore (generazione mazzo, valutazione match, macchina a
-stati delle categorie, scorer perseverativo).
+| Elemento | Dove | Comportamento |
+|---|---|---|
+| Carte-stimolo | `WCST_STIMULUS_CARDS` | Le 4 carte fisse |
+| Mazzo | `buildDeck` | Permutazione casuale delle 64 combinazioni, ripetuta se serve |
+| Regola attiva | `ruleForCategory` | `ordine[categoria mod 3]`: colore, forma, numero |
+| Confronto | `matchingDims` | Dimensioni su cui la carta-risposta combacia con la carta-stimolo **scelta** |
+| Cambio categoria | `WcstView` | Dopo `runToShift` corrette consecutive la categoria avanza e il contatore si azzera |
+| Fine del test | `WcstView` | `maxCategories` categorie completate oppure mazzo esaurito |
+| Punteggio | `scoreWcst` | Rielabora la sequenza dei trial con le regole attive di ciascuno; formule in §5 |
+| Principio perseverato | `PerseverationScanner` | Vedi §5.2 |
+| Parametri | `DEFAULTS.wcst` | `deckSize 64`, `runToShift 10`, `maxCategories 6` |
+
+Il test non prevede trial di pratica né un tempo massimo. Gli RT sono registrati per trial nei dati grezzi, ma **non**
+compaiono nel riepilogo.
 
 ---
 
 ## 5. Metriche e formule
 
-Notazione: sia una **trial** una singola presentazione carta+risposta+feedback. Le metriche
-seguono lo scoring standard del manuale Heaton (1993).
+Notazione: un **trial** è una presentazione carta + risposta + feedback. Si considerano i trial non interrotti.
 
 ### 5.1 Indici di prestazione globale
 
-- **Trial totali** — numero di carte-risposta effettivamente somministrate (≤ dimensione
-  mazzo). Il test termina al raggiungimento di 6 categorie o all'esaurimento del mazzo.
-- **Categorie completate** — `∈ [0, 6]`. Numero di volte in cui il soggetto raggiunge **10
-  risposte corrette consecutive** sotto la regola vigente.
-- **Errori totali** — numero di trial con risposta non conforme alla regola corretta corrente.
-  Vale l'identità di partizione:
+- **Trial totali** — carte somministrate (≤ dimensione del mazzo).
+- **Categorie completate** — numero di volte in cui si raggiungono `runToShift` (10) risposte corrette consecutive;
+  l'ultima categoria completata chiude il test se si raggiunge `maxCategories`.
+- **Errori totali** — trial in cui la carta-risposta **non** combacia con la scelta sulla dimensione della regola attiva
+  (comprese le risposte che non combaciano su nessuna dimensione). Vale
+  `Errori totali = Errori perseverativi + Errori non perseverativi`.
+- **Trial per la 1ª categoria** — indice di efficienza iniziale (formazione del concetto). Se nessuna categoria è
+  completata, vale il numero di trial totali.
+- **Risposte a livello concettuale (%)** — quota di risposte che fanno parte di una corsa di **almeno 3 corrette
+  consecutive**; le corse **non** si azzerano al cambio di categoria.
+- **Failure to maintain set** — numero di errori che interrompono una corsa di 5–9 corrette consecutive prima del
+  completamento della categoria (la finestra superiore segue `runToShift`).
 
-  ```
-  Errori totali = Errori perseverativi + Errori non perseverativi
-  ```
+### 5.2 Scoring perseverativo
 
-- **Trial per completare la 1ª categoria** — indice di efficienza iniziale (concept
-  formation).
-- **RT decisionale medio** — media dei tempi di risposta (dalla presentazione della carta alla
-  scelta), tipicamente sulle sole risposte valide.
+Si segue la procedura di Heaton et al. (1993) come descritta da **Howlett e Moseley (2024)**, un aggiornamento del
+diagramma di scoring di Berry (1996) pensato proprio per controllare che le versioni computerizzate seguano il manuale:
 
-### 5.2 Definizioni operative dello scoring perseverativo (Heaton)
+> Howlett, C. A., & Moseley, G. L. (2024). *An improved diagrammatic procedure for interpreting and scoring the
+> Wisconsin Card Sorting Test: An update to Steve Berry's 1996 edition.* **Behavior Research Methods, 56**(8),
+> 8715–8719. DOI: `10.3758/s13428-024-02499-w`
 
-Lo scoring perseverativo di Heaton si fonda su tre concetti precisi. **Questa è la parte
-load-bearing per l'implementazione dello scorer.**
+**Risposta ambigua / non ambigua.** Una risposta è *non ambigua* se la carta scelta combacia con la carta-stimolo su **una
+sola** dimensione, *ambigua* se su più dimensioni. Una risposta che non combacia su nessuna dimensione è un errore e non
+è né l'una né l'altra ai fini di questo scoring.
 
-**a) Risposta ambigua vs. non ambigua.**
+**Principio perseverato (PP)** — la dimensione errata a cui il partecipante si attiene. Regole implementate:
 
-> *"An unambiguous response is one in which the response card matches a stimulus card on only
-> one dimension."*
-> *"An ambiguous response is one in which the response card matches a stimulus card on more
-> than one dimension."* (aggiornamento diagrammatico Heaton, 2024)
+1. Si stabilisce al **primo errore non ambiguo** (che conta come perseverativo: scelta di implementazione, vedi limiti).
+2. Quando una categoria è completata, il PP diventa il **criterio appena abbandonato**.
+3. **Tre errori non ambigui consecutivi** su una dimensione che non è né quella corretta né il PP spostano il PP su quella
+   dimensione; le risposte ambigue tra i tre errori devono combaciare con la stessa dimensione. Il testo di riferimento
+   dice che un nuovo PP non vale e non è perseverativo fino al **secondo** errore non ambiguo: si legge come «il primo dei
+   tre errori non è perseverativo, il secondo e il terzo sì», e lo stesso vale per quelli successivi sul nuovo PP.
 
-- **Non ambigua (unambiguous):** la carta-risposta condivide con le carte-stimolo **una sola**
-  dimensione → l'intenzione del soggetto è identificabile senza incertezza.
-- **Ambigua (ambiguous):** la carta condivide **più** dimensioni → l'intenzione non è
-  univocamente determinabile dalla sola scelta.
+**Errore perseverativo e risposta perseverativa.** Una *risposta perseverativa* ripete l'ordinamento secondo il PP e può
+essere corretta oppure no; un *errore perseverativo* è una risposta perseverativa **sbagliata**. Gli errori
+perseverativi sono dunque un sottoinsieme delle risposte perseverative, e una risposta perseverativa può essere corretta
+solo se è ambigua.
 
-**b) Principio perseverato (perseverated-to principle, PP) — «principio perseverativo».**
+**Regola del «sandwich».** Una risposta **ambigua** è perseverativa solo se è incastrata tra due errori perseverativi
+**non ambigui** e combacia col PP in vigore; subito dopo il completamento di una categoria non può esserlo.
 
-Il PP è la **dimensione errata verso cui il soggetto persevera**. Regola operativa:
+**Errori non perseverativi** = Errori totali − Errori perseverativi.
 
-- Viene **stabilito la prima volta** al primo **errore non ambiguo** della prima categoria
-  (Colore):
+**Metriche riportate:** errori perseverativi, % di errori perseverativi (sui trial totali), **risposte perseverative**,
+errori non perseverativi.
 
-  > *"The PP is established in the first category (i.e., color category) once the first
-  > unambiguous error is made."*
-
-- Il PP viene **aggiornato** quando:
-  1. una categoria è completata (10 corrette) → il PP diventa la dimensione **appena
-     completata** (quella che ora smette di essere corretta);
-  2. il soggetto produce **tre errori non ambigui consecutivi** che matchano la stessa
-     dimensione non-corretta → quella dimensione diventa il nuovo PP.
-
-**c) Risposta perseverativa vs. errore perseverativo.**
-
-- **Risposta perseverativa** = qualunque risposta (corretta *o* errata) che **corrisponde al
-  PP corrente**. Una risposta perseverativa **può essere corretta**, quando il PP coincide con
-  la regola che è tornata/diventata corretta:
-
-  > *"Perseverative responses (repeated card sorts) can be correct, but perseverative errors
-  > are, by definition, not."*
-
-- **Errore perseverativo** = una risposta perseverativa che è **anche un errore** (non conforme
-  alla regola corretta corrente). Vale l'inclusione stretta:
-
-  > *"Perseverative errors are perseverative responses; however, not all perseverative
-  > responses are perseverative errors."*
-
-  Formalmente:
-
-  ```
-  errore_perseverativo(trial) ⇔  matches(risposta, PP_corrente)  ∧  ¬matches(risposta, regola_corretta_corrente)
-  ```
-
-- **Regola del «sandwich».** Una risposta **ambigua** viene conteggiata come perseverativa solo
-  se è «incastrata» tra due errori perseverativi **non ambigui** che matchano il PP corrente:
-
-  > *"an ambiguous response that is situated ('sandwiched') between two unambiguous
-  > perseverative errors"*
-
-**Errori non perseverativi** = errori che **non** matchano il PP corrente (errori casuali,
-di distraibilità o di ipotesi diversa dalla perseverata). Si ottengono per differenza:
-`Errori non perseverativi = Errori totali − Errori perseverativi`.
-
-### 5.3 Failure to maintain set (fallimento nel mantenimento del set)
-
-Definizione operativa Heaton:
-
-- **Failure to maintain set** = si verifica quando il soggetto fornisce **5 o più (ma meno di
-  10) risposte corrette consecutive** sotto la regola vigente e poi **commette un errore prima
-  di completare la categoria** (cioè prima di raggiungere le 10 corrette). L'indice conta il
-  numero di tali episodi (finestra **5–9** corrette consecutive seguite da errore).
-
-  ```
-  failure_to_maintain_set:  (run corrette consecutive ∈ [5, 9])  →  errore  (prima delle 10)
-  ```
-
-Interpretazione: distraibilità / instabilità del set, distinta dalla rigidità perseverativa.
-
-### 5.4 Riepilogo metriche da produrre
+### 5.3 Riepilogo
 
 | Metrica | Definizione sintetica |
 |---|---|
-| Categorie completate | n. di run da 10 corrette consecutive (0–6) |
-| Trial totali | n. carte somministrate |
-| Errori totali | trial non conformi alla regola corretta |
-| Errori perseverativi | risposte che matchano il PP e sono errate (def. Heaton, §5.2) |
-| Errori non perseverativi | Errori totali − Errori perseverativi |
-| Failure to maintain set | episodi con 5–9 corrette consecutive seguite da errore pre-categoria |
-| Trial 1ª categoria | trial necessari a completare la prima categoria |
-| RT decisionale medio | media dei tempi di risposta |
+| Categorie completate | corse di `runToShift` corrette consecutive |
+| Trial totali | carte somministrate |
+| Errori totali | trial non conformi alla regola attiva |
+| Errori perseverativi / % | secondo §5.2 |
+| Risposte perseverative | errori perseverativi + risposte ambigue corrette incastrate |
+| Errori non perseverativi | totali − perseverativi |
+| Failure to maintain set | errori dopo 5–9 corrette consecutive |
+| Risposte a livello concettuale | % di risposte in corse di ≥ 3 corrette |
+| Trial per la 1ª categoria | trial necessari a completare la prima categoria |
+
+---
+
+## 6. Limiti e cautele
+
+- **Scoring non validato.** L'implementazione segue le regole esplicite di Howlett e Moseley (2024) ma **non è stata
+  confrontata con lo scoring ufficiale PAR** su dati reali. Due punti sono letture del testo: l'errore che stabilisce il
+  PP iniziale è contato come perseverativo (la fonte non lo dice espressamente), e il trattamento dei tre errori
+  consecutivi (primo escluso). Per uso clinico o confronti normativi serve una validazione.
+- **Mazzo casuale**, non l'ordine prestabilito del test ufficiale; mazzo ridotto a 64 carte.
+- **Nessuna pratica e nessun tempo massimo**; gli RT non sono nel riepilogo.
+- **Un solo ordine dei criteri** (colore, forma, numero), identico per tutti i partecipanti.
+- **Ripetizioni ravvicinate** possono produrre effetti di apprendimento: non sono quantificati qui, e vanno considerati nei disegni con più somministrazioni.
 
 ---
 
@@ -230,14 +207,21 @@ Interpretazione: distraibilità / instabilità del set, distinta dalla rigidità
   *Wisconsin Card Sorting Test Manual: Revised and Expanded.* PAR.
 - Kongs, S. K., Thompson, L. L., Iverson, G. L., & Heaton, R. K. (2000).
   *Wisconsin Card Sorting Test-64 Card Version (WCST-64).* PAR.
+- Howlett, C. A., & Moseley, G. L. (2024). *An improved diagrammatic procedure for interpreting and scoring the Wisconsin Card Sorting Test: An update to Steve Berry's 1996 edition.* **Behavior Research Methods, 56**(8), 8715–8719. DOI: `10.3758/s13428-024-02499-w`
 - Nyhus, E., & Barceló, F. (2009). *The Wisconsin Card Sorting Test and the cognitive
   assessment of prefrontal executive functions: A critical update.*
   **Brain and Cognition, 71**(3), 437–451. DOI: `10.1016/j.bandc.2009.03.005`
-- Steinke, A., & Kopp, B. (2020/2021). *Considerations for using the Wisconsin Card Sorting
-  Test to assess cognitive flexibility.* **Behavior Research Methods.**
-  DOI: `10.3758/s13428-021-01551-3`
-- Aggiornamento diagrammatico dello scoring Heaton (update di Berry, 1996):
-  **Behavior Research Methods** (2024). DOI: `10.3758/s13428-024-02499-w`
+- Miles, S., Howlett, C. A., Berryman, C., Nedeljkovic, M., Moseley, G. L., & Phillipou, A. (2021). *Considerations for using the Wisconsin Card Sorting Test to assess cognitive flexibility.* **Behavior Research Methods, 53**(5), 2083–2091. DOI: `10.3758/s13428-021-01551-3`
+
+## Cronologia delle revisioni
+
+- **Revisione scientifica 2026-10.** **Riscritto lo scoring perseverativo** secondo Howlett e Moseley (2024): il codice
+  precedente contava come perseverativo qualunque errore combaciante col PP (comprese le risposte ambigue) e non
+  spostava mai il PP dopo tre errori consecutivi; ora si applicano la regola del sandwich e il cambio del PP, e si
+  riportano le risposte perseverative. **Corretta l'attribuzione** del DOI 10.3758/s13428-021-01551-3 (Miles et al., 2021,
+  non «Steinke & Kopp») e quella dell'aggiornamento 2024 (Howlett & Moseley, non «Heaton, 2024»). Rimossi i passaggi
+  attribuiti ai manuali senza verifica (equivalenza 64/128 con correlazioni .7–.9) e le citazioni testuali; descritte
+  durata del feedback (900 ms, fissa) e mazzo casuale come scelte di progetto.
 
 ## Aggiornamento metriche (revisione)
 

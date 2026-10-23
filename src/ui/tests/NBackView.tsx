@@ -8,6 +8,7 @@ import { RtTestRunner, type RtTestPlan } from '../runtime/RtTestRunner';
 import type { TrialSpec } from '../runtime/sequencer';
 import { generateNBack, scoreNBack, type NBackParams, type NBackStimulus } from '../../engine/tests/nback';
 import { mulberry32 } from '../../engine/rng';
+import { nBackInstruction } from '../content/instructions';
 import type { TestResult } from '../../engine/types';
 
 interface NBackViewProps {
@@ -22,7 +23,8 @@ interface NBackViewProps {
 }
 
 function toSpec(s: NBackStimulus): TrialSpec {
-  return { condition: s.isTarget ? 'target' : 'nontarget', stimulusLabel: s.letter, data: s };
+  const condition = s.isTarget ? 'target' : s.isLure ? 'lure' : 'nontarget';
+  return { condition, stimulusLabel: s.letter, data: s };
 }
 
 export function NBackView(props: NBackViewProps): JSX.Element {
@@ -56,7 +58,7 @@ export function NBackView(props: NBackViewProps): JSX.Element {
       const s = t.data as NBackStimulus;
       return <span className="text-8xl font-bold text-ink">{s.letter}</span>;
     },
-    statusHint: 'BARRA SPAZIATRICE se la lettera è uguale a 2 passi fa',
+    statusHint: `${nBackInstruction(params.n).keyHints[0]}`,
     score: (trials) => scoreNBack(trials),
   };
 

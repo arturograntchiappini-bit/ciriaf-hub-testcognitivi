@@ -26,6 +26,15 @@ describe('generateStroop', () => {
     expect(seq.filter((s) => !s.congruent)).toHaveLength(24);
   });
 
+  it('con 48 trial ogni colore e ogni parola compaiono 6 volte tra gli incongruenti e 6 tra i congruenti', () => {
+    const seq = generateStroop(PARAMS, mulberry32(3));
+    for (const color of ['ROSSO', 'VERDE', 'BLU', 'GIALLO']) {
+      expect(seq.filter((s) => !s.congruent && s.color === color)).toHaveLength(6);
+      expect(seq.filter((s) => !s.congruent && s.word === color)).toHaveLength(6);
+      expect(seq.filter((s) => s.congruent && s.color === color)).toHaveLength(6);
+    }
+  });
+
   it('gli incongruenti hanno parola diversa dal colore, i congruenti uguali', () => {
     const seq = generateStroop(PARAMS, mulberry32(2));
     for (const s of seq) {
@@ -88,6 +97,26 @@ describe('scoreStroop', () => {
     const interference = summary.find((m) => m.label.startsWith('Effetto interferenza'));
     // mean inc (850) - mean con (550) = 300
     expect(interference?.value).toBe(300);
+  });
+
+  it('calcola il costo in accuratezza come accuratezza congruenti − incongruenti, in punti percentuali', () => {
+    const trials: TrialResult[] = [
+      trial({ condition: 'congruent', correct: true }),
+      trial({ condition: 'congruent', correct: true }),
+      trial({ condition: 'incongruent', correct: true }),
+      trial({ condition: 'incongruent', correct: false }),
+    ];
+    const summary = scoreStroop(trials);
+    expect(summary.find((m) => m.label.startsWith('Costo in accuratezza'))?.value).toBe(50);
+  });
+
+  it('esclude i trial interrotti dall’accuratezza', () => {
+    const trials: TrialResult[] = [
+      trial({ condition: 'congruent', correct: true }),
+      trial({ condition: 'congruent', correct: false, flag: 'INTERRUPTED' }),
+    ];
+    const summary = scoreStroop(trials);
+    expect(summary.find((m) => m.label === 'Accuratezza congruenti')?.value).toBe(100);
   });
 
   it('conta anticipazioni e omissioni', () => {

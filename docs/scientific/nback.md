@@ -1,6 +1,6 @@
 # N-Back Task (2-back) — Riferimenti scientifici
 
-> Documento scientifico di riferimento per la piattaforma sperimentale CIRIAF.
+> Documento scientifico di riferimento per la piattaforma sperimentale Sintropia.
 > Variante impiegata: **2-back verbale (lettere), single n-back**, risposta go/no-go.
 
 ---
@@ -24,12 +24,18 @@ continuamente aggiornata mentre nuova informazione arriva, così che l'item
 rilevante scivola progressivamente indietro nella sequenza. È questa proprietà di
 **flusso continuo** a distinguere l'N-Back dai compiti di span classici.
 
-La validità del paradigma come misura della memoria di lavoro (WM) e le sue
-proprietà psicometriche sono discusse in:
+Le proprietà psicometriche del paradigma come misura della memoria di lavoro (WM) sono discusse in:
 
 > Jaeggi, S. M., Buschkuehl, M., Perrig, W. J., & Meier, B. (2010). *The concurrent
 > validity of the N-back task as a working memory measure.* **Memory, 18**(4),
 > 394–412. DOI: [10.1080/09658211003702171](https://doi.org/10.1080/09658211003702171)
+
+Jaeggi et al. (2010) hanno rivisto la letteratura e condotto tre esperimenti con varianti del compito (stimoli e carichi
+diversi). La conclusione è netta: l'N-back **non è una misura utile delle differenze individuali** di memoria di lavoro,
+soprattutto per **affidabilità insufficiente**, ma resta utile nella **ricerca sperimentale** sulla WM e predice
+differenze individuali in altre funzioni cognitive superiori, come l'intelligenza fluida, specie ai carichi alti.
+Questo orienta l'uso del test su Sintropia: è adatto a confronti **entro i partecipanti tra condizioni** (per esempio
+due condizioni ambientali), meno a classificare le persone con un punteggio singolo (§6).
 
 Il correlato neurale del compito è consolidato dalla meta-analisi di neuroimaging:
 
@@ -56,57 +62,68 @@ L'N-Back sollecita simultaneamente i tre processi centrali della memoria di lavo
 
 Poiché lo stream è ininterrotto, il sistema deve gestire in parallelo codifica del
 nuovo item, ricalcolo delle posizioni e decisione di risposta, sotto pressione
-temporale. La meta-analisi di **Owen et al. (2005)** localizza in modo robusto questi
-processi in una rete **fronto-parietale** bilaterale — corteccia prefrontale
-dorsolaterale e ventrolaterale, corteccia parietale (lobulo parietale inferiore e
-precuneo), area premotoria/motoria supplementare e corteccia cingolata — coerente con
-l'ipotesi che l'N-Back indicizzi le componenti esecutive della WM.
+temporale. La meta-analisi di **Owen et al. (2005)**, su 668 insiemi di coordinate di attivazione tratti da 24 studi,
+trova attivazioni consistenti in regioni **frontali e parietali** — premotorie, prefrontali, cingolate e parietali
+posteriori — simili tra compiti verbali e non verbali e tra monitoraggio dell'identità e della posizione. Le
+localizzazioni sono un risultato di gruppo sul paradigma, non una mappatura dei punteggi individuali.
 
 Un punto metodologico critico riguarda la **strategia di familiarità**: un
 partecipante può rispondere "target" semplicemente perché uno stimolo *sembra
-familiare*, senza recuperarne la posizione seriale esatta. Per forzare il vero
-processo di updating/binding è necessario introdurre **lure** (esche), cioè item che
-ricompaiono a un lag diverso da *n* (vedi §3). Jaeggi et al. (2010) e la letteratura
-sulla validità di costrutto sottolineano che il controllo dei lure è ciò che rende
-l'N-Back una misura esecutiva e non un semplice compito di riconoscimento.
+familiare*, senza recuperarne la posizione seriale esatta. Per contrastare la sola
+familiarità si introducono **lure** (esche), cioè non-target che ripetono una lettera a un lag vicino a *n* (§3).
+Kane et al. (2007) hanno mostrato, in 2-back e 3-back verbali, che le esche portano più **falsi allarmi** delle
+altre lettere non-target, e che nel 3-back portano anche più mancati sui target immediatamente successivi: segno che il
+compito richiede di **controllare le risposte basate sulla familiarità**.
 
-> Riferimento sul ruolo dei lure e sulla validità di costrutto:
 > Kane, M. J., Conway, A. R. A., Miura, T. K., & Colflesh, G. J. H. (2007). *Working
 > memory, attention control, and the N-back task: A question of construct validity.*
 > **Journal of Experimental Psychology: Learning, Memory, and Cognition, 33**(3),
 > 615–622. DOI: [10.1037/0278-7393.33.3.615](https://doi.org/10.1037/0278-7393.33.3.615)
 
+Lo stesso lavoro riporta anche che l'N-back correla **solo debolmente** con un compito di operation span, quindi i due
+non misurano necessariamente lo stesso costrutto: l'N-back ha validità di facciata come compito di WM ma non
+validità convergente con almeno una misura consolidata.
+
 ---
 
 ## 3. Parametri adottati
 
-| Parametro | Valore | Fonte / razionale |
-|---|---|---|
-| **n (livello)** | **2** (2-back) | Kirchner (1958); il livello 2 è il carico standard di riferimento — sufficientemente impegnativo da caricare l'updating senza produrre effetti pavimento tipici di 3-back/4-back nella popolazione generale. |
-| **Durata presentazione lettera** | **500 ms** | Valore standard nelle implementazioni di riferimento (es. neurobs Psychlab, Jaeggi et al. 2010). Tempo sufficiente per la codifica senza favorire la reiterazione articolatoria prolungata. |
-| **Durata schermo vuoto / blank (ISI)** | **1500 ms** | Intervallo inter-stimolo entro il range della letteratura (≈1000–2500 ms). Con 500 ms di stimolo dà un **trial di 2000 ms (2 s)** = SOA. Ritmo abbastanza rapido da imporre "rapidly changing information" (Kirchner) ma compatibile con RT affidabili. |
-| **Durata trial (SOA)** | **2000 ms** (500 + 1500) | Derivato. |
-| **N. trial (blocco)** | **360 trial** (≈ **12 min**) | Scelta di piattaforma: il protocollo CIRIAF richiede blocchi di ≥10–15 min per valutare la **tenuta della traccia mnestica nel tempo**. 360 × 2 s = 720 s = 12 min. Nota: gli studi classici usano blocchi brevi (20–64 trial); qui il blocco è deliberatamente esteso per l'analisi di stabilità temporale (§5, quartili). |
-| **Target rate** | **~30%** dei trial (numero fisso di target per blocco) | Coerente con Jaeggi et al. (2010) e con la pratica prevalente (~25–35%). Su 360 trial ⇒ ~108 target e ~252 non-target. Un numero **fisso** e bilanciato di target riduce la varianza tra blocchi/soggetti. |
-| **Controllo lure** | **Lure a lag 1 (1-back) e lag 3 (3-back)**, cioè n±1 | Essenziale per neutralizzare la strategia di familiarità. Per il 2-back gli item interferenti sono quelli che ricompaiono **una posizione prima (1-back)** o **una dopo (3-back)** rispetto al target: sono familiari ma **non** sono target. Quota consigliata di lure ~15–25% dei non-target. Rif.: Jaeggi et al. (2010); Kane et al. (2007). |
-| **N. trial di pratica** | **20 trial** | Blocco di familiarizzazione con feedback, escluso dall'analisi. Sufficiente a stabilizzare la comprensione della regola 2-back e della risposta go/no-go. |
-| **Set di stimoli (lettere)** | **Consonanti** — vocali (A, E, I, O, U) **escluse** | Escludere le vocali impedisce la formazione involontaria di parole/sillabe pronunciabili e il chunking fonologico, mantenendo il carico sull'updating. Set consigliato: `B C D F G H J K L M N P Q R S T V W X Y Z` (evitando eventuali coppie visivamente/foneticamente confondibili). Caratteri maiuscoli, font monospaziato, centrati. |
-| **Tasto di risposta** | **Barra spaziatrice** — pressione **solo sui target** | Paradigma **go/no-go**: si preme la barra spaziatrice quando lo stimolo corrente è uguale a quello di 2 posizioni prima; sui non-target **non si preme** (risposta trattenuta). Semplifica la mappatura motoria e isola falsi allarmi vs omissioni. |
+La colonna *Origine* distingue fonti primarie, prassi e **scelte di progetto**.
 
-**Sintesi del blocco:** 2-back, lettere consonantiche, 500 ms stimolo + 1500 ms blank
-(2 s/trial), 360 trial (~12 min), ~30% target, lure a lag 1 e 3, 20 trial di pratica,
-risposta go/no-go con barra spaziatrice.
+| Parametro | Valore | Origine e razionale |
+|---|---|---|
+| **n (livello)** | **2** (2-back); modificabile da 1 a 3 | **Scelta di progetto**: carico intermedio che richiede aggiornamento continuo. Le istruzioni e il suggerimento a schermo seguono il valore scelto. |
+| **Durata lettera** | **500 ms** | **Scelta di progetto**: tempo sufficiente per la codifica visiva di una lettera. |
+| **Schermo vuoto** | **1500 ms** | **Scelta di progetto**. Con la lettera dà un trial di **2000 ms**. La risposta è valida per tutta la durata del trial (lettera + schermo vuoto). |
+| **N. trial** | **360** (≈ 12 min) | **Scelta di progetto**: blocco lungo per osservare la stabilità nel tempo (quartili, §5.5). 360 × 2 s = 720 s. Un blocco così lungo mescola memoria di lavoro e cali di vigilanza: va tenuto presente nell'interpretazione. |
+| **Target rate** | **30%** dei trial idonei (≥ n) | **Scelta di progetto**. Su 360 trial: 107 target (30% di 358 trial idonei) e 253 non-target. Numero **fisso**, per ridurre la varianza tra blocchi. |
+| **Posizione dei target** | Casuale, **mai due target adiacenti** (vincolo rilassato solo se necessario), mai nelle prime n posizioni | **Scelta di progetto**: evita artefatti da sequenze di target consecutivi. |
+| **Lure** | **20%** dei non-target (`lureRate`), a **lag n−1 o n+1** (per il 2-back: lag 1 o 3), scelti a caso fra i lag possibili | Kane et al. (2007) usano come esche gli item che ricorrono **una posizione prima** (lag n−1). L'aggiunta di n+1 e la quota del 20% sono **scelte di progetto**. Gli altri non-target **evitano** ripetizioni a quei lag, così i lure sono esattamente quelli pianificati. |
+| **Pratica** | **20 trial** con feedback | **Scelta di progetto**; esclusi dalle metriche. |
+| **Lettere** | **16 consonanti**: B C D F G H L M N P Q R S T V Z | **Scelta di progetto**: vocali escluse per evitare sillabe e parole pronunciabili; escluse anche J K W X Y per ridurre confusioni visive e fonetiche. |
+| **Tasto** | **Barra spaziatrice** solo sui target | Paradigma di tipo go/no-go: i non-target richiedono di trattenere la risposta. |
 
 ---
 
 ## 4. Mappatura implementativa
 
-*Da completare — vedi `src/engine/tests/nback.ts`.*
+Corrispondenza fra §3 e il codice (`src/engine/tests/nback.ts`, `src/engine/sdt.ts`, `src/config/defaults.ts`, `src/ui/tests/NBackView.tsx`).
 
-(Questa sezione collegherà i parametri di §3 ai simboli/costanti del motore
-sperimentale: timing dello scheduler, generazione della sequenza con vincolo sul
-numero di target e sull'inserimento controllato dei lure a lag 1/3, mappatura del
-tasto e finestra di raccolta della risposta, logging per-trial.)
+| Elemento | Dove | Comportamento |
+|---|---|---|
+| Parametri | `DEFAULTS.nback` | `n 2`, `letterMs 500`, `blankMs 1500`, `nTrials 360`, `targetRate 0.3`, `lureRate 0.2`, `practiceTrials 20` |
+| Numero target | `generateNBack` | `round((nTrials − n) · targetRate)` |
+| Posizioni target | `chooseTargetPositions` | Estrazione casuale (RNG con seme) con vincolo di non adiacenza; se non basta, il vincolo viene rilassato |
+| Posizioni lure | `chooseLurePositions` | Estrazione casuale fra i non-target che hanno disponibili entrambi i lag; numero `round(non-target · lureRate)` |
+| Lettere | `generateNBack` | Target: copia la lettera a lag n. Lure: copia quella a lag n−1 o n+1 se diversa da quella a lag n (altrimenti sarebbe un target). Altro: lettera che evita lag n, n−1 e n+1 |
+| Etichette | `generateNBack` | `isTarget` e `isLure` sono **ricalcolati** dalla sequenza finale, quindi coincidono sempre con ciò che il partecipante vede |
+| Condizioni nei dati | `NBackView` | `target`, `lure`, `nontarget` per ogni trial |
+| Finestra di risposta | `NBackView` | 2000 ms (lettera + schermo vuoto), senza chiusura alla pressione |
+| Compatibilità | `generateNBack` | I modelli di sessione salvati prima dei lure non hanno `lureRate`: valgono 0 lure, come in precedenza |
+| Metriche | `scoreNBack` | Solo trial di test; i trial interrotti sono esclusi dai conteggi. Formule in §5 |
+
+Una versione precedente del generatore **evitava** i lure invece di inserirli: la familiarità recente era quindi un
+indizio perfetto per il target. Il difetto è stato corretto (vedi cronologia).
 
 ---
 
@@ -118,7 +135,7 @@ tasto e finestra di raccolta della risposta, logging per-trial.)
 |---|---|
 | **Hit** | Pressione della barra spaziatrice su un **target** (entro la finestra di risposta). |
 | **Miss / Omissione** | Nessuna risposta su un **target**. |
-| **Falso allarme (FA)** | Pressione su un **non-target** (inclusi i **lure**). |
+| **Falso allarme (FA)** | Pressione su un **non-target** (inclusi i **lure**). Il tasso di FA sui soli lure si riporta a parte. |
 | **Rifiuto corretto (CR)** | Nessuna risposta su un **non-target**. |
 
 Con `nTarget` = numero di target e `nNonTarget` = numero di non-target nel blocco:
@@ -175,23 +192,41 @@ e falsi allarmi:
 - **RT medio** dei hit: `mean(RT_hit)`
 - **Deviazione standard** dei hit: `sd(RT_hit)`
 
-Opzionale: scarto degli outlier (es. RT < 150 ms come risposte anticipatorie, o oltre
-±3 SD) prima del calcolo.
+Un hit con $RT < 150\,\text{ms}$ è classificato come anticipazione: conta come hit nei conteggi e nel $d'$, ma non
+entra negli RT. Non si applicano altri scarti di outlier.
 
 ### 5.5 Analisi per quartili temporali del blocco (stabilità nel tempo)
 
-Poiché il blocco è esteso (~12 min) proprio per valutare la **tenuta della traccia
-mnestica**, il blocco viene suddiviso in **4 quartili temporali** (Q1–Q4, ~90 trial /
-~3 min ciascuno). Per ogni quartile si ricalcolano:
+Il blocco è suddiviso in **4 quartili** contigui di trial (~90 trial, ~3 min ciascuno). Per ogni quartile la
+piattaforma riporta il `d′`, con la correzione loglinear applicata ai conteggi del singolo quartile. Hit, falsi allarmi
+e RT per quartile non sono calcolati nel riepilogo ma si ricavano dai dati grezzi (una riga per trial, con condizione,
+risposta e flag).
 
-- `d′` (con correzione loglinear applicata sui conteggi del singolo quartile),
-- hit rate, false-alarm rate,
-- RT medio e SD dei hit.
+Il confronto Q1→Q4 indica un eventuale calo nel tempo (vigilanza, affaticamento). Con circa 25 target e 65 non-target
+per quartile, il $d'$ di un quartile è una stima **rumorosa**: va letto come tendenza, non come misura puntuale.
 
-Il confronto Q1→Q4 quantifica l'eventuale **decremento da vigilanza / affaticamento**
-(calo di d′, aumento di FA o di RT) rispetto a una prestazione stabile, fornendo un
-indice della robustezza temporale della memoria di lavoro oltre alla prestazione
-media.
+### 5.6 Falsi allarmi sui lure
+
+`Falsi allarmi su lure` e `Tasso di falsi allarmi su lure` $= 100 \cdot n_{\text{FA su lure}} / n_{\text{lure}}$ misurano
+quanto la risposta è guidata dalla familiarità (Kane et al., 2007). Un tasso sui lure molto più alto di quello sugli altri
+non-target indica una strategia basata sulla familiarità. I lure contano anche come non-target nel calcolo di $F$ e di $d'$.
+
+---
+
+## 6. Limiti e cautele
+
+- **Affidabilità e differenze individuali.** Jaeggi et al. (2010) trovano l'affidabilità insufficiente per usare
+  l'N-back come misura individuale di WM. Su Sintropia i risultati sono più difendibili come confronto **tra condizioni
+  nello stesso partecipante** che come punteggio assoluto.
+- **Validità convergente.** Kane et al. (2007) riportano una correlazione debole con l'operation span: l'N-back non è
+  intercambiabile con altri compiti di WM.
+- **Blocco lungo.** 12 minuti confondono memoria di lavoro e vigilanza.
+- **Un solo livello e un solo tipo di stimolo** (lettere): nessuna generalizzazione ad altri carichi o a stimoli spaziali.
+- **Tempi di risposta in browser**: vedi [validazione RT](validazione-rt.md).
+
+---
+
+
 
 ---
 
@@ -203,7 +238,16 @@ media.
 - Kane, M. J., Conway, A. R. A., Miura, T. K., & Colflesh, G. J. H. (2007). *Working memory, attention control, and the N-back task: A question of construct validity.* **Journal of Experimental Psychology: LMC, 33**(3), 615–622. DOI: [10.1037/0278-7393.33.3.615](https://doi.org/10.1037/0278-7393.33.3.615)
 - Hautus, M. J. (1995). *Corrections for extreme proportions and their biasing effects on estimated values of d′.* **Behavior Research Methods, Instruments, & Computers, 27**, 46–51. DOI: [10.3758/BF03203619](https://doi.org/10.3758/BF03203619)
 
-## Aggiornamento metriche (revisione)
+## Cronologia delle revisioni
+
+- **Revisione scientifica 2026-10.** **Corretto un difetto del generatore**: i lure a lag n−1 e n+1 erano evitati
+  invece che inseriti, contro lo scopo dichiarato nel paper e rendendo la familiarità un indizio perfetto. Ora una
+  quota `lureRate` (20%) dei non-target è composta da lure e il riepilogo riporta i falsi allarmi su lure.
+  Verificati su Crossref/Europe PMC tutti i riferimenti; riscritte le affermazioni non verificate (Jaeggi, Owen,
+  Kane); aggiunta la sezione dei limiti con l'affidabilità. Le istruzioni e il suggerimento a schermo seguono ora il
+  livello n scelto (prima erano fissi a 2). Il paper dichiarava hit, FA e RT per quartile, mentre il codice calcola solo
+  il d′: allineato al codice.
+- **Criterio c.**
 
 Accanto a **d′** viene ora riportato il **criterio decisionale c** (bias di
 risposta), con la stessa correzione loglinear di Hautus:

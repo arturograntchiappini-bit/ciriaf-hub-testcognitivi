@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateGoNoGo, scoreGoNoGo, type GoNoGoParams } from './gonogo';
+import { criterionC, dPrime } from '../sdt';
 import { mulberry32 } from '../rng';
 import type { TrialResult } from '../types';
 
@@ -83,5 +84,32 @@ describe('scoreGoNoGo', () => {
     expect(summary.find((m) => m.label === 'RT medio Go corretti')?.value).toBe(400);
     // CV = SD/mean*100; RT 300 e 500 → mean 400, SD campionaria √(20000)=141.42 → CV 35.4%
     expect(summary.find((m) => m.label === 'CV RT Go corretti')?.value).toBe(35.4);
+  });
+
+  it('esclude i trial interrotti dai denominatori dei tassi', () => {
+    const trials: TrialResult[] = [
+      trial({ condition: 'nogo', stimulus: 'nogo', correct: false, rtMs: 300 }),
+      trial({ condition: 'nogo', stimulus: 'nogo', correct: true, response: null, rtMs: null, flag: 'INTERRUPTED' }),
+      trial({ condition: 'go', rtMs: 400 }),
+      trial({ condition: 'go', correct: false, response: null, rtMs: null, flag: 'INTERRUPTED' }),
+    ];
+    const summary = scoreGoNoGo(trials);
+    expect(summary.find((m) => m.label === 'Tasso di commissione')?.value).toBe(100);
+    expect(summary.find((m) => m.label === 'Tasso di omissione')?.value).toBe(0);
+  });
+
+  it("calcola d' e criterio dalla risposta sui Go (hit) e sui No-Go (falso allarme), anticipazioni comprese", () => {
+    const hits = [
+      ...Array.from({ length: 8 }, () => trial({ condition: 'go', rtMs: 400 })),
+      trial({ condition: 'go', rtMs: 90, flag: 'ANTICIPATION' }),
+    ];
+    const misses = [trial({ condition: 'go', correct: false, response: null, rtMs: null, flag: 'OMISSION' })];
+    const falseAlarm = [trial({ condition: 'nogo', stimulus: 'nogo', correct: false, rtMs: 300 })];
+    const rejections = Array.from({ length: 3 }, () =>
+      trial({ condition: 'nogo', stimulus: 'nogo', correct: true, response: null, rtMs: null, flag: 'OMISSION' }),
+    );
+    const summary = scoreGoNoGo([...hits, ...misses, ...falseAlarm, ...rejections]);
+    expect(summary.find((m) => m.label === "Sensibilità d'")?.value).toBeCloseTo(Math.round(dPrime(9, 10, 1, 4) * 100) / 100, 2);
+    expect(summary.find((m) => m.label === 'Criterio decisionale (c)')?.value).toBeCloseTo(Math.round(criterionC(9, 10, 1, 4) * 100) / 100, 2);
   });
 });

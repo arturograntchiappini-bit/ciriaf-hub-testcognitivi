@@ -176,5 +176,15 @@ describe('scoreCorsi', () => {
     // Ponderato: baseline (3-1)=2 + 0.5*2 superati = 3
     expect(summary.find((m) => m.label === 'Punteggio Corsi (Ponderato)')?.value).toBe(3);
     expect(summary.find((m) => m.label === 'Trial totali superati')?.value).toBe(2);
+    // Punteggio totale di Kessels: span (4) × sequenze corrette (2)
+    expect(summary.find((m) => m.label === 'Punteggio totale (MBS × superati)')?.value).toBe(8);
+  });
+
+  it('con nessun trial superato tutte le metriche sono 0', () => {
+    const trials: TrialResult[] = [
+      { testId: 'corsi', sessionId: 'C', trialIndex: 0, phase: 'test', condition: 'len3', stimulus: '0-1-2', response: '0-1', correct: false, rtMs: null, flag: 'VALID', onsetTimestamp: 0 },
+    ];
+    const summary = scoreCorsi(trials, 3);
+    expect(summary.map((m) => m.value)).toEqual([0, 0, 0, 0]);
   });
 });

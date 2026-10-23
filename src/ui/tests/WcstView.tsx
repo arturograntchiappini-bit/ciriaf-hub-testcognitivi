@@ -136,7 +136,7 @@ export function WcstView(props: WcstViewProps): JSX.Element {
         <div className="flex h-7 items-center">
           {feedback && (
             <span
-              className={`text-xl font-semibold ${feedback === 'correct' ? 'text-[color:var(--color-accent)]' : 'text-[#D0021B]'}`}
+              className={`text-xl font-semibold ${feedback === 'correct' ? 'text-accent' : 'text-danger'}`}
             >
               {feedback === 'correct' ? 'Corretto' : 'Errato'}
             </span>

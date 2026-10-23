@@ -1,5 +1,11 @@
 # Revisione motore — copie standalone dei test cognitivi
 
+> **Stato (2026-10-23): queste copie NON sono più allineate.** La revisione scientifica ha cambiato i motori vivi di
+> Go/No-Go (d′, criterio, interrotti esclusi), Stroop (costo in accuratezza), Corsi (punteggio totale), N-Back (lure
+> inseriti, falsi allarmi sui lure), WCST (scoring perseverativo di Heaton/Howlett e Moseley) e PVT (omissioni come
+> lapse, velocità di risposta). Le copie qui sotto riflettono la versione **precedente**: per il comportamento attuale
+> vale `src/engine/tests/` e il paper in `docs/scientific/`. La risincronizzazione è in programma.
+
 Questa cartella contiene, **per ogni test cognitivo, una copia autosufficiente**
 dello script "core" del motore, pensata per la **revisione e la spiegazione**
 tecnica indipendente dalla piattaforma.

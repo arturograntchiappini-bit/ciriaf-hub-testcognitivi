@@ -12,7 +12,7 @@ interface StimulusStageProps {
  */
 export function StimulusStage({ children, statusBar }: StimulusStageProps): JSX.Element {
   return (
-    <div className="fixed inset-0 flex flex-col bg-paper">
+    <div className="theme-stimulus fixed inset-0 flex flex-col bg-paper text-ink">
       <div className="flex flex-1 items-center justify-center select-none">{children}</div>
       {statusBar && (
         <div className="border-t border-line px-6 py-3 text-center text-sm text-muted">{statusBar}</div>

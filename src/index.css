@@ -1,22 +1,47 @@
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
-@import '@fontsource/inter/600.css';
-@import '@fontsource/inter/700.css';
+/* Solo il sottoinsieme latino: l'interfaccia è in italiano e gli altri alfabeti non servono. */
+@import '@fontsource/inter/latin-400';
+@import '@fontsource/inter/latin-500';
+@import '@fontsource/inter/latin-600';
+@import '@fontsource/inter/latin-700';
+@import '@fontsource/big-shoulders-display/latin-700';
+@import '@fontsource/big-shoulders-display/latin-800';
+@import '@fontsource/jetbrains-mono/latin-400';
+@import '@fontsource/jetbrains-mono/latin-500';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Token — palette scientifica dark CIRIAF */
-  --color-ink: #E1E7EF;
-  --color-paper: #0A0E1A;
-  --color-surface: #111827;
-  --color-elevated: #1A2538;
-  --color-accent: #4A90D9;
-  --color-accent-soft: #132238;
-  --color-line: #1E2740;
-  --color-muted: #8892A4;
+  color-scheme: dark;
+  /* Token dell'interfaccia (canali RGB, per usare l'alpha di Tailwind) — palette scientifica scura Sintropia */
+  --c-ink: 225 231 239;
+  --c-paper: 10 14 26;
+  --c-surface: 17 24 39;
+  --c-elevated: 26 37 56;
+  --c-accent: 74 144 217;
+  --c-accent-soft: 19 34 56;
+  --c-accent-glow: 107 181 255;
+  --c-line: 30 39 64;
+  --c-muted: 136 146 164;
+  --c-danger: 255 107 107;
+  /* Un solo easing per tutta la pagina: uscita esponenziale */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Area degli stimoli: sfondo bianco come da specifica (i colori Stroop e Go/No-Go sono scelti per il chiaro). */
+.theme-stimulus {
+  color-scheme: light;
+  --c-ink: 17 17 17;
+  --c-paper: 255 255 255;
+  --c-surface: 247 248 250;
+  --c-elevated: 238 241 245;
+  --c-accent: 31 95 168;
+  --c-accent-soft: 234 242 251;
+  --c-accent-glow: 74 144 217;
+  --c-line: 228 231 236;
+  --c-muted: 102 112 133;
+  --c-danger: 208 2 27;
 }
 
 html,
@@ -27,16 +52,32 @@ body,
 
 body {
   margin: 0;
-  background-color: var(--color-paper);
-  color: var(--color-ink);
+  background-color: rgb(var(--c-paper));
+  color: rgb(var(--c-ink));
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Controlli: sfondo e testo coerenti col tema (mai bianco su bianco) */
+input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']),
+select,
+textarea {
+  background-color: rgb(var(--c-paper));
+  color: rgb(var(--c-ink));
+}
+input::placeholder,
+textarea::placeholder {
+  color: rgb(var(--c-muted) / 0.7);
+}
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: rgb(var(--c-accent));
+}
+
 /* Focus ring azzurrino sempre visibile (accessibilità AA) */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid rgb(var(--c-accent));
   outline-offset: 2px;
 }
 
@@ -48,14 +89,14 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-line);
+  background: rgb(var(--c-line));
   border-radius: 3px;
 }
 
 /* Selezione testo */
 ::selection {
-  background: var(--color-accent);
-  color: var(--color-ink);
+  background: rgb(var(--c-accent));
+  color: rgb(var(--c-ink));
 }
 
 /* Rispetto della preferenza di movimento ridotto */
@@ -79,4 +120,338 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ---------- Home: sistema di movimento (un easing, durate 300-1000 ms) ---------- */
+
+/* Entrata del titolo: due righe mascherate che salgono */
+.mask-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.04em;
+}
+.mask-line > span {
+  display: block;
+  transform: translateY(105%);
+  animation: line-up 1s var(--ease) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+@keyframes line-up {
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Entrata del testo corrente (solo opacità e transform) */
+.rise {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: rise 0.9s var(--ease) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+@keyframes rise {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Rivelazione allo scroll: useReveal aggiunge data-in="true" */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.8s var(--ease),
+    transform 0.8s var(--ease);
+  transition-delay: var(--delay, 0ms);
+}
+.reveal[data-in='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Griglia a filo della hero, sfumata in basso */
+.hero-grid {
+  background-image:
+    linear-gradient(to right, rgba(136, 146, 164, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(136, 146, 164, 0.07) 1px, transparent 1px);
+  background-size: 96px 96px;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%);
+}
+
+/* Grana di pellicola: dà materia alle superfici piatte */
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Bagliore statico dietro la scena: unica grafica se WebGL non c'è */
+.brain-glow {
+  background:
+    radial-gradient(ellipse 45% 55% at 72% 45%, rgba(74, 144, 217, 0.1), transparent 70%),
+    radial-gradient(ellipse 30% 40% at 78% 50%, rgba(107, 181, 255, 0.07), transparent 70%);
+}
+.brain-glow[data-fallback='true'] {
+  background:
+    radial-gradient(ellipse 45% 55% at 72% 45%, rgba(74, 144, 217, 0.32), transparent 70%),
+    radial-gradient(ellipse 22% 30% at 76% 48%, rgba(107, 181, 255, 0.25), transparent 70%);
+}
+
+/* Angoli smussati solo su pannelli non interattivi (il clip-path taglierebbe il focus) */
+.chamfer {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+}
+
+/* Riga dell'indice test: barra d'accento e spostamento */
+.test-row {
+  position: relative;
+  transition:
+    padding-left 0.45s var(--ease),
+    background-color 0.3s var(--ease);
+}
+.test-row::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: rgb(var(--c-accent));
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.45s var(--ease);
+}
+.test-row[data-active='true'] {
+  padding-left: 1rem;
+  background-color: rgba(74, 144, 217, 0.08);
+}
+.test-row[data-active='true']::before {
+  transform: scaleY(1);
+}
+.test-row-arrow {
+  transition: transform 0.45s var(--ease);
+}
+.test-row[data-active='true'] .test-row-arrow {
+  transform: translateX(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mask-line > span,
+  .rise,
+  .reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Barra di avanzamento della batteria nella simulazione della Sessione */
+.demo-progress {
+  transform-origin: left;
+  animation: demo-fill 2.4s linear forwards;
+}
+@keyframes demo-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .demo-progress {
+    animation: none;
+  }
+}
+
+/* ---------- Componenti riusabili delle schermate interne ---------- */
+.eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(var(--c-muted));
+}
+.page-title {
+  font-family: 'Big Shoulders Display', Impact, 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.6rem, 6vw, 4.2rem);
+  line-height: 0.9;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  color: rgb(var(--c-ink));
+}
+.panel {
+  border: 1px solid rgb(var(--c-line));
+  background-color: rgb(var(--c-surface) / 0.6);
+}
+
+/* ---------- Lettura dei paper scientifici ---------- */
+.prose-paper {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: rgb(var(--c-ink) / 0.92);
+  max-width: 46rem;
+}
+.prose-paper > * + * {
+  margin-top: 1.1rem;
+}
+.prose-paper h2 {
+  margin-top: 3.2rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid rgb(var(--c-line));
+  font-family: 'Big Shoulders Display', Impact, 'Arial Narrow', sans-serif;
+  font-size: clamp(1.9rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 0.98;
+  text-transform: uppercase;
+  color: rgb(var(--c-ink));
+  scroll-margin-top: 1.5rem;
+}
+.prose-paper h3 {
+  margin-top: 2.2rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: rgb(var(--c-accent-glow));
+  scroll-margin-top: 1.5rem;
+}
+.prose-paper h4 {
+  margin-top: 1.6rem;
+  font-weight: 600;
+  color: rgb(var(--c-ink));
+}
+.prose-paper strong {
+  font-weight: 600;
+  color: rgb(var(--c-ink));
+}
+.prose-paper a,
+.prose-paper .prose-link {
+  color: rgb(var(--c-accent-glow));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+.prose-paper .prose-link {
+  display: inline;
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.prose-paper ul,
+.prose-paper ol {
+  padding-left: 1.4rem;
+}
+.prose-paper ul {
+  list-style: square;
+}
+.prose-paper ol {
+  list-style: decimal;
+}
+.prose-paper li + li {
+  margin-top: 0.4rem;
+}
+.prose-paper li::marker {
+  color: rgb(var(--c-accent));
+}
+.prose-paper blockquote {
+  padding: 0.2rem 0 0.2rem 1.25rem;
+  border-left: 2px solid rgb(var(--c-accent));
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgb(var(--c-muted));
+}
+.prose-paper blockquote p + p {
+  margin-top: 0.6rem;
+}
+.prose-paper code {
+  padding: 0.1em 0.35em;
+  background: rgb(var(--c-surface));
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.86em;
+}
+.prose-paper pre {
+  overflow-x: auto;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(var(--c-line));
+  background: rgb(var(--c-surface));
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.prose-paper pre code {
+  padding: 0;
+  background: none;
+}
+.prose-paper hr {
+  margin-top: 2.5rem;
+  border: 0;
+  border-top: 1px solid rgb(var(--c-line));
+}
+.prose-paper hr + h2 {
+  margin-top: 1.5rem;
+  padding-top: 0;
+  border-top: 0;
+}
+.prose-table {
+  overflow-x: auto;
+  border: 1px solid rgb(var(--c-line));
+}
+.prose-table table {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.prose-table th,
+.prose-table td {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid rgb(var(--c-line));
+  text-align: left;
+  vertical-align: top;
+}
+.prose-table th {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(var(--c-muted));
+  background: rgb(var(--c-surface));
+}
+.prose-table tr:last-child td {
+  border-bottom: 0;
+}
+.math-display {
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  font-size: 1.15rem;
+  text-align: center;
+}
+.math-inline {
+  white-space: nowrap;
+}
+.math-fallback {
+  background: none;
+}
+.prose-paper math {
+  font-size: 1.08em;
+}
+.prose-table:focus-visible,
+.prose-paper pre:focus-visible {
+  outline: 2px solid rgb(var(--c-accent));
+  outline-offset: 2px;
+}
+.math-display:focus-visible {
+  outline: 2px solid rgb(var(--c-accent));
+  outline-offset: 2px;
 }

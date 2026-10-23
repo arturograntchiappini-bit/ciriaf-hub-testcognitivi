@@ -70,7 +70,7 @@ describe('toJson', () => {
   it('è re-parsabile e contiene params, summary e trials', () => {
     const json = toJson(sampleResult(), { exportedAt: '2026-07-06T15:00:00.000Z', userAgent: 'test' });
     const parsed = JSON.parse(json);
-    expect(parsed.app).toBe('CIRIAF - COLAB/NEXTROOM COGNITIVE TESTING HUB');
+    expect(parsed.app).toBe('Sintropia - Cognitive tests Hub');
     expect(parsed.params.nTrials).toBe(48);
     expect(parsed.summary).toHaveLength(1);
     expect(parsed.trials).toHaveLength(2);

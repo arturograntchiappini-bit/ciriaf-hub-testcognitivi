@@ -207,7 +207,7 @@ export function RtTestRunner({
   if (stage === 'paused') {
     return (
       <StimulusStage>
-        <div className="mx-auto max-w-md rounded-card border border-line bg-white p-8 text-center shadow-card">
+        <div className="mx-auto max-w-md rounded-card border border-line bg-surface p-8 text-center">
           <h2 className="text-lg font-semibold text-ink">Test in pausa</h2>
           <p className="mt-3 text-sm text-muted">
             Puoi riprendere dal punto in cui eri, uscire salvando i dati raccolti finora, oppure
@@ -254,7 +254,7 @@ export function RtTestRunner({
   if (seqState?.phase === 'feedback') {
     content = (
       <div
-        className={`text-3xl font-semibold ${seqState.feedback === 'correct' ? 'text-[color:var(--color-accent)]' : 'text-[#D0021B]'}`}
+        className={`text-3xl font-semibold ${seqState.feedback === 'correct' ? 'text-accent' : 'text-danger'}`}
       >
         {seqState.feedback === 'correct' ? 'Corretto' : 'Errato'}
       </div>

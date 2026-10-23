@@ -1,5 +1,5 @@
 /**
- * Token dell'identità visiva CIRIAF, riusabili fuori da Tailwind (canvas, stimoli).
+ * Token dell'identità visiva Sintropia, riusabili fuori da Tailwind (canvas, stimoli).
  * I colori funzionali degli stimoli sono tenuti SEPARATI dai token di UI: non devono
  * mai comparire come colori dell'interfaccia, per non confondersi con gli stimoli.
  * @see docs/architettura.md — sezione "Identità visiva"

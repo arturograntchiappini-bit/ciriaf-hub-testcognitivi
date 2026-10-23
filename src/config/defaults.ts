@@ -8,6 +8,8 @@ import type { GoNoGoParams } from '../engine/tests/gonogo';
 import type { CorsiParams } from '../engine/tests/corsi';
 import type { NBackParams } from '../engine/tests/nback';
 import type { WcstParams } from '../engine/tests/wcst';
+import type { PvtParams } from '../engine/tests/pvt';
+import type { FlankerParams } from '../engine/tests/flanker';
 
 export interface AllParams {
   stroop1: StroopParams;
@@ -16,6 +18,8 @@ export interface AllParams {
   corsi: CorsiParams;
   nback: NBackParams;
   wcst: WcstParams;
+  pvt: PvtParams;
+  flanker: FlankerParams;
 }
 
 /**
@@ -76,6 +80,7 @@ export const DEFAULTS: AllParams = {
     blankMs: 1500, // 2 s/trial
     nTrials: 360, // blocco esteso ~12 min per la tenuta della traccia
     targetRate: 0.3,
+    lureRate: 0.2, // quota di non-target che sono lure (lag n−1 / n+1): neutralizza la sola familiarità
     practiceTrials: 20,
   },
 
@@ -88,5 +93,34 @@ export const DEFAULTS: AllParams = {
     deckSize: 64, // WCST-64 (Kongs et al., 2000)
     runToShift: 10, // 10 corrette consecutive per il cambio (Grant & Berg, 1948)
     maxCategories: 6,
+  },
+
+  /**
+   * PVT (Psychomotor Vigilance Task): 100 trial, stimolo visivo fino a 10 s,
+   * ISI 2–10 s, 5 trial di pratica.
+   * Fonte: Dinges & Powell (1985); Basner & Dinges (2011). Vedi docs/scientific/pvt.md
+   */
+  pvt: {
+    nTrials: 100, // ~10 min con ISI medio ~6 s (Basner & Dinges, 2011)
+    stimulusMaxMs: 10000, // timeout 10 s — omissione oltre
+    isiMinMs: 2000, // ISI minimo: evita anticipazione ritmica
+    isiMaxMs: 10000, // ISI massimo: mantiene incertezza temporale
+    practiceTrials: 5,
+  },
+
+  /**
+   * Flanker (Eriksen): 96 trial (39 congruenti / 38 incongruenti / 19 neutri), fissazione 500 ms,
+   * finestra di risposta 1500 ms, ISI 700–1100 ms, 12 trial di pratica.
+   * Fonte: Eriksen & Eriksen (1974); Gratton, Coles & Donchin (1992). Vedi docs/scientific/flanker.md
+   */
+  flanker: {
+    nTrials: 96, // abbastanza trial incongruenti per stimare l'effetto e l'adattamento al conflitto
+    incongruentRatio: 0.4, // 40% incongruenti
+    neutralRatio: 0.2, // 20% neutri: permettono di separare interferenza e facilitazione
+    fixationMs: 500, // croce di fissazione (convenzione jsPsych/PsyToolkit)
+    responseWindowMs: 1500, // oltre = omissione
+    isiMinMs: 700, // jitter dell'ISI: evita l'anticipazione ritmica
+    isiMaxMs: 1100,
+    practiceTrials: 12, // pratica con feedback
   },
 };

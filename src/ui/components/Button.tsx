@@ -6,16 +6,16 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const STYLES: Record<NonNullable<ButtonProps['variant']>, string> = {
-  primary: 'bg-accent text-white hover:brightness-95 border border-accent',
-  secondary: 'bg-white text-ink border border-line hover:border-accent',
-  ghost: 'bg-transparent text-muted hover:text-ink border border-transparent',
+  primary: 'border border-accent bg-accent text-paper hover:border-accent-glow hover:bg-accent-glow',
+  secondary: 'border border-line bg-transparent text-ink hover:border-accent',
+  ghost: 'border border-transparent bg-transparent text-muted hover:text-ink',
 };
 
-/** Pulsante coerente con l'identità visiva istituzionale. */
+/** Pulsante dell'identità Sintropia: angoli netti, etichetta mono maiuscola, bersaglio da almeno 44 px. */
 export function Button({ variant = 'primary', children, className = '', ...rest }: ButtonProps): JSX.Element {
   return (
     <button
-      className={`inline-flex items-center justify-center rounded-card px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${STYLES[variant]} ${className}`}
+      className={`inline-flex min-h-[44px] items-center justify-center gap-2 px-5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-40 ${STYLES[variant]} ${className}`}
       {...rest}
     >
       {children}

@@ -1,6 +1,6 @@
 # Corsi Block Task — Riferimenti scientifici
 
-> Documento scientifico di riferimento per l'implementazione del **Corsi Block-Tapping Task (CBT)** sulla piattaforma sperimentale CIRIAF.
+> Documento scientifico di riferimento per l'implementazione del **Corsi Block-Tapping Task (CBT)** sulla piattaforma sperimentale Sintropia.
 > Le citazioni sono riportate in lingua originale (inglese); il testo esplicativo è in italiano.
 
 ---
@@ -32,9 +32,11 @@ Il CBT sollecita il **taccuino visuo-spaziale** (*visuo-spatial sketchpad*) del 
 1. **Configurazione spaziale** — la posizione dei singoli blocchi nel piano (informazione *dove*), mantenuta come pattern statico.
 2. **Sequenza temporale-spaziale** — l'**ordine** con cui i blocchi vengono toccati, cioè un percorso ordinato che collega le posizioni (componente *sequenziale/ordinale*).
 
-Il carico non dipende solo dal numero di blocchi (span numerico) ma anche dalle **proprietà geometriche del percorso**: sequenze più lunghe, con maggiore distanza totale percorsa e con **auto-intersezioni (incroci)** del tracciato, sono più difficili da codificare e riprodurre. Per questo la piattaforma introduce un **indice di complessità** basato su lunghezza euclidea del percorso e numero di incroci (§3, §5), usato per **bilanciare** i trial dello stesso livello e isolare l'effetto della lunghezza da quello della configurazione geometrica.
+Il carico non dipende solo dal numero di blocchi (span numerico) ma anche dalle **proprietà geometriche del percorso**. Orsini, Simonetta e Marmorato (2004) rappresentano una sequenza come la linea che unisce i centri dei cubi e mostrano, su 70 studenti universitari, che il **numero di cubi**, il **numero di incroci del percorso con sé stesso** e la **lunghezza del percorso in millimetri** influenzano tutti la prestazione; sequenze con pari numero di cubi, incroci e lunghezza differivano comunque in difficoltà, quindi altri fattori contano. Per questo la piattaforma introduce un **indice di complessità** basato su lunghezza euclidea ed incroci (§3, §5), usato per **bilanciare** i trial dello stesso livello e ridurre l'effetto della configurazione geometrica: l'equivalenza è **approssimata**, non perfetta.
 
-Rispetto allo span verbale (Digit Span), il CBT carica selettivamente le regioni **temporo-mediali e parietali destre**; è per questo impiegato come marcatore di memoria di lavoro spaziale relativamente indipendente dal linguaggio.
+> Orsini, A., Simonetta, S., & Marmorato, M. S. (2004). *Corsi's block-tapping test: Some characteristics of the spatial path which influence memory.* **Perceptual and Motor Skills, 98**(2), 382–388. https://doi.org/10.2466/pms.98.2.382-388
+
+Rispetto allo span verbale (Digit Span), il CBT è impiegato come misura di memoria di lavoro spaziale meno dipendente dal linguaggio. Le associazioni con specifiche regioni cerebrali discusse in letteratura (Berch et al., 1998) non sono qui usate né per la scelta dei parametri né per l'interpretazione dei punteggi.
 
 ---
 
@@ -44,15 +46,15 @@ Rispetto allo span verbale (Digit Span), il CBT carica selettivamente le regioni
 |---|---|---|
 | Coordinate dei 9 blocchi | Configurazione asimmetrica fissa di Kessels — vedi tabella §3bis | Kessels et al. (2000); trascrizione numerica da PEBL (`CorsiPoints`, mm, cubetti 30 mm), che dichiara di seguire Kessels |
 | Numero di blocchi | 9 | Corsi (1972); Kessels et al. (2000) |
-| Lunghezza iniziale della sequenza | **3** (valore di piattaforma) | Default CIRIAF. La versione classica Kessels/PEBL parte da 2 (`startlength = 2`); si adotta 3 per evitare l'effetto pavimento negli adulti sani |
-| Lunghezza massima | 9 | Kessels et al. (2000); PEBL (`gEndLength = 9`) — corrisponde al numero di blocchi |
+| Lunghezza iniziale della sequenza | **3** (valore di piattaforma) | Default di piattaforma. La versione classica Kessels/PEBL parte da 2 (`startlength = 2`); si adotta 3 per evitare l'effetto pavimento negli adulti sani |
+| Lunghezza massima | 9 | Kessels et al. (2000); corrisponde al numero di blocchi (in PEBL `endlength` non è tra i parametri di default della versione a sequenze fisse) |
 | Durata illuminazione per blocco | **1000 ms** | PEBL default `isi = 1000` ms; ritmo classico ≈ 1 blocco/secondo. Variante nota: 500 ms di accensione + 1000 ms di intervallo onset-onset (implementazioni digitali tipo eCorsi) |
 | Intervallo tra i blocchi (ITI/gap) | 1000 ms (onset-to-onset) | PEBL default `iti = 1000` ms |
 | N. trial per livello | **2** | Kessels et al. (2000); PEBL (`timesperlength = 2`) |
-| Regola di arresto | Interruzione quando **entrambi** i trial di uno stesso livello sono falliti | Kessels et al. (2000): si avanza di livello se **almeno un** trial è riprodotto correttamente |
-| Punteggio (metrica di piattaforma) | **0,5 punti per ogni trial corretto** (span = somma dei mezzi-punti) | Scelta CIRIAF: con 2 trial/livello, entrambi corretti = 1,0 → span graduato in mezzi passi (stile Wechsler) |
-| Punteggio classico (riferimento) | Corsi span = lunghezza massima riprodotta; **Total score = span × n. sequenze corrette** | Kessels et al. (2000): prodotto span × trial corretti |
-| Indice di complessità del percorso | Distanza euclidea totale **L(S)** + numero di incroci geometrici **X(S)** | Costrutto di piattaforma per il bilanciamento intra-livello (§5) |
+| Regola di arresto | Interruzione quando **entrambi** i trial di uno stesso livello sono falliti | Kessels et al. (2000), come riportato dai manuali Inquisit (il test si ferma quando non si riescono due sequenze di pari lunghezza); si avanza se **almeno un** trial del livello è corretto |
+| Punteggio ponderato | **`startLength − 1` + 0,5 per ogni trial superato** (0 se nessuno) | Scelta di progetto: con 2 trial per livello, superarli entrambi porta il punteggio esattamente alla lunghezza del livello (§5.1) |
+| Punteggio classico (riferimento) | Corsi span = lunghezza massima riprodotta; **Total score = span × n. sequenze corrette** | Kessels et al. (2000), come riportato dai manuali Inquisit: prodotto span × sequenze corrette |
+| Indice di complessità del percorso | Distanza euclidea totale **L(S)** + numero di incroci geometrici **X(S)** | Le due variabili sono quelle studiate da Orsini et al. (2004); la loro combinazione in un indice per il bilanciamento è una scelta di progetto (§5) |
 | Bilanciamento intra-livello | Stessa **L(S)** e stesso **X(S)** tra i trial dello stesso livello | Controllo della difficoltà geometrica a parità di lunghezza |
 
 ---
@@ -74,7 +76,7 @@ Le coordinate seguenti riproducono la **configurazione asimmetrica standard** di
 | 9 | 64.0 | 23.2 | 135 | 30 |
 
 **Note sulla fonte e sull'asimmetria.**
-- **Fonte.** Configurazione standard di **Kessels et al. (2000)**; valori numerici nativi presi dalla trascrizione open-source PEBL (`CorsiPoints`), che nell'intestazione del sorgente cita testualmente Kessels et al. (2000) e usa cubetti da 30 mm. L'estensione dei punti di riferimento è x∈[15,195] mm, y∈[20,155] mm (≈180×135 mm tra i blocchi estremi; ≈210×165 mm includendo l'ingombro dei cubetti), coerente con le board fisiche classiche da ~20–28 cm.
+- **Fonte.** Configurazione standard di **Kessels et al. (2000)**; valori numerici nativi presi dalla trascrizione open-source PEBL (`CorsiPoints`, controllata sul sorgente `battery/corsi/corsi.pbl` il 2026-10-23: i nove punti coincidono con la tabella), la cui intestazione cita Kessels et al. (2000) per standardizzazione e coordinate. L'estensione dei punti di riferimento è x∈[15,195] mm, y∈[20,155] mm (≈180×135 mm tra i blocchi estremi; ≈210×165 mm includendo l'ingombro dei cubetti), coerente con le board fisiche classiche da ~20–28 cm.
 - **Asimmetria.** I 9 blocchi sono volutamente **sparsi e non allineati** (nessuna riga/colonna regolare, distanze inter-blocco disuguali) per impedire strategie basate su pattern geometrici prevedibili. La normalizzazione applica lo **stesso** coefficiente ai due assi, quindi non introduce distorsioni: la geometria relativa (angoli, rapporti tra distanze) è identica all'originale.
 - **Orientamento dell'asse y.** Le coordinate normalizzate sono espresse in convenzione **cartesiana** (origine in basso a sinistra, y crescente verso l'alto). Le implementazioni con origine schermo in alto a sinistra (y verso il basso, come PEBL) devono applicare `y' = 100 − y`: la configurazione resta identica a meno di una riflessione verticale.
 
@@ -82,7 +84,24 @@ Le coordinate seguenti riproducono la **configurazione asimmetrica standard** di
 
 ## 4. Mappatura implementativa
 
-*Da completare — vedi `src/engine/tests/corsi.ts`.*
+Corrispondenza fra §3 e il codice (`src/engine/tests/corsi.ts`, `src/config/defaults.ts`, `src/ui/tests/CorsiView.tsx`).
+
+| Elemento | Dove | Comportamento |
+|---|---|---|
+| Blocchi | `CORSI_BLOCKS` | I 9 punti normalizzati della tabella §3bis, convenzione cartesiana (y verso l'alto); la vista applica `100 − y` |
+| Parametri | `DEFAULTS.corsi` | `startLength 3`, `maxLength 9`, `trialsPerLevel 2`, `presentMsPerBlock 1000`, `complexityTolerance 8` |
+| Complessità | `pathLength`, `countCrossings` | `L(S)` somma delle distanze euclidee; `X(S)` coppie di segmenti non adiacenti che si intersecano **propriamente** (tocchi ed estremi in comune non contano) |
+| Bersaglio del livello | `targetPathLength` | `(k − 1) · d̄`, con `d̄` distanza media fra due blocchi distinti (49,83 per questa tavoletta): costante del layout, identica in ogni somministrazione |
+| Generazione | `generateBalancedSequences` | Fino a 2000 permutazioni parziali con il seme; candidati deduplicati per traiettoria (una sequenza e il suo rovescio sono lo stesso candidato); si estrae a sorte un gruppo di sequenze a **pari numero di incroci**, con `L(S)` entro `complexityTolerance` dal bersaglio e ampiezza interna entro la tolleranza |
+| Degradazione | `generateBalancedSequences` | Se non esiste un gruppo ideale: (1) perde il vincolo di ampiezza interna; (2) perde l'ancoraggio al bersaglio ma resta a pari incroci, usando le sequenze più vicine al bersaglio. Mai un campione arbitrario |
+| Arresto | `shouldStop` | Dopo i due trial di un livello, si ferma se **entrambi** sono sbagliati |
+| Punteggio | `scoreCorsi` | Solo trial di test non interrotti; metriche in §5 |
+
+Limiti del bilanciamento:
+
+- L'equivalenza è su `L(S)` e `X(S)`, non su altri fattori che Orsini et al. (2004) indicano come influenti: due sequenze equivalenti per l'indice possono essere comunque di difficoltà diversa.
+- Ai livelli molto lunghi (8–9 su 9 blocchi) le sequenze possibili sono poche, quindi la variabilità fra le somministrazioni è minore.
+- Con `startLength = 3` non si somministra la lunghezza 2 della procedura classica: chi fallisce al livello 3 ha span 0 e non è confrontabile con dati normativi che partono da 2.
 
 ---
 
@@ -90,25 +109,27 @@ Le coordinate seguenti riproducono la **configurazione asimmetrica standard** di
 
 Sia una sequenza-stimolo di lunghezza *k* l'ordine di blocchi **S = (b₁, b₂, …, b_k)**, dove ogni b_i è uno dei 9 blocchi con coordinate (xᵢ, yᵢ) dalla tabella §3bis.
 
-### 5.1 Span (metrica di piattaforma)
+### 5.1 Metriche calcolate dalla piattaforma
 
-Per ogni trial riprodotto correttamente si assegnano **0,5 punti**. Con 2 trial per livello:
+Si considerano i trial di **test non interrotti**. Sia $P$ il numero di trial riprodotti correttamente e $\ell_i$ la
+lunghezza del trial $i$.
 
-```
-span = Σ (0,5 · trial_corretto)      con trial_corretto ∈ {0, 1}
-```
+- **Span visuo-spaziale (MBS, maximum block span)** $= \max_i \ell_i$ tra i trial corretti (0 se nessuno): la
+  lunghezza della sequenza più lunga riprodotta correttamente, l'indice classico di Corsi.
+- **Punteggio ponderato** $= \begin{cases} 0 & P = 0 \\ (\text{startLength} - 1) + 0{,}5\,P & P > 0 \end{cases}$
+  Assume superati i livelli sotto `startLength`, che non vengono somministrati. Con 2 trial per livello, superare
+  entrambi i trial del livello $L$ porta il punteggio esattamente a $L$; un trial solo vale mezzo punto.
+- **Trial totali superati** $= P$.
+- **Punteggio totale (MBS × superati)** $= \text{MBS} \cdot P$: il total score di Kessels et al. (2000), prodotto dello
+  span per il numero di sequenze corrette.
 
-sommato su tutti i trial somministrati (tutti i livelli). Interpretazione: un livello superato in entrambi i trial vale 1,0; un livello superato in un solo trial vale 0,5. Lo span è quindi graduato a passi di mezzo punto.
+La **regola di arresto** interrompe la prova quando entrambi i trial di un livello sono falliti.
 
-- **Livello massimo** = il livello più alto in cui è stato riprodotto correttamente **almeno un** trial.
-- **Regola di arresto** = si interrompe quando **entrambi** i trial di uno stesso livello sono falliti (nessuna riproduzione corretta a quel livello).
+### 5.2 Confronto con la letteratura
 
-### 5.2 Punteggio classico (per confronto con la letteratura)
-
-```
-Corsi span (classico) = lunghezza della più lunga sequenza riprodotta correttamente
-Total score (Kessels) = Corsi span × (numero totale di sequenze riprodotte correttamente)
-```
+Span e total score hanno la stessa definizione del Corsi classico, ma la procedura differisce in un punto: la
+piattaforma parte da lunghezza 3 invece che da 2. Per confrontare i punteggi con dati normativi si imposta
+`startLength = 2` dalle Impostazioni.
 
 ### 5.3 Indice di complessità del percorso
 
@@ -145,7 +166,16 @@ In questo modo la variazione di prestazione tra trial dello stesso livello è at
 - Corsi, P. M. (1972). *Human memory and the medial temporal region of the brain.* Doctoral dissertation, McGill University, Montreal. (Diss. Abstr. Int., 34, 819B).
 - Kessels, R. P. C., van Zandvoort, M. J. E., Postma, A., Kappelle, L. J., & de Haan, E. H. F. (2000). "The Corsi Block-Tapping Task: standardization and normative data." *Applied Neuropsychology, 7*(4), 252–258. DOI: 10.1207/S15324826AN0704_8
 - Berch, D. B., Krikorian, R., & Huha, E. M. (1998). "The Corsi block-tapping task: Methodological and theoretical considerations." *Brain and Cognition, 38*(3), 317–338. DOI: 10.1006/brcg.1998.1039
+- Orsini, A., Simonetta, S., & Marmorato, M. S. (2004). "Corsi's block-tapping test: Some characteristics of the spatial path which influence memory." *Perceptual and Motor Skills, 98*(2), 382–388. DOI: 10.2466/pms.98.2.382-388
 - Mueller, S. T., & Piper, B. J. (2014). "The Psychology Experiment Building Language (PEBL) and PEBL Test Battery." *Journal of Neuroscience Methods, 222*, 250–259. DOI: 10.1016/j.jneumeth.2013.10.024 — *implementazione open-source di riferimento delle coordinate di Kessels (`CorsiPoints`).*
+
+## Cronologia delle revisioni
+
+- **Revisione scientifica 2026-10.** Verificati su Crossref tutti i riferimenti e controllate sul sorgente PEBL le
+  coordinate dei 9 blocchi. Aggiunta la fonte del costrutto geometrico (Orsini et al., 2004) con il suo limite;
+  rimossa l'affermazione neuroanatomica senza fonte; documentata la differenza di punto di partenza (3 invece di 2) e
+  la formula del punteggio ponderato, prima descritta in modo diverso dal codice; aggiunto il punteggio totale di
+  Kessels.
 
 ## Aggiornamento metriche e generazione (revisione)
 

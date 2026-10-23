@@ -10,6 +10,7 @@ export type Route =
   | { name: 'run'; testId: TestId }
   | { name: 'results'; result: TestResult }
   | { name: 'settings' }
+  | { name: 'science'; slug: string | null; from: 'home' | TestId }
   | { name: 'sessionMenu' }
   | { name: 'sessionBuilder'; template: SessionTemplate | null }
   | { name: 'sessionRun'; run: SessionRun };
@@ -28,4 +29,6 @@ export const TEST_CATALOG: readonly TestMeta[] = [
   { id: 'corsi', title: 'Corsi Block Task', domain: 'Memoria visuo-spaziale' },
   { id: 'nback', title: 'N-Back (2-back)', domain: 'Memoria di lavoro' },
   { id: 'wcst', title: 'Wisconsin Card Sorting Test', domain: 'Flessibilità cognitiva' },
+  { id: 'pvt', title: 'PVT — Vigilanza Psicomotoria', domain: 'Attenzione sostenuta' },
+  { id: 'flanker', title: 'Flanker — Frecce di Eriksen', domain: 'Attenzione selettiva' },
 ];

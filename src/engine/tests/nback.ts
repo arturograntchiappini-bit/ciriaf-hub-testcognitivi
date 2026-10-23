@@ -6,8 +6,12 @@
  * di n posizioni prima. d' calcolato con correzione loglinear (sempre applicata).
  */
 import type { SummaryMetric, TrialResult } from '../types';
-import { pick } from '../rng';
+import { pick, shuffle } from '../rng';
 import { mean, standardDeviation } from '../validation';
+import { criterionC, dPrime } from '../sdt';
+
+// Riesportati per compatibilità: la logica vive in engine/sdt.ts.
+export { probit, dPrime, criterionC } from '../sdt';
 
 export interface NBackParams {
   n: number;
@@ -16,12 +20,16 @@ export interface NBackParams {
   nTrials: number;
   /** Proporzione target (es. 0.30). */
   targetRate: number;
+  /** Proporzione dei non-target che sono lure, cioè ripetizioni a lag n−1 o n+1 (es. 0.20). */
+  lureRate: number;
   practiceTrials: number;
 }
 
 export interface NBackStimulus {
   letter: string;
   isTarget: boolean;
+  /** Non-target che ripete la lettera a lag n−1 o n+1: familiare ma non target. */
+  isLure: boolean;
 }
 
 /** Consonanti (vocali escluse per impedire strategie fonologiche/chunking). */
@@ -29,33 +37,66 @@ export const NBACK_LETTERS: readonly string[] = [
   'B', 'C', 'D', 'F', 'G', 'H', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'Z',
 ];
 
+/** Lag dei lure rispetto a n: una posizione prima (n−1) e una dopo (n+1) il lag del target. */
+function lureLags(n: number): number[] {
+  return [n - 1, n + 1].filter((lag) => lag > 0);
+}
+
 /**
- * Genera lo stream di lettere: ~targetRate target (letter[i]===letter[i-n]),
- * nessun target nelle prime n posizioni, con controllo dei lure a lag n-1 e n+1
- * (evita match accidentali che favorirebbero la strategia di familiarità).
+ * Genera lo stream di lettere: ~targetRate target (letter[i]===letter[i-n]), nessun
+ * target nelle prime n posizioni, e una quota `lureRate` di non-target che sono LURE
+ * (ripetono la lettera a lag n−1 o n+1). I lure servono a rendere inutile la sola
+ * familiarità: senza di essi, vedere una lettera recente basterebbe a indovinare il target.
+ * Tutti gli altri non-target evitano di ripetere una lettera a quei lag, così i lure
+ * sono esattamente quelli pianificati.
  */
 export function generateNBack(params: NBackParams, rand: () => number): NBackStimulus[] {
   const { n, nTrials, targetRate } = params;
-  const eligible = nTrials - n; // posizioni che possono essere target
-  const nTargets = Math.round(eligible * targetRate);
+  const lureRate = params.lureRate ?? 0; // modelli di sessione salvati prima dell'introduzione dei lure
+  const nTargets = Math.round((nTrials - n) * targetRate); // posizioni idonee: da n in poi
 
-  // Scegli le posizioni target tra quelle idonee (>= n), senza due target adiacenti
-  // per evitare artefatti; se non basta, si rilassa il vincolo.
+  // Posizioni target tra quelle idonee (>= n), senza due target adiacenti per
+  // evitare artefatti; se non basta, si rilassa il vincolo.
   const targetPositions = chooseTargetPositions(n, nTrials, nTargets, rand);
+  const lurePositions = chooseLurePositions(n, nTrials, targetPositions, lureRate, rand);
 
   const letters: string[] = [];
   for (let i = 0; i < nTrials; i++) {
-    if (targetPositions.has(i)) {
-      letters.push(letters[i - n] as string);
-    } else {
-      letters.push(pickNonTarget(letters, i, n, rand));
-    }
+    if (targetPositions.has(i)) letters.push(letters[i - n] as string);
+    else if (lurePositions.has(i)) letters.push(pickLure(letters, i, n, rand));
+    else letters.push(pickNonTarget(letters, i, n, rand));
   }
 
-  return letters.map((letter, i) => ({
-    letter,
-    isTarget: i >= n && letter === letters[i - n],
-  }));
+  return letters.map((letter, i) => {
+    const isTarget = i >= n && letter === letters[i - n];
+    const isLure = !isTarget && lureLags(n).some((lag) => i - lag >= 0 && letters[i - lag] === letter);
+    return { letter, isTarget, isLure };
+  });
+}
+
+/** Sceglie a caso le posizioni dei lure fra i non-target che hanno disponibili entrambi i lag. */
+function chooseLurePositions(
+  n: number,
+  nTrials: number,
+  targetPositions: ReadonlySet<number>,
+  lureRate: number,
+  rand: () => number,
+): Set<number> {
+  const maxLag = n + 1;
+  const candidates: number[] = [];
+  for (let i = maxLag; i < nTrials; i++) if (!targetPositions.has(i)) candidates.push(i);
+  const nonTargets = nTrials - n - targetPositions.size;
+  const wanted = Math.min(candidates.length, Math.round(nonTargets * lureRate));
+  return new Set(shuffle(candidates, rand).slice(0, wanted));
+}
+
+/** Lettera di un lure: ripete quella a lag n−1 o n+1 purché non coincida con quella a lag n (sarebbe un target). */
+function pickLure(letters: readonly string[], i: number, n: number, rand: () => number): string {
+  const targetLetter = letters[i - n] as string;
+  const options = lureLags(n)
+    .map((lag) => letters[i - lag] as string)
+    .filter((letter) => letter !== targetLetter);
+  return options.length > 0 ? pick(options, rand) : pickNonTarget(letters, i, n, rand);
 }
 
 function chooseTargetPositions(
@@ -97,62 +138,13 @@ function pickNonTarget(letters: readonly string[], i: number, n: number, rand: (
   return pick(relaxed.length > 0 ? relaxed : NBACK_LETTERS, rand);
 }
 
-/** Inversa della CDF normale standard (probit) — algoritmo di Acklam. */
-export function probit(p: number): number {
-  if (p <= 0) return -Infinity;
-  if (p >= 1) return Infinity;
-  const a = [-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2, 1.38357751867269e2, -3.066479806614716e1, 2.506628277459239];
-  const b = [-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2, 6.680131188771972e1, -1.328068155288572e1];
-  const c = [-7.784894002430293e-3, -3.223964580411365e-1, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783];
-  const d = [7.784695709041462e-3, 3.224671290700398e-1, 2.445134137142996, 3.754408661907416];
-  const pLow = 0.02425;
-  const pHigh = 1 - pLow;
-  let q: number;
-  let r: number;
-  if (p < pLow) {
-    q = Math.sqrt(-2 * Math.log(p));
-    return (((((c[0]! * q + c[1]!) * q + c[2]!) * q + c[3]!) * q + c[4]!) * q + c[5]!) /
-      ((((d[0]! * q + d[1]!) * q + d[2]!) * q + d[3]!) * q + 1);
-  }
-  if (p <= pHigh) {
-    q = p - 0.5;
-    r = q * q;
-    return (((((a[0]! * r + a[1]!) * r + a[2]!) * r + a[3]!) * r + a[4]!) * r + a[5]!) * q /
-      (((((b[0]! * r + b[1]!) * r + b[2]!) * r + b[3]!) * r + b[4]!) * r + 1);
-  }
-  q = Math.sqrt(-2 * Math.log(1 - p));
-  return -(((((c[0]! * q + c[1]!) * q + c[2]!) * q + c[3]!) * q + c[4]!) * q + c[5]!) /
-    ((((d[0]! * q + d[1]!) * q + d[2]!) * q + d[3]!) * q + 1);
-}
-
-/**
- * d' con correzione loglinear di Hautus (1995), applicata sempre:
- * H = (hits+0.5)/(targets+1), F = (fa+0.5)/(nonTargets+1), d' = z(H) − z(F).
- */
-export function dPrime(hits: number, targets: number, falseAlarms: number, nonTargets: number): number {
-  const h = (hits + 0.5) / (targets + 1);
-  const f = (falseAlarms + 0.5) / (nonTargets + 1);
-  return probit(h) - probit(f);
-}
-
-/**
- * Criterio decisionale c (bias di risposta), con la stessa correzione loglinear
- * di Hautus: c = −0.5·(z(H) + z(F)). c > 0 = criterio conservativo (tende a NON
- * rispondere, favorisce i miss); c < 0 = criterio liberale (tende a rispondere,
- * favorisce i falsi allarmi); c ≈ 0 = nessun bias. Complementa d' separando la
- * sensibilità dalla tendenza di risposta.
- */
-export function criterionC(hits: number, targets: number, falseAlarms: number, nonTargets: number): number {
-  const h = (hits + 0.5) / (targets + 1);
-  const f = (falseAlarms + 0.5) / (nonTargets + 1);
-  return -0.5 * (probit(h) + probit(f));
-}
-
 interface Counts {
   hits: number;
   targets: number;
   falseAlarms: number;
   nonTargets: number;
+  lures: number;
+  lureFalseAlarms: number;
 }
 
 function countHitsFa(trials: readonly TrialResult[]): Counts {
@@ -160,22 +152,29 @@ function countHitsFa(trials: readonly TrialResult[]): Counts {
   let targets = 0;
   let falseAlarms = 0;
   let nonTargets = 0;
+  let lures = 0;
+  let lureFalseAlarms = 0;
   for (const t of trials) {
     if (t.flag === 'INTERRUPTED') continue;
     if (t.condition === 'target') {
       targets++;
       if (t.response !== null) hits++;
-    } else if (t.condition === 'nontarget') {
+    } else if (t.condition === 'nontarget' || t.condition === 'lure') {
       nonTargets++;
       if (t.response !== null) falseAlarms++;
+      if (t.condition === 'lure') {
+        lures++;
+        if (t.response !== null) lureFalseAlarms++;
+      }
     }
   }
-  return { hits, targets, falseAlarms, nonTargets };
+  return { hits, targets, falseAlarms, nonTargets, lures, lureFalseAlarms };
 }
 
 /**
- * Metriche: hit, miss, falsi allarmi, d', RT medio/SD dei hit validi, e le stesse
- * suddivise per quartili temporali del blocco (stabilità della traccia nel tempo).
+ * Metriche: hit, miss, falsi allarmi (anche sui soli lure), d', criterio c, RT medio/SD
+ * dei hit validi, e d' per quartili temporali del blocco (stabilità della traccia nel
+ * tempo). I trial interrotti sono esclusi dai conteggi.
  */
 export function scoreNBack(trials: readonly TrialResult[], nQuartiles = 4): SummaryMetric[] {
   const test = trials.filter((t) => t.phase === 'test');
@@ -190,6 +189,8 @@ export function scoreNBack(trials: readonly TrialResult[], nQuartiles = 4): Summ
     { label: 'Hit (target rilevati)', value: c.hits },
     { label: 'Miss (target mancati)', value: misses },
     { label: 'Falsi allarmi', value: c.falseAlarms },
+    { label: 'Falsi allarmi su lure', value: c.lureFalseAlarms },
+    { label: 'Tasso di falsi allarmi su lure', value: c.lures > 0 ? round1((c.lureFalseAlarms / c.lures) * 100) : 0, unit: '%' },
     { label: "Sensibilità d'", value: round2(dPrime(c.hits, c.targets, c.falseAlarms, c.nonTargets)) },
     { label: 'Criterio decisionale (c)', value: round2(criterionC(c.hits, c.targets, c.falseAlarms, c.nonTargets)) },
     { label: 'RT medio hit', value: round1(mean(hitRts)), unit: 'ms' },

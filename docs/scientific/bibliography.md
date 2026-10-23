@@ -1,8 +1,9 @@
 # Bibliografia
 
-Riferimenti bibliografici della piattaforma, in formato APA. Le citazioni sono
-nella lingua originale della fonte. I DOI sono verificati; le tesi e i manuali
-senza DOI sono indicati come tali.
+Riferimenti bibliografici della piattaforma, in formato APA. Le citazioni sono nella lingua originale della fonte.
+Ogni riferimento con DOI è stato **verificato su Crossref** (autori, titolo, rivista, anno, volume, fascicolo, pagine);
+la data dell'ultima verifica è 2026-10-23. I testi senza DOI (tesi, manuali, monografie) sono indicati come tali e **non
+sono stati consultati direttamente**.
 
 ## Stroop Task
 
@@ -12,8 +13,19 @@ senza DOI sono indicati come tali.
 - MacLeod, C. M. (1991). Half a century of research on the Stroop effect: An
   integrative review. *Psychological Bulletin, 109*(2), 163–203.
   https://doi.org/10.1037/0033-2909.109.2.163
-- Galer, S., Kerkhofs, M., et al. (2014). [ISI e modulazione dell'interferenza
-  Stroop]. *Psychologica Belgica.* https://doi.org/10.5334/pb.ad
+- Galer, S., Schmitz, R., Leproult, R., De Tiège, X., Van Bogaert, P., &
+  Peigneux, P. (2014). Response-stimulus interval duration modulates
+  interference effects in the Stroop task. *Psychologica Belgica, 54*(1),
+  97–110. https://doi.org/10.5334/pb.ad
+- de Leeuw, J. R. (2015). jsPsych: A JavaScript library for creating
+  behavioral experiments in a Web browser. *Behavior Research Methods, 47*(1),
+  1–12. https://doi.org/10.3758/s13428-014-0458-y
+- Stoet, G. (2010). PsyToolkit: A software package for programming
+  psychological experiments using Linux. *Behavior Research Methods, 42*(4),
+  1096–1104. https://doi.org/10.3758/BRM.42.4.1096
+- Stoet, G. (2017). PsyToolkit: A novel web-based method for running online
+  questionnaires and reaction-time experiments. *Teaching of Psychology, 44*(1),
+  24–31. https://doi.org/10.1177/0098628316677643
 
 ## Go / No-Go Task
 
@@ -24,11 +36,33 @@ senza DOI sono indicati come tali.
 - Wessel, J. R. (2018). Prepotent motor activity and inhibitory control demands
   in different variants of the go/no-go paradigm. *Psychophysiology, 55*(3),
   e12871. https://doi.org/10.1111/psyp.12871
-- Wilson, T. W., et al. (2016). [Proporzione Go e prestazione inibitoria].
-  *Experimental Brain Research, 234*(10), 2989–2998.
-  https://doi.org/10.1007/s00221-016-4701-x
-- Hasegawa, K., et al. (2021). [ISI, pratica e stimoli nel go/no-go].
-  *Scandinavian Journal of Psychology.* https://doi.org/10.1111/sjop.12679
+- Wilson, K. M., Finkbeiner, K. M., de Joux, N. R., Russell, P. N., & Helton,
+  W. S. (2016). Go-stimuli proportion influences response strategy in a
+  sustained attention to response task. *Experimental Brain Research, 234*(10),
+  2989–2998. https://doi.org/10.1007/s00221-016-4701-x
+- Hasegawa, A., Matsumoto, N., Yamashita, Y., Tanaka, K., Kawaguchi, J., &
+  Yamamoto, T. (2021). Do shorter inter-stimulus intervals in the go/no-go task
+  enable better assessment of response inhibition? *Scandinavian Journal of
+  Psychology, 62*(2), 118–124. https://doi.org/10.1111/sjop.12679
+- Donders, F. C. (1969). On the speed of mental processes. *Acta Psychologica,
+  30*, 412–431. https://doi.org/10.1016/0001-6918(69)90065-1
+
+## Flanker Task
+
+- Eriksen, B. A., & Eriksen, C. W. (1974). Effects of noise letters upon the
+  identification of a target letter in a nonsearch task. *Perception &
+  Psychophysics, 16*(1), 143–149. https://doi.org/10.3758/BF03203267
+- Eriksen, C. W. (1995). The flankers task and response competition: A useful
+  tool for investigating a variety of cognitive problems. *Visual Cognition,
+  2*(2–3), 101–118. https://doi.org/10.1080/13506289508401726
+- Gratton, G., Coles, M. G. H., & Donchin, E. (1992). Optimizing the use of
+  information: Strategic control of activation of responses. *Journal of
+  Experimental Psychology: General, 121*(4), 480–506.
+  https://doi.org/10.1037/0096-3445.121.4.480
+- Fan, J., McCandliss, B. D., Sommer, T., Raz, A., & Posner, M. I. (2002).
+  Testing the efficiency and independence of attentional networks. *Journal of
+  Cognitive Neuroscience, 14*(3), 340–347.
+  https://doi.org/10.1162/089892902317361886
 
 ## Corsi Block-Tapping Task
 
@@ -41,6 +75,10 @@ senza DOI sono indicati come tali.
 - Berch, D. B., Krikorian, R., & Huha, E. M. (1998). The Corsi block-tapping
   task: Methodological and theoretical considerations. *Brain and Cognition,
   38*(3), 317–338. https://doi.org/10.1006/brcg.1998.1039
+- Orsini, A., Simonetta, S., & Marmorato, M. S. (2004). Corsi's block-tapping
+  test: Some characteristics of the spatial path which influence memory.
+  *Perceptual and Motor Skills, 98*(2), 382–388.
+  https://doi.org/10.2466/pms.98.2.382-388
 - Mueller, S. T., & Piper, B. J. (2014). The Psychology Experiment Building
   Language (PEBL) and PEBL Test Battery. *Journal of Neuroscience Methods, 222*,
   250–259. https://doi.org/10.1016/j.jneumeth.2013.10.024
@@ -53,6 +91,10 @@ senza DOI sono indicati come tali.
 - Jaeggi, S. M., Buschkuehl, M., Perrig, W. J., & Meier, B. (2010). The concurrent
   validity of the N-back task as a working memory measure. *Memory, 18*(4),
   394–412. https://doi.org/10.1080/09658211003702171
+- Kane, M. J., Conway, A. R. A., Miura, T. K., & Colflesh, G. J. H. (2007).
+  Working memory, attention control, and the N-back task: A question of
+  construct validity. *Journal of Experimental Psychology: Learning, Memory, and
+  Cognition, 33*(3), 615–622. https://doi.org/10.1037/0278-7393.33.3.615
 - Owen, A. M., McMillan, K. M., Laird, A. R., & Bullmore, E. (2005). N-back
   working memory paradigm: A meta-analysis of normative functional neuroimaging
   studies. *Human Brain Mapping, 25*(1), 46–59. https://doi.org/10.1002/hbm.20131
@@ -69,9 +111,38 @@ senza DOI sono indicati come tali.
   reinforcement and ease of shifting to new responses in a Weigl-type card-sorting
   problem. *Journal of Experimental Psychology, 38*(4), 404–411.
   https://doi.org/10.1037/h0059831
+- Heaton, R. K., Chelune, G. J., Talley, J. L., Kay, G. G., & Curtiss, G. (1993).
+  *Wisconsin Card Sorting Test manual: Revised and expanded.* Psychological
+  Assessment Resources. (manuale, senza DOI)
 - Kongs, S. K., Thompson, L. L., Iverson, G. L., & Heaton, R. K. (2000).
   *Wisconsin Card Sorting Test-64 Card Version (WCST-64)*. Psychological
   Assessment Resources. (manuale, senza DOI)
+- Howlett, C. A., & Moseley, G. L. (2024). An improved diagrammatic procedure
+  for interpreting and scoring the Wisconsin Card Sorting Test: An update to
+  Steve Berry's 1996 edition. *Behavior Research Methods, 56*(8), 8715–8719.
+  https://doi.org/10.3758/s13428-024-02499-w
+- Miles, S., Howlett, C. A., Berryman, C., Nedeljkovic, M., Moseley, G. L., &
+  Phillipou, A. (2021). Considerations for using the Wisconsin Card Sorting Test
+  to assess cognitive flexibility. *Behavior Research Methods, 53*(5), 2083–2091.
+  https://doi.org/10.3758/s13428-021-01551-3
+- Nyhus, E., & Barceló, F. (2009). The Wisconsin Card Sorting Test and the
+  cognitive assessment of prefrontal executive functions: A critical update.
+  *Brain and Cognition, 71*(3), 437–451.
+  https://doi.org/10.1016/j.bandc.2009.03.005
+
+## PVT — Psychomotor Vigilance Task
+
+- Dinges, D. F., & Powell, J. W. (1985). Microcomputer analyses of performance on
+  a portable, simple visual RT task during sustained operations. *Behavior
+  Research Methods, Instruments, & Computers, 17*(6), 652–655.
+  https://doi.org/10.3758/BF03200977
+- Basner, M., & Dinges, D. F. (2011). Maximizing sensitivity of the psychomotor
+  vigilance test (PVT) to sleep loss. *Sleep, 34*(5), 581–591.
+  https://doi.org/10.1093/sleep/34.5.581
+- Lan, L., Wargocki, P., Wyon, D. P., & Lian, Z. (2011). Effects of thermal
+  discomfort in an office on perceived air quality, SBS symptoms, physiological
+  responses, and human performance. *Indoor Air, 21*(5), 376–390.
+  https://doi.org/10.1111/j.1600-0668.2011.00714.x
 
 ## Trattamento dei tempi di reazione
 
@@ -80,8 +151,12 @@ senza DOI sono indicati come tali.
 - Ratcliff, R. (1993). Methods for dealing with reaction time outliers.
   *Psychological Bulletin, 114*(3), 510–532.
   https://doi.org/10.1037/0033-2909.114.3.510
-- Kofler, M. J., et al. (2013). Reaction time variability in ADHD: A meta-analytic
-  review. *Clinical Psychology Review, 33*(6), 795–811.
-  https://doi.org/10.1016/j.cpr.2013.06.001
+- Ulrich, R., & Miller, J. (1994). Effects of truncation on reaction time
+  analysis. *Journal of Experimental Psychology: General, 123*(1), 34–80.
+  https://doi.org/10.1037/0096-3445.123.1.34
+- Kofler, M. J., Rapport, M. D., Sarver, D. E., Raiker, J. S., Orban, S. A.,
+  Friedman, L. M., & Kolomeyer, E. G. (2013). Reaction time variability in ADHD:
+  A meta-analytic review of 319 studies. *Clinical Psychology Review, 33*(6),
+  795–811. https://doi.org/10.1016/j.cpr.2013.06.001
 - Luce, R. D. (1986). *Response times: Their role in inferring elementary mental
   organization.* Oxford University Press. (monografia, senza DOI)

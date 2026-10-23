@@ -107,7 +107,7 @@ export function BatteryEditor({ battery, onChange }: BatteryEditorProps): JSX.El
                   <button
                     onClick={() => removeAt(i)}
                     aria-label="Rimuovi test"
-                    className="rounded border border-line px-2 py-0.5 text-xs text-[#D0021B] hover:border-[#D0021B]"
+                    className="rounded border border-line px-2 py-0.5 text-xs text-danger hover:border-danger"
                   >
                     ✕
                   </button>

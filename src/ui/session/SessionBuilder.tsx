@@ -6,6 +6,7 @@
  */
 import { useRef, useState } from 'react';
 import { Header } from '../components/Header';
+import { PageHeading } from '../components/PageHeading';
 import { Button } from '../components/Button';
 import { BatteryEditor } from './BatteryEditor';
 import { SessionTimeline } from './SessionTimeline';
@@ -178,21 +179,24 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
   return (
     <div className="min-h-full bg-paper">
       <Header />
-      <main className="mx-auto max-w-content px-6 py-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">Costruttore sessione</h1>
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={doExport}>Esporta JSON</Button>
-            <Button variant="secondary" onClick={() => fileRef.current?.click()}>Importa JSON</Button>
-            <input ref={fileRef} type="file" accept="application/json" onChange={onImportFile} className="hidden" />
-          </div>
-        </div>
-        {importError && <p className="mt-3 text-sm text-[#D0021B]">{importError}</p>}
+      <main className="mx-auto max-w-content px-6 py-12">
+        <PageHeading
+          eyebrow="Modalità Sessione"
+          title="Costruttore sessione"
+          actions={
+            <>
+              <Button variant="secondary" onClick={doExport}>Esporta JSON</Button>
+              <Button variant="secondary" onClick={() => fileRef.current?.click()}>Importa JSON</Button>
+              <input ref={fileRef} type="file" accept="application/json" onChange={onImportFile} className="hidden" />
+            </>
+          }
+        />
+        {importError && <p className="mt-3 text-sm text-danger">{importError}</p>}
 
         {/* 1. Nome + durata totale */}
         <div className="mt-6 flex flex-wrap items-end gap-x-6 gap-y-3">
           <label className="flex flex-col gap-1">
-            <span className="text-sm text-ink">Nome della sessione</span>
+            <span className="eyebrow">Nome della sessione</span>
             <input
               value={draft.name}
               onChange={(e) => update((d) => void (d.name = e.target.value))}
@@ -201,7 +205,7 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
             />
           </label>
           <div className="flex flex-col gap-1">
-            <span className="text-sm text-ink">Durata totale</span>
+            <span className="eyebrow">Durata totale</span>
             <DurationInput valueMs={draft.totalMs} onChange={setTotalMs} ariaPrefix="Durata totale" />
           </div>
         </div>
@@ -209,8 +213,8 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
         {/* 2. Timeline interattiva */}
         <div className="mt-6">
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Linea temporale</p>
-            <span className={`text-xs ${overAllocated ? 'text-[#D0021B]' : 'text-muted'}`}>
+            <p className="eyebrow text-accent-glow">Linea temporale</p>
+            <span className={`text-xs ${overAllocated ? 'text-danger' : 'text-muted'}`}>
               Fasi allocate: {fmtMs(allocated)} / {fmtMs(draft.totalMs)}
             </span>
           </div>
@@ -226,7 +230,7 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
 
         {/* 3. Fasi */}
         <div className="mt-8 flex items-center justify-between">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Fasi e pin</p>
+          <p className="eyebrow text-accent-glow">Fasi e pin</p>
           <button onClick={distributeEvenly} className="text-xs text-accent hover:underline">
             Riparti durate equamente
           </button>
@@ -253,7 +257,7 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
                   <span className="ml-auto flex gap-1">
                     <button onClick={() => movePhase(pi, -1)} aria-label="Su" className="rounded border border-line px-1.5 py-0.5 text-xs text-muted hover:border-accent">↑</button>
                     <button onClick={() => movePhase(pi, 1)} aria-label="Giù" className="rounded border border-line px-1.5 py-0.5 text-xs text-muted hover:border-accent">↓</button>
-                    <button onClick={() => removePhase(pi)} aria-label="Elimina fase" className="rounded border border-line px-1.5 py-0.5 text-xs text-[#D0021B] hover:border-[#D0021B]">✕</button>
+                    <button onClick={() => removePhase(pi)} aria-label="Elimina fase" className="rounded border border-line px-1.5 py-0.5 text-xs text-danger hover:border-danger">✕</button>
                   </span>
                 </div>
 
@@ -288,16 +292,16 @@ export function SessionBuilder({ initial, onSave, onBack }: SessionBuilderProps)
                           {/* Riepilogo batteria */}
                           <span className="flex flex-wrap items-center gap-1">
                             {pin.battery.length === 0 ? (
-                              <span className="text-[11px] text-[#D0021B]">batteria vuota</span>
+                              <span className="text-[11px] text-danger">batteria vuota</span>
                             ) : (
                               pin.battery.map((b, k) => (
-                                <span key={k} className="rounded-full bg-white px-2 py-0.5 text-[11px] text-ink ring-1 ring-line">
+                                <span key={k} className="rounded-sm bg-elevated px-2 py-0.5 text-[11px] text-ink">
                                   {testTitle(b.testId)}
                                 </span>
                               ))
                             )}
                           </span>
-                          <button onClick={() => removePin(pi, ti)} aria-label="Rimuovi pin" className="ml-auto rounded border border-line px-1.5 py-0.5 text-xs text-[#D0021B] hover:border-[#D0021B]">✕</button>
+                          <button onClick={() => removePin(pi, ti)} aria-label="Rimuovi pin" className="ml-auto rounded border border-line px-1.5 py-0.5 text-xs text-danger hover:border-danger">✕</button>
                         </div>
                         {/* Editor batteria (espanso) */}
                         {open && (

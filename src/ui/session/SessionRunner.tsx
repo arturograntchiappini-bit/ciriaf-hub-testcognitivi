@@ -173,6 +173,7 @@ export function SessionRunner({ initialRun, feedbackDuringTest, onExit }: Sessio
     return (
       <BatteryReady
         testId={item.testId}
+        params={item.params}
         index={batteryIdx}
         total={pin.battery.length}
         onStart={() => setMode('test')}
@@ -213,7 +214,7 @@ export function SessionRunner({ initialRun, feedbackDuringTest, onExit }: Sessio
       />
       {exiting && (
         <div className="fixed inset-0 z-10 flex items-center justify-center bg-black/20">
-          <div className="mx-auto max-w-md rounded-card border border-line bg-white p-8 text-center shadow-card">
+          <div className="mx-auto max-w-md rounded-card border border-line bg-surface p-8 text-center">
             <h2 className="text-lg font-semibold text-ink">Uscire dalla sessione?</h2>
             <p className="mt-3 text-sm text-muted">
               Puoi riprendere più tardi (la sessione resta salvata), vedere i risultati parziali
