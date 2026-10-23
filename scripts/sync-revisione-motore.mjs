@@ -14,14 +14,14 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const ENGINES = ['stroop', 'gonogo', 'corsi', 'nback', 'wcst', 'pvt', 'flanker', 'sart'];
+export const ENGINES = ['stroop', 'gonogo', 'corsi', 'nback', 'wcst', 'pvt', 'flanker', 'sart', 'visualSearch', 'mentalRotation'];
 
 const DEPS_MARKER = '/* ===== Dipendenze inline';
 const CORE_MARKER = '/* ============================ CORE DEL TEST ============================ */';
 const DEMO_MARKER = '/* ================================ DEMO ================================ */';
 const IMPORT_LINE = /^(import\s|export\s*\{[^}]*\}\s*from\s)/;
 const KEEP_EXPORT_FROM = new Set(['sdt.ts']);
-const SOURCES = ['types.ts', 'rng.ts', 'validation.ts', 'sdt.ts'];
+const SOURCES = ['types.ts', 'rng.ts', 'validation.ts', 'sdt.ts', 'regression.ts'];
 
 const rootDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 

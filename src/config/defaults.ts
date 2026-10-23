@@ -11,6 +11,9 @@ import type { WcstParams } from '../engine/tests/wcst';
 import type { PvtParams } from '../engine/tests/pvt';
 import type { FlankerParams } from '../engine/tests/flanker';
 import type { SartParams } from '../engine/tests/sart';
+import type { VisualSearchParams } from '../engine/tests/visualSearch';
+import type { MentalRotationParams } from '../engine/tests/mentalRotation';
+import type { TrailMakingParams } from '../engine/tests/trailMaking';
 
 export interface AllParams {
   stroop1: StroopParams;
@@ -22,6 +25,9 @@ export interface AllParams {
   pvt: PvtParams;
   flanker: FlankerParams;
   sart: SartParams;
+  visualSearch: VisualSearchParams;
+  mentalRotation: MentalRotationParams;
+  trailMaking: TrailMakingParams;
 }
 
 /**
@@ -138,5 +144,43 @@ export const DEFAULTS: AllParams = {
     digitMs: 250,
     maskMs: 900,
     practiceTrials: 18,
+  },
+
+  /**
+   * Visual Search (Treisman & Gelade, 1980): 96 trial = 2 tipi (caratteristica / congiunzione) × 3 numerosità
+   * (4, 8, 16) × 2 (bersaglio presente / assente) × 8 ripetizioni; fissazione 500 ms, tempo massimo 4000 ms,
+   * ISI 700–1100 ms, 8 trial di pratica. Valori operativi di progetto. Vedi docs/scientific/visual-search.md
+   */
+  visualSearch: {
+    nTrials: 96, // 8 prove per cella: stima delle pendenze con 3 numerosità
+    fixationMs: 500,
+    responseWindowMs: 4000, // la ricerca di congiunzione ad assenza può richiedere più di 2 s
+    isiMinMs: 700,
+    isiMaxMs: 1100,
+    practiceTrials: 8,
+  },
+
+  /**
+   * Mental Rotation (Shepard & Metzler, 1971): 84 trial = 7 angoli (0–180° a passi di 30°) × (uguali / diverse)
+   * × 6 ripetizioni; fissazione 500 ms, tempo massimo 8000 ms, ISI 700–1100 ms, 6 trial di pratica.
+   * Figure di 10 cubetti generate al volo; non sono le figure originali. Vedi docs/scientific/mental-rotation.md
+   */
+  mentalRotation: {
+    nTrials: 84, // 6 prove per cella
+    fixationMs: 500,
+    responseWindowMs: 8000, // la rotazione mentale a 180° può richiedere diversi secondi
+    isiMinMs: 700,
+    isiMaxMs: 1100,
+    practiceTrials: 6,
+  },
+
+  /**
+   * Trail Making A e B (Reitan, 1958): 25 cerchi per parte (la parte B alterna 13 numeri e 12 lettere),
+   * 8 cerchi per parte nella pratica. Versione a schermo con clic: non è il test cartaceo originale.
+   * Vedi docs/scientific/trail-making.md
+   */
+  trailMaking: {
+    nTargets: 25, // numero classico di cerchi per parte
+    practiceTargets: 8,
   },
 };

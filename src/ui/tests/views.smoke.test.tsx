@@ -5,6 +5,9 @@ import { WcstView } from './WcstView';
 import { PvtView } from './PvtView';
 import { FlankerView } from './FlankerView';
 import { SartView } from './SartView';
+import { VisualSearchView } from './VisualSearchView';
+import { TrailMakingView } from './TrailMakingView';
+import { MentalRotationView } from './MentalRotationView';
 import { DEFAULTS } from '../../config/defaults';
 
 const common = {
@@ -35,6 +38,21 @@ describe('smoke render viste interattive', () => {
   it('SartView si monta senza errori', () => {
     render(<SartView params={DEFAULTS.sart} {...common} />);
     expect(screen.getByText(/Pratica/)).toBeInTheDocument();
+  });
+
+  it('VisualSearchView si monta senza errori', () => {
+    render(<VisualSearchView params={DEFAULTS.visualSearch} {...common} />);
+    expect(screen.getByText(/Pratica/)).toBeInTheDocument();
+  });
+
+  it('MentalRotationView si monta senza errori', () => {
+    render(<MentalRotationView params={DEFAULTS.mentalRotation} {...common} />);
+    expect(screen.getByText(/Pratica/)).toBeInTheDocument();
+  });
+
+  it('TrailMakingView mostra la parte A e avvia il campo dei cerchi', () => {
+    render(<TrailMakingView params={DEFAULTS.trailMaking} {...common} />);
+    expect(screen.getByText(/parte A/)).toBeInTheDocument();
   });
 
   it('PvtView si monta senza errori', () => {

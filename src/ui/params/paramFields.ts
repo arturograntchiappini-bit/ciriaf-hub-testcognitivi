@@ -124,6 +124,38 @@ export const PARAM_SECTIONS: SectionDesc[] = [
       { key: 'practiceTrials', label: 'Trial di pratica', unit: 'trial', min: 0, max: 40, step: 1 },
     ],
   },
+  {
+    testKey: 'visualSearch',
+    title: 'Visual Search — Ricerca visiva',
+    fields: [
+      { key: 'nTrials', label: 'Numero di trial', unit: 'trial', min: 12, max: 480, step: 12 },
+      { key: 'fixationMs', label: 'Durata fissazione', unit: 'ms', min: 200, max: 2000, step: 100 },
+      { key: 'responseWindowMs', label: 'Tempo massimo', unit: 'ms', min: 1000, max: 10000, step: 500 },
+      { key: 'isiMinMs', label: 'ISI minimo', unit: 'ms', min: 300, max: 3000, step: 100 },
+      { key: 'isiMaxMs', label: 'ISI massimo', unit: 'ms', min: 400, max: 4000, step: 100 },
+      { key: 'practiceTrials', label: 'Trial di pratica', unit: 'trial', min: 0, max: 40, step: 1 },
+    ],
+  },
+  {
+    testKey: 'mentalRotation',
+    title: 'Mental Rotation — Rotazione mentale',
+    fields: [
+      { key: 'nTrials', label: 'Numero di trial', unit: 'trial', min: 14, max: 420, step: 14 },
+      { key: 'fixationMs', label: 'Durata fissazione', unit: 'ms', min: 200, max: 2000, step: 100 },
+      { key: 'responseWindowMs', label: 'Tempo massimo', unit: 'ms', min: 2000, max: 20000, step: 1000 },
+      { key: 'isiMinMs', label: 'ISI minimo', unit: 'ms', min: 300, max: 3000, step: 100 },
+      { key: 'isiMaxMs', label: 'ISI massimo', unit: 'ms', min: 400, max: 4000, step: 100 },
+      { key: 'practiceTrials', label: 'Trial di pratica', unit: 'trial', min: 0, max: 40, step: 1 },
+    ],
+  },
+  {
+    testKey: 'trailMaking',
+    title: 'Trail Making A/B',
+    fields: [
+      { key: 'nTargets', label: 'Cerchi per parte', unit: 'cerchi', min: 8, max: 51, step: 1 },
+      { key: 'practiceTargets', label: 'Cerchi di pratica', unit: 'cerchi', min: 0, max: 15, step: 1 },
+    ],
+  },
 ];
 
 /** Sezione dei parametri per un dato test. */

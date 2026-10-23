@@ -79,16 +79,17 @@ export function Hero({ focus, onOpenSession, onOpenSettings, onOpenScience }: He
             className="rise hidden justify-self-end font-mono text-[11px] uppercase tracking-[0.18em] md:block md:min-w-[18rem]"
             style={{ '--delay': '900ms' } as React.CSSProperties}
           >
+            <div className="pb-2 text-accent-glow">Mappa cerebrale interattiva</div>
             <div className="flex justify-between gap-8 border-t border-line py-2">
-              <dt className="text-muted">Regione</dt>
-              <dd className="text-ink">{focus ? focus.focus.regionLabel : '—'}</dd>
+              <dt className="text-muted">Area coinvolta</dt>
+              <dd className="text-ink">{focus ? focus.focus.regionLabel : 'nessuna'}</dd>
             </div>
             <div className="flex justify-between gap-8 border-t border-line py-2">
               <dt className="text-muted">Test</dt>
-              <dd className="text-right text-ink">{focus ? focus.testTitle.split(' — ')[0] : 'passa su un test'}</dd>
+              <dd className="text-right text-ink">{focus ? focus.testTitle.split(' — ')[0] : 'nessuno'}</dd>
             </div>
-            <div className="border-t border-line pt-2 normal-case tracking-normal text-muted">
-              Trascina il cursore · clicca per un impulso
+            <div className="border-t border-line pt-2 normal-case leading-snug tracking-normal text-muted">
+              {focus ? focus.focus.task : 'Passa il cursore su un test del catalogo: si accende l’area del cervello che mette alla prova. Mappatura illustrativa.'}
             </div>
           </dl>
         </div>

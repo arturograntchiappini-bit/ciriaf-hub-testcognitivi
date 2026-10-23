@@ -5,7 +5,7 @@
 import { Header } from '../components/Header';
 import { PageHeading } from '../components/PageHeading';
 import { Button } from '../components/Button';
-import { toSessionJson, toSessionCsv, sessionFilename } from '../../engine/session/export';
+import { toSessionJson, toSessionCsv, toSessionSummaryCsv, sessionFilename } from '../../engine/session/export';
 import { triggerDownload } from '../download';
 import { TEST_CATALOG } from '../router';
 import type { SessionRun } from '../../engine/session/model';
@@ -28,6 +28,9 @@ function testTitle(id: string): string {
 export function SessionResults({ run, partial, onExit }: SessionResultsProps): JSX.Element {
   function downloadJson(): void {
     triggerDownload(sessionFilename(run, 'json'), toSessionJson(run), 'application/json');
+  }
+  function downloadSummary(): void {
+    triggerDownload(sessionFilename(run, 'csv').replace(/.csv$/, '_riepilogo.csv'), toSessionSummaryCsv(run), 'text/csv');
   }
   function downloadCsv(): void {
     triggerDownload(sessionFilename(run, 'csv'), toSessionCsv(run), 'text/csv');
@@ -84,12 +87,15 @@ export function SessionResults({ run, partial, onExit }: SessionResultsProps): J
           <Button variant="secondary" onClick={downloadCsv}>
             Scarica CSV combinato
           </Button>
+          <Button variant="secondary" onClick={downloadSummary}>
+            Scarica riepilogo metriche
+          </Button>
           <Button variant="ghost" onClick={onExit}>
             ← Torna al menu
           </Button>
         </div>
         <p className="mt-4 text-xs text-muted">
-          Il CSV combina tutti i trial della sessione con colonne di contesto fase / t / test. Il JSON
+          Il CSV combina tutti i trial della sessione con colonne di contesto fase / t / test. Il riepilogo ha una riga per metrica di ogni test. Il JSON
           contiene il protocollo usato e ogni risultato per esteso.
         </p>
       </main>

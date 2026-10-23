@@ -38,12 +38,12 @@ describe('Home', () => {
   it('mostra la regione cerebrale quando il puntatore è su un test e la toglie all’uscita', async () => {
     const user = userEvent.setup();
     const catalog = renderHome();
-    expect(screen.getByText('passa su un test')).toBeInTheDocument();
+    expect(screen.getByText('nessuno', { selector: 'dd' })).toBeInTheDocument();
     const row = within(catalog).getByRole('button', { name: /Corsi Block Task/ });
     await user.hover(row);
     expect(screen.getByText('Parietale', { selector: 'dd' })).toBeInTheDocument();
     await user.unhover(row);
-    expect(screen.getByText('passa su un test')).toBeInTheDocument();
+    expect(screen.getByText('nessuno', { selector: 'dd' })).toBeInTheDocument();
   });
 
   it('apre la modalità Sessione dalla hero e dal pannello dedicato', async () => {

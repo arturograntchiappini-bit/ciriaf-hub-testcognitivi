@@ -23,10 +23,10 @@ const CSV_HEADER = [
 ].join(CSV_SEPARATOR);
 
 /** Mette tra virgolette e raddoppia le virgolette se il campo contiene separatore/newline/virgolette. */
-export function csvField(value: string | number | boolean | null): string {
+export function csvField(value: string | number | boolean | null, separator: string = CSV_SEPARATOR): string {
   if (value === null) return '';
   const s = String(value);
-  if (s.includes(CSV_SEPARATOR) || s.includes('"') || s.includes('\n')) {
+  if (s.includes(separator) || s.includes('"') || s.includes('\n')) {
     return `"${s.replace(/"/g, '""')}"`;
   }
   return s;
@@ -53,7 +53,7 @@ export function trialCsvValues(t: TrialResult): (string | number | null)[] {
 }
 
 function trialToCsvRow(t: TrialResult): string {
-  return [t.testId, ...trialCsvValues(t)].map(csvField).join(CSV_SEPARATOR);
+  return [t.testId, ...trialCsvValues(t)].map((v) => csvField(v)).join(CSV_SEPARATOR);
 }
 
 /** Serializza un risultato in CSV con header fisso. */

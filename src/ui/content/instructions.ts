@@ -108,6 +108,33 @@ export const INSTRUCTIONS: Record<TestId, Instruction> = {
     keyHints: ['← = freccia centrale a sinistra', '→ = freccia centrale a destra'],
   },
   sart: sartInstruction(3),
+  mentalRotation: {
+    title: 'Mental Rotation — Rotazione mentale',
+    paragraphs: [
+      'Compariranno due figure fatte di cubetti, affiancate.',
+      'A volte la figura di destra è la stessa di quella di sinistra, solo ruotata. Altre volte è la sua immagine speculare e non potrai mai sovrapporla.',
+      'Immagina di ruotare una figura per capire se sono uguali o diverse; rispondi il più rapidamente possibile, senza sbagliare.',
+    ],
+    keyHints: ['← = figure UGUALI (solo ruotate)', '→ = figure DIVERSE (speculari)'],
+  },
+  trailMaking: {
+    title: 'Trail Making A/B',
+    paragraphs: [
+      'Sullo schermo ci sono dei cerchi sparsi. Nella parte A sono numerati: collegali in ordine, 1, 2, 3…',
+      'Nella parte B ci sono numeri e lettere: collegali alternando, 1, A, 2, B, 3, C…',
+      'Fai clic sui cerchi con il mouse o con il dito, il più velocemente possibile senza sbagliare. Se sbagli il tempo continua a scorrere.',
+    ],
+    keyHints: ['Mouse o tocco = clic sul cerchio successivo'],
+  },
+  visualSearch: {
+    title: 'Visual Search — Ricerca visiva',
+    paragraphs: [
+      'Comparirà un campo con molte figure colorate. Il bersaglio è un CERCHIO ARANCIONE.',
+      'A volte il bersaglio c’è, a volte no. Cercalo e rispondi il più rapidamente possibile, senza sbagliare.',
+      'I distrattori cambiano: possono essere tutti diversi per colore, oppure assomigliare al bersaglio per forma o per colore.',
+    ],
+    keyHints: ['← = cerchio arancione PRESENTE', '→ = cerchio arancione ASSENTE'],
+  },
 };
 
 /** Istruzioni di un test, adattate ai parametri scelti (livello n dell'N-Back, cifra bersaglio del SART). */

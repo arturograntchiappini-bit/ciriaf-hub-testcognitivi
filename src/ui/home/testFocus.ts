@@ -20,6 +20,9 @@ const FOCUS_BY_TEST: Partial<Record<TestId, TestFocus>> = {
   nback: { regions: FRONTO_PARIETAL, regionLabel: 'Fronto-parietale', task: 'Di’ se lo stimolo coincide con quello di due posizioni prima.' },
   wcst: { regions: FRONTAL, regionLabel: 'Frontale', task: 'Deduci la regola di smistamento e cambiala quando cambia.' },
   flanker: { regions: FRONTAL, regionLabel: 'Frontale', task: 'Rispondi alla freccia centrale e ignora quelle ai lati.' },
+  visualSearch: { regions: [1, 3], regionLabel: 'Parieto-occipitale', task: 'Trova il cerchio arancione tra i distrattori, o dì che non c’è.' },
+  mentalRotation: { regions: PARIETAL, regionLabel: 'Parietale', task: 'Stabilisci se due figure a blocchi sono la stessa, solo ruotata, o speculari.' },
+  trailMaking: { regions: FRONTO_PARIETAL, regionLabel: 'Fronto-parietale', task: 'Collega i cerchi in ordine, prima solo numeri, poi alternando numeri e lettere.' },
   sart: { regions: FRONTO_PARIETAL, regionLabel: 'Fronto-parietale', task: 'Premi a ogni cifra, tranne a una: trattieniti quando compare.' },
   pvt: { regions: FRONTO_PARIETAL, regionLabel: 'Fronto-parietale', task: 'Rispondi appena compare lo stimolo, a intervalli imprevedibili.' },
 };

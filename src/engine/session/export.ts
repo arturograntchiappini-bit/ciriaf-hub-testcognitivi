@@ -5,6 +5,7 @@
  */
 import { CSV_SEPARATOR, csvField, trialCsvValues } from '../export';
 import type { SessionRun } from './model';
+import type { CsvLocale } from '../exportFormats';
 
 const SESSION_CSV_HEADER = [
   'fase',
@@ -30,10 +31,24 @@ export function toSessionCsv(run: SessionRun): string {
   for (const str of run.results) {
     for (const trial of str.result.trials) {
       const context = [str.phaseName, str.offsetMs, str.result.testId, str.indexInBattery, run.runId];
-      rows.push([...context, ...trialCsvValues(trial)].map(csvField).join(CSV_SEPARATOR));
+      rows.push([...context, ...trialCsvValues(trial)].map((v) => csvField(v)).join(CSV_SEPARATOR));
     }
   }
   return [SESSION_CSV_HEADER, ...rows].join('\r\n');
+}
+
+/** Riepilogo in formato lungo: una riga per metrica di ogni test della sessione, con fase e offset. */
+export function toSessionSummaryCsv(run: SessionRun, locale: CsvLocale = 'it'): string {
+  const sep = locale === 'it' ? ';' : ',';
+  const header = ['fase', 't_offset_ms', 'test', 'indice_batteria', 'run_id', 'metrica', 'valore', 'unita'].join(sep);
+  const rows = run.results.flatMap((str) =>
+    str.result.summary.map((m) =>
+      [str.phaseName, str.offsetMs, str.result.testId, str.indexInBattery, run.runId, m.label, typeof m.value === 'number' && locale === 'it' ? String(m.value).replace('.', ',') : m.value, m.unit ?? '']
+        .map((v) => csvField(v, sep))
+        .join(sep),
+    ),
+  );
+  return [header, ...rows].join('\r\n');
 }
 
 export interface SessionJsonExport {

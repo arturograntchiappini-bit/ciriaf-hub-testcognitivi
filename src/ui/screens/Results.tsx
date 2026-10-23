@@ -6,6 +6,7 @@ import { Header } from '../components/Header';
 import { Button } from '../components/Button';
 import { PageHeading } from '../components/PageHeading';
 import { toCsv, toJson, exportFilename } from '../../engine/export';
+import { toEventsTsv, toHtmlReport, toSummaryCsv, toTrialsCsv, formatFilename } from '../../engine/exportFormats';
 import { triggerDownload } from '../download';
 import { TEST_CATALOG } from '../router';
 import type { TestResult } from '../../engine/types';
@@ -24,6 +25,14 @@ export function Results({ result, onHome }: ResultsProps): JSX.Element {
   function downloadJson(): void {
     triggerDownload(exportFilename(result, 'json'), toJson(result), 'application/json');
   }
+
+  const title = meta?.title ?? result.testId;
+  const otherFormats = [
+    { label: 'CSV internazionale', hint: 'virgola e punto decimale: R, Python, Excel inglese', run: () => triggerDownload(formatFilename(result, 'csv-intl'), toTrialsCsv(result, 'intl'), 'text/csv') },
+    { label: 'Riepilogo metriche (CSV)', hint: 'una riga per metrica, per tabelle pivot e confronti tra sessioni', run: () => triggerDownload(formatFilename(result, 'summary-csv'), toSummaryCsv(result, 'it'), 'text/csv') },
+    { label: 'Eventi TSV (stile BIDS)', hint: 'onset e tempi in secondi, colonne dei file _events.tsv', run: () => triggerDownload(formatFilename(result, 'events-tsv'), toEventsTsv(result), 'text/tab-separated-values') },
+    { label: 'Report HTML', hint: 'pagina leggibile da aprire, stampare o salvare in PDF', run: () => triggerDownload(formatFilename(result, 'html'), toHtmlReport(result, title), 'text/html') },
+  ];
 
   return (
     <div className="min-h-full bg-paper">
@@ -67,6 +76,20 @@ export function Results({ result, onHome }: ResultsProps): JSX.Element {
             ← Torna alla home
           </Button>
         </div>
+        <section aria-labelledby="altri-formati" className="mt-10">
+          <h2 id="altri-formati" className="eyebrow">Altri formati</h2>
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+            {otherFormats.map((f) => (
+              <li key={f.label} className="panel flex items-center justify-between gap-4 px-4 py-3">
+                <div>
+                  <div className="text-sm text-ink">{f.label}</div>
+                  <div className="text-xs text-muted">{f.hint}</div>
+                </div>
+                <Button variant="secondary" onClick={f.run} aria-label={`Scarica ${f.label}`}>Scarica</Button>
+              </li>
+            ))}
+          </ul>
+        </section>
         <p className="mt-5 max-w-2xl text-xs leading-relaxed text-muted">
           Il CSV contiene una riga per trial (pratica inclusa) con i flag di validazione. Il JSON include anche i
           parametri usati per questa sessione.

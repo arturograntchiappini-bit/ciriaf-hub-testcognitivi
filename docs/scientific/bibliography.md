@@ -78,6 +78,33 @@ sono stati consultati direttamente**.
   does not measure sustained attention. *Experimental Brain Research, 236*(8),
   2255–2262. https://doi.org/10.1007/s00221-018-5291-6
 
+## Visual Search
+
+- Treisman, A. M., & Gelade, G. (1980). A feature-integration theory of attention.
+  *Cognitive Psychology, 12*(1), 97–136.
+  https://doi.org/10.1016/0010-0285(80)90005-5
+
+## Mental Rotation
+
+- Shepard, R. N., & Metzler, J. (1971). Mental rotation of three-dimensional
+  objects. *Science, 171*(3972), 701–703.
+  https://doi.org/10.1126/science.171.3972.701
+
+## Trail Making Test
+
+- Reitan, R. M. (1958). Validity of the Trail Making Test as an indicator of
+  organic brain damage. *Perceptual and Motor Skills, 8*(3), 271–276.
+  https://doi.org/10.2466/pms.1958.8.3.271
+- Tombaugh, T. N. (2004). Trail Making Test A and B: Normative data stratified by
+  age and education. *Archives of Clinical Neuropsychology, 19*(2), 203–214.
+  https://doi.org/10.1016/S0887-6177(03)00039-8
+- Sánchez-Cubillo, I., Periáñez, J. A., Adrover-Roig, D., Rodríguez-Sánchez, J. M.,
+  Ríos-Lago, M., Tirapu, J., & Barceló, F. (2009). Construct validity of the Trail
+  Making Test: Role of task-switching, working memory, inhibition/interference
+  control, and visuomotor abilities. *Journal of the International
+  Neuropsychological Society, 15*(3), 438–450.
+  https://doi.org/10.1017/S1355617709090626
+
 ## Corsi Block-Tapping Task
 
 - Corsi, P. M. (1972). *Human memory and the medial temporal region of the brain*

@@ -4,7 +4,7 @@
 
 # Sintropia — Cognitive tests Hub
 
-**Nove test cognitivi classici, con la loro base scientifica, direttamente nel browser.**<br>
+**Dodici test cognitivi classici, con la loro base scientifica, direttamente nel browser.**<br>
 Per studiare come l'ambiente fisico influisce sulla mente. Nessun account, nessun server: i dati grezzi restano tuoi.
 
 [![Licenza MIT](https://img.shields.io/badge/licenza-MIT-4a90d9?style=flat-square)](LICENSE)
@@ -79,8 +79,9 @@ Tre idee guida:
 | 7 | PVT — Vigilanza psicomotoria | Attenzione sostenuta | Dinges & Powell (1985) | [pvt](docs/scientific/pvt.md) |
 | 8 | Flanker (frecce di Eriksen) | Attenzione selettiva | Eriksen & Eriksen (1974) | [flanker](docs/scientific/flanker.md) |
 | 9 | SART — Attenzione sostenuta alla risposta | Controllo attentivo | Robertson et al. (1997) | [sart](docs/scientific/sart.md) |
-
-In arrivo: Visual Search, Mental Rotation e Trail Making A/B (vedi [Roadmap](#roadmap)).
+| 10 | Visual Search — Ricerca visiva | Attenzione visiva | Treisman & Gelade (1980) | [visual-search](docs/scientific/visual-search.md) |
+| 11 | Mental Rotation — Rotazione mentale | Cognizione spaziale | Shepard & Metzler (1971) | [mental-rotation](docs/scientific/mental-rotation.md) |
+| 12 | Trail Making A/B | Flessibilità e velocità visuo-motoria | Reitan (1958) | [trail-making](docs/scientific/trail-making.md) |
 
 > **Nota sui paper.** Motori e paper dei test sono stati rivisti nell'ottobre 2026: ogni riferimento con DOI è verificato
 > su Crossref, ciò che non si è potuto verificare (per esempio i manuali commerciali) è dichiarato come tale, e le scelte
@@ -211,9 +212,9 @@ Dettagli in [`docs/architettura.md`](docs/architettura.md).
 ## Roadmap
 
 - [x] SART — Sustained Attention to Response Task (parametri da confrontare con l'articolo originale)
-- [ ] Visual Search (Treisman & Gelade)
-- [ ] Mental Rotation (Shepard & Metzler)
-- [ ] Trail Making A/B
+- [x] Visual Search (Treisman & Gelade)
+- [x] Mental Rotation (Shepard & Metzler)
+- [x] Trail Making A/B
 - [x] Revisione scientifica dei motori e dei paper dei test esistenti
 - [x] Copie autonome in `revisione-motore/` generate dai motori vivi (`node scripts/sync-revisione-motore.mjs`) e protette da un test di allineamento
 

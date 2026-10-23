@@ -75,6 +75,27 @@ export const PAPERS: readonly PaperMeta[] = [
     summary: 'Cifre in sequenza e una sola da non rispondere: commissioni, tempi prima dell’errore e compromesso velocità-accuratezza.',
   },
   {
+    slug: 'visual-search',
+    title: 'Visual Search — Ricerca visiva',
+    kind: 'test',
+    testIds: ['visualSearch'],
+    summary: 'Trovare un cerchio arancione tra i distrattori: pendenza della ricerca di caratteristica e di congiunzione.',
+  },
+  {
+    slug: 'mental-rotation',
+    title: 'Mental Rotation — Rotazione mentale',
+    kind: 'test',
+    testIds: ['mentalRotation'],
+    summary: 'Figure a blocchi uguali o speculari: il tempo di risposta cresce con l’angolo di rotazione.',
+  },
+  {
+    slug: 'trail-making',
+    title: 'Trail Making A/B',
+    kind: 'test',
+    testIds: ['trailMaking'],
+    summary: 'Collegare cerchi in ordine, prima numeri poi numeri e lettere alternati: velocità e flessibilità cognitiva.',
+  },
+  {
     slug: 'validazione-rt',
     title: 'Validazione dei tempi di reazione',
     kind: 'method',

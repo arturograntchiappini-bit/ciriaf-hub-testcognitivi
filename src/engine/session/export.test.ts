@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { toSessionCsv, toSessionJson, sessionFilename } from './export';
+import { toSessionCsv, toSessionJson, toSessionSummaryCsv, sessionFilename } from './export';
 import type { SessionRun } from './model';
 import type { TestResult, TrialResult } from '../types';
 
@@ -93,5 +93,14 @@ describe('toSessionJson', () => {
 describe('sessionFilename', () => {
   it('compone sessione_{runId}_{stamp}.{ext}', () => {
     expect(sessionFilename(run(), 'csv')).toBe('sessione_S-7K2Q-1000_2026-07-07T10-00-00-000Z.csv');
+  });
+});
+
+describe('toSessionSummaryCsv', () => {
+  it('should_write_one_row_per_metric_with_session_context', () => {
+    const lines = toSessionSummaryCsv(run()).split('\r\n');
+    expect(lines[0]).toBe('fase;t_offset_ms;test;indice_batteria;run_id;metrica;valore;unita');
+    const metricCount = run().results.reduce((n, r) => n + r.result.summary.length, 0);
+    expect(lines).toHaveLength(metricCount + 1);
   });
 });
