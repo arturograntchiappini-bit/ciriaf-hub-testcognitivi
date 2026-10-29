@@ -1,8 +1,8 @@
 //! Viste dei test a ritmo lento (Corsi, WCST): disegno con painter egui e logica di avanzamento testabile.
 //! Il timing usa `Instant` per frame: qui non serve la precisione al ms del sequencer.
-#![allow(dead_code)] // finché la shell non aggancia i runner
 
 pub mod corsi;
+pub mod trail_making;
 pub mod wcst;
 
 use std::collections::BTreeMap;
@@ -13,6 +13,7 @@ use serde_json::{Map, Value};
 use sintropia_core::TestId;
 
 pub use corsi::CorsiRunner;
+pub use trail_making::TrailMakingRunner;
 pub use wcst::WcstRunner;
 
 use crate::runner::TestRunner;
@@ -80,6 +81,17 @@ pub fn create_custom_runner(spec: &RunnerSpec) -> Option<Box<dyn TestRunner>> {
         ))),
         TestId::Wcst => Some(Box::new(WcstRunner::new(
             params_or_default(spec.params, sintropia_engines::defaults::all_params().wcst),
+            spec.session_id,
+            spec.started_at,
+            spec.seed,
+            spec.practice,
+            spec.feedback,
+        ))),
+        TestId::TrailMaking => Some(Box::new(TrailMakingRunner::new(
+            params_or_default(
+                spec.params,
+                sintropia_engines::defaults::all_params().trail_making,
+            ),
             spec.session_id,
             spec.started_at,
             spec.seed,

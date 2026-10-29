@@ -8,7 +8,6 @@ use crate::corsi::js_hypot;
 use serde::{Deserialize, Serialize};
 use sintropia_core::rng::shuffle;
 use sintropia_core::types::{js_round, Phase, SummaryMetric, TestId, TrialResult, ValidationFlag};
-use sintropia_core::validation::mean;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -182,14 +181,15 @@ fn in_part(trials: &[TrialResult], part: TrailPart) -> Vec<&TrialResult> {
         .collect()
 }
 
-fn rts(clicks: &[&TrialResult]) -> Vec<f64> {
-    clicks.iter().map(|t| t.rt_ms.unwrap_or(0.0)).collect()
+/// Somma degli RT in ms (nell'ordine dei clic, come il `reduce` del TS), senza allocare.
+fn total_ms(clicks: &[&TrialResult]) -> f64 {
+    clicks.iter().map(|t| t.rt_ms.unwrap_or(0.0)).sum()
 }
 
 /// Tempo totale della parte in secondi, solo se completata (`n_targets` collegamenti corretti).
 fn completed_seconds(clicks: &[&TrialResult], n_targets: usize) -> Option<f64> {
     let correct = clicks.iter().filter(|t| t.correct).count();
-    (correct >= n_targets).then(|| rts(clicks).iter().sum::<f64>() / 1000.0)
+    (correct >= n_targets).then(|| total_ms(clicks) / 1000.0)
 }
 
 fn round2(x: f64) -> f64 {
@@ -207,7 +207,11 @@ fn mean_link_metric(label: &str, clicks: &[&TrialResult]) -> SummaryMetric {
     if clicks.is_empty() {
         return SummaryMetric::new(label, "—", None);
     }
-    SummaryMetric::new(label, round2(mean(&rts(clicks)) / 1000.0), Some("s"))
+    SummaryMetric::new(
+        label,
+        round2(total_ms(clicks) / clicks.len() as f64 / 1000.0),
+        Some("s"),
+    )
 }
 
 /// Metriche: tempo e errori per parte, differenza e rapporto B − A, B / A (il tempo di una parte conta solo se è

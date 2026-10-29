@@ -168,7 +168,12 @@ pub fn to_json(result: &TestResult, exported_at: &str, user_agent: &str) -> Stri
 
 /// Sostituisce `:` e `.` con `-` (ISO sanificata per i nomi file).
 pub fn sanitize_stamp(iso: &str) -> String {
+    // Il resto dei caratteri non ASCII-alfanumerici (separatori di percorso, `..`) viene scartato: lo `startedAt` di
+    // una sessione importata non deve poter uscire dalla cartella di export.
     iso.replace([':', '.'], "-")
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_'))
+        .collect()
 }
 
 /// Mantiene solo `[A-Za-z0-9-]`.
@@ -683,6 +688,15 @@ mod tests {
             format_filename(&r, ExportFormat::SummaryCsv),
             format!("stroop1_S-AB12-0930_{stamp}_riepilogo.csv")
         );
+    }
+
+    #[test]
+    fn should_strip_path_separators_from_the_timestamp_in_file_names() {
+        let mut r = sample_result();
+        r.started_at = r"..\../evil:x.y".into();
+        let name = export_filename(&r, "csv");
+        assert!(!name.contains(['/', '\\', ':']), "{name}");
+        assert!(!name.contains(".."), "{name}");
     }
 
     #[test]

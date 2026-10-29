@@ -11,3 +11,10 @@ serde_json.workspace = true
 
 [dev-dependencies]
 proptest = "1"
+# Solo per leggere le fixture del fuzz differenziale (.json.gz); mai nel motore (WASM).
+flate2 = "1"
+
+# Benchmark con harness proprio (std::time::Instant solo qui: i motori restano puri). Vedi fixtures/BENCHMARK.md.
+[[bench]]
+name = "engines"
+harness = false

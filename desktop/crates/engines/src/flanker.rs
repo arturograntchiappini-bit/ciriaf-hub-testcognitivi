@@ -6,8 +6,7 @@ use sintropia_core::rng::{rand_int, shuffle};
 use sintropia_core::types::{
     js_round, MetricValue, Phase, SummaryMetric, TrialResult, ValidationFlag,
 };
-use sintropia_core::validation::{count_flag, mean, standard_deviation};
-use std::collections::HashMap;
+use sintropia_core::validation::{mean, standard_deviation};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -51,22 +50,6 @@ pub enum FlankerDirection {
     Right,
 }
 
-impl FlankerDirection {
-    fn arrow(self) -> &'static str {
-        match self {
-            Self::Left => "←",
-            Self::Right => "→",
-        }
-    }
-
-    fn opposite(self) -> Self {
-        match self {
-            Self::Left => Self::Right,
-            Self::Right => Self::Left,
-        }
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FlankerStimulus {
@@ -79,21 +62,27 @@ pub struct FlankerStimulus {
     pub isi_ms: u32,
 }
 
-const NEUTRAL_FLANKER: &str = "–";
-const FLANKERS_PER_SIDE: usize = 2;
 /// Mai più di 3 trial consecutivi della stessa condizione né della stessa risposta.
 const MAX_RUN: usize = 3;
 const SHUFFLE_ATTEMPTS: u32 = 300;
 
+/// Stringa dello stimolo a 5 elementi (2 flanker, target, 2 flanker), senza allocare.
+fn arrows_str(condition: FlankerCondition, direction: FlankerDirection) -> &'static str {
+    use FlankerCondition::{Congruent, Incongruent, Neutral};
+    use FlankerDirection::{Left, Right};
+    match (condition, direction) {
+        (Congruent, Left) => "←←←←←",
+        (Congruent, Right) => "→→→→→",
+        (Incongruent, Left) => "→→←→→",
+        (Incongruent, Right) => "←←→←←",
+        (Neutral, Left) => "––←––",
+        (Neutral, Right) => "––→––",
+    }
+}
+
 /// Compone lo stimolo a 5 elementi: 2 flanker, target, 2 flanker.
 pub fn build_arrows(condition: FlankerCondition, direction: FlankerDirection) -> String {
-    let flanker = match condition {
-        FlankerCondition::Congruent => direction.arrow(),
-        FlankerCondition::Incongruent => direction.opposite().arrow(),
-        FlankerCondition::Neutral => NEUTRAL_FLANKER,
-    }
-    .repeat(FLANKERS_PER_SIDE);
-    format!("{flanker}{}{flanker}", direction.arrow())
+    arrows_str(condition, direction).to_owned()
 }
 
 /// Conteggi per condizione, nell'ordine di consumo del RNG del TS: incongruenti, neutri, congruenti.
@@ -124,11 +113,10 @@ fn directions_for(count: usize, rand: &mut dyn FnMut() -> f64) -> Vec<FlankerDir
     list
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 struct Draft {
     condition: FlankerCondition,
     direction: FlankerDirection,
-    arrows: String,
 }
 
 /// True se aggiungere `candidate` non crea una serie più lunga di MAX_RUN (stessa condizione o stessa risposta).
@@ -173,7 +161,6 @@ pub fn generate_flanker(
             pool.push(Draft {
                 condition,
                 direction,
-                arrows: build_arrows(condition, direction),
             });
         }
     }
@@ -182,7 +169,7 @@ pub fn generate_flanker(
         .map(|d| FlankerStimulus {
             condition: d.condition,
             direction: d.direction,
-            arrows: d.arrows,
+            arrows: build_arrows(d.condition, d.direction),
             isi_ms: rand_int(
                 i64::from(params.isi_min_ms),
                 i64::from(params.isi_max_ms),
@@ -205,14 +192,18 @@ fn rts_of(trials: &[&TrialResult]) -> Vec<f64> {
 }
 
 fn accuracy_percent(trials: &[&TrialResult]) -> f64 {
-    let scored: Vec<&&TrialResult> = trials
+    let (mut scored, mut correct) = (0usize, 0usize);
+    for t in trials
         .iter()
         .filter(|t| t.flag != ValidationFlag::Interrupted)
-        .collect();
-    if scored.is_empty() {
+    {
+        scored += 1;
+        correct += usize::from(t.correct);
+    }
+    if scored == 0 {
         return 0.0;
     }
-    scored.iter().filter(|t| t.correct).count() as f64 / scored.len() as f64 * 100.0
+    correct as f64 / scored as f64 * 100.0
 }
 
 fn is_comparable(condition: &str) -> bool {
@@ -222,14 +213,28 @@ fn is_comparable(condition: &str) -> bool {
 /// Adattamento al conflitto (Gratton, Coles & Donchin, 1992): ritorna (cI − cC) − (iI − iC), con
 /// c/i = congruenza del trial precedente e C/I = del trial corrente; considera solo trial
 /// consecutivi preceduti da una risposta corretta. `None` se una cella è vuota.
-pub fn conflict_adaptation(trials: &[TrialResult]) -> Option<f64> {
+pub fn conflict_adaptation<'a>(trials: impl IntoIterator<Item = &'a TrialResult>) -> Option<f64> {
+    conflict_adaptation_refs(&trials.into_iter().collect::<Vec<_>>())
+}
+
+/// Trial con `trial_index` esatto in una lista ordinata (a parità di indice vince l'ultimo, come una mappa).
+fn find_by_index<'a>(sorted: &[&'a TrialResult], index: u32) -> Option<&'a TrialResult> {
+    let end = sorted.partition_point(|t| t.trial_index <= index);
+    sorted[..end]
+        .last()
+        .copied()
+        .filter(|t| t.trial_index == index)
+}
+
+fn conflict_adaptation_refs(trials: &[&TrialResult]) -> Option<f64> {
     let mut cells: [Vec<f64>; 4] = Default::default(); // cC, cI, iC, iI
-    let by_index: HashMap<u32, &TrialResult> = trials.iter().map(|t| (t.trial_index, t)).collect();
-    for current in trials {
+    let mut sorted = trials.to_vec();
+    sorted.sort_by_key(|t| t.trial_index); // stabile: l'ordine di inserimento decide i duplicati
+    for &current in trials {
         let Some(previous) = current
             .trial_index
             .checked_sub(1)
-            .and_then(|i| by_index.get(&i))
+            .and_then(|i| find_by_index(&sorted, i))
         else {
             continue;
         };
@@ -271,28 +276,24 @@ fn num_or_dash(label: &str, value: Option<f64>, unit: &str) -> SummaryMetric {
 /// interferenza (incongruente − neutro), facilitazione (neutro − congruente), costo in accuratezza,
 /// adattamento al conflitto, variabilità e trial invalidi.
 pub fn score_flanker(trials: &[TrialResult]) -> Vec<SummaryMetric> {
-    let test: Vec<TrialResult> = trials
-        .iter()
-        .filter(|t| t.phase == Phase::Test)
-        .cloned()
-        .collect();
-    let by = |condition: FlankerCondition| -> Vec<&TrialResult> {
-        test.iter()
-            .filter(|t| t.condition == condition.as_str())
-            .collect()
-    };
-    let (congruent, incongruent, neutral) = (
-        by(FlankerCondition::Congruent),
-        by(FlankerCondition::Incongruent),
-        by(FlankerCondition::Neutral),
-    );
+    let test: Vec<&TrialResult> = trials.iter().filter(|t| t.phase == Phase::Test).collect();
+    let (mut congruent, mut incongruent, mut neutral) = (Vec::new(), Vec::new(), Vec::new());
+    for &t in &test {
+        match t.condition.as_str() {
+            "congruent" => congruent.push(t),
+            "incongruent" => incongruent.push(t),
+            "neutral" => neutral.push(t),
+            _ => {}
+        }
+    }
     let rt_con = mean(&rts_of(&congruent));
     let rt_inc = mean(&rts_of(&incongruent));
     let rt_neu = mean(&rts_of(&neutral));
     let neutral_value = |v: f64| (!neutral.is_empty()).then_some(v);
     let acc_con = accuracy_percent(&congruent);
     let acc_inc = accuracy_percent(&incongruent);
-    let all: Vec<&TrialResult> = test.iter().collect();
+    let count_test_flag =
+        |flag: ValidationFlag| test.iter().filter(|t| t.flag == flag).count() as f64;
 
     vec![
         num("RT medio congruenti", round1(rt_con), Some("ms")),
@@ -322,22 +323,22 @@ pub fn score_flanker(trials: &[TrialResult]) -> Vec<SummaryMetric> {
         ),
         num_or_dash(
             "Adattamento al conflitto (Gratton)",
-            conflict_adaptation(&test),
+            conflict_adaptation_refs(&test),
             "ms",
         ),
         num(
             "SD RT (tutti i corretti)",
-            round1(standard_deviation(&rts_of(&all))),
+            round1(standard_deviation(&rts_of(&test))),
             Some("ms"),
         ),
         num(
             "Errori di omissione",
-            count_flag(&test, ValidationFlag::Omission) as f64,
+            count_test_flag(ValidationFlag::Omission),
             None,
         ),
         num(
             "Errori di anticipazione",
-            count_flag(&test, ValidationFlag::Anticipation) as f64,
+            count_test_flag(ValidationFlag::Anticipation),
             None,
         ),
     ]

@@ -14,7 +14,7 @@ use crate::runner::TestRunner;
 use crate::theme::stimulus::INK;
 
 const PRACTICE_FEEDBACK_MS: f64 = 500.0;
-const LETTER_SIZE_PX: f32 = 96.0;
+const LETTER_SIZE_PX: f32 = 140.0;
 /// Quartili dell'analisi della vigilanza (default di `scoreNBack`).
 const N_QUARTILES: usize = 4;
 
@@ -42,7 +42,7 @@ fn draw(ctx: &StimulusCtx, stimulus: &Stimulus) {
     if !ctx.show {
         return;
     }
-    let font = FontId::new(LETTER_SIZE_PX, FontFamily::Proportional);
+    let font = FontId::new(LETTER_SIZE_PX * ctx.scale(), FontFamily::Proportional);
     bold_text(
         ctx.painter,
         ctx.center(),

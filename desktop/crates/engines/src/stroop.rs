@@ -1,7 +1,6 @@
 //! Stroop Task (varianti 1 "focus parola" e 2 "focus colore"). Porta `src/engine/tests/stroop.ts`.
 //! Stroop (1935); MacLeod (1991). Vedi docs/scientific/stroop.md
 use serde::{Deserialize, Serialize};
-use sintropia_core::rng::shuffle;
 use sintropia_core::types::{
     js_round, MetricValue, Phase, SummaryMetric, TrialResult, ValidationFlag,
 };
@@ -126,14 +125,26 @@ pub fn generate_stroop(
         .collect();
     all.extend((0..half).map(|i| pairs[i % pairs.len()]));
 
-    let mut attempt = shuffle(&all, rand);
+    // Un solo buffer riusato per tutti i tentativi (niente allocazioni nei ritentativi).
+    let mut attempt = all.clone();
+    shuffle_in_place(&mut attempt, rand);
     for _ in 0..SHUFFLE_RETRIES {
         if !violates_run(&attempt) {
             break;
         }
-        attempt = shuffle(&all, rand);
+        attempt.copy_from_slice(&all);
+        shuffle_in_place(&mut attempt, rand);
     }
     attempt
+}
+
+/// Stessa permutazione e stesso consumo del RNG di `rng::shuffle`. Il prodotto è >= 0, quindi il
+/// troncamento del cast coincide con `floor` (che su x86-64 base è una chiamata a libreria).
+fn shuffle_in_place(items: &mut [StroopStimulus], rand: &mut dyn FnMut() -> f64) {
+    for i in (1..items.len()).rev() {
+        let j = (rand() * (i + 1) as f64) as usize;
+        items.swap(i, j);
+    }
 }
 
 /// Tasto corretto per lo stimolo data la variante.

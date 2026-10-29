@@ -43,7 +43,25 @@ impl Settings {
         params
     }
 
+    /// Come `load_from`, ma segnala a parole un file presente e illeggibile (l'assenza non è un errore).
+    pub fn load_checked(path: &Path) -> (Self, Option<String>) {
+        let Ok(text) = std::fs::read_to_string(path) else {
+            return (Self::default(), None);
+        };
+        match serde_json::from_str(&text) {
+            Ok(settings) => (settings, None),
+            Err(e) => (
+                Self::default(),
+                Some(format!(
+                    "Il file delle impostazioni ({}) è corrotto e non è stato letto: {e}. Si usano i valori predefiniti; salvando lo sovrascrivi.",
+                    path.display()
+                )),
+            ),
+        }
+    }
+
     /// Carica da file; file assente o corrotto dà i default (mai un crash all'avvio).
+    #[cfg(test)]
     pub fn load_from(path: &Path) -> Self {
         std::fs::read_to_string(path)
             .ok()
@@ -109,6 +127,20 @@ mod tests {
             Settings::load_from(&path.with_file_name("missing.json")),
             Settings::default()
         );
+        let _ = std::fs::remove_dir_all(path.parent().unwrap());
+    }
+
+    #[test]
+    fn should_report_corrupt_file_but_not_missing_one() {
+        let path = temp_file("checked");
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::write(&path, "{non json").unwrap();
+        let (settings, warning) = Settings::load_checked(&path);
+        assert_eq!(settings, Settings::default());
+        assert!(warning.is_some_and(|w| w.contains("corrotto")));
+        assert!(Settings::load_checked(&path.with_file_name("missing.json"))
+            .1
+            .is_none());
         let _ = std::fs::remove_dir_all(path.parent().unwrap());
     }
 

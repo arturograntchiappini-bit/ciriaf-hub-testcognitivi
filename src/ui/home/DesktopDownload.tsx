@@ -2,13 +2,29 @@ import { useState } from 'react';
 import { REPOSITORY_URL } from '../components/AuthorCard';
 
 export const RELEASES_URL = `${REPOSITORY_URL}/releases/latest`;
-export const INSTALLER_URL = `${REPOSITORY_URL}/releases/latest/download/Sintropia-Setup-x64.msi`;
+// Relativi: i file sono serviti dallo stesso sito (public/download), così il download parte senza passare da GitHub.
+export const INSTALLER_URL = './download/Sintropia-Setup-x64.msi';
+export const PORTABLE_URL = './download/Sintropia-Desktop-x64.zip';
+export const CHECKSUMS_URL = './download/SHA256SUMS.txt';
 const INSTALL_SCRIPT_URL = 'https://raw.githubusercontent.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/main/scripts/install.ps1';
 
-export const INSTALL_COMMANDS: ReadonlyArray<{ label: string; command: string }> = [
-  { label: 'PowerShell', command: `irm ${INSTALL_SCRIPT_URL} | iex` },
-  { label: 'Rust (cargo)', command: `cargo install --git ${REPOSITORY_URL} sintropia-desktop` },
-];
+/** Con il sito servito in https il comando PowerShell scarica da qui (script e MSI sono in public/); altrimenti da GitHub. */
+export function installCommands(siteBase: string | null): ReadonlyArray<{ label: string; command: string }> {
+  const powershell = siteBase
+    ? `$env:SINTROPIA_BASE_URL='${siteBase}/download'; irm ${siteBase}/install.ps1 | iex`
+    : `irm ${INSTALL_SCRIPT_URL} | iex`;
+  return [
+    { label: 'PowerShell', command: powershell },
+    { label: 'Rust (cargo)', command: `cargo install --git ${REPOSITORY_URL} sintropia-desktop` },
+  ];
+}
+
+export const INSTALL_COMMANDS = installCommands(null);
+
+function currentSiteBase(): string | null {
+  if (window.location.protocol !== 'https:') return null;
+  return new URL('.', window.location.href).href.replace(/\/$/, '');
+}
 
 function CopyableCommand({ label, command }: { label: string; command: string }): JSX.Element {
   const [copied, setCopied] = useState(false);
@@ -31,7 +47,7 @@ function CopyableCommand({ label, command }: { label: string; command: string })
           {copied ? 'Copiato' : 'Copia'}
         </button>
       </div>
-      <pre className="overflow-x-auto px-4 py-3 font-mono text-[12px] leading-relaxed text-ink" tabIndex={0}>
+      <pre className="whitespace-pre-wrap break-all px-4 py-3 font-mono text-[12px] leading-relaxed text-ink" tabIndex={0}>
         <code>{command}</code>
       </pre>
     </div>
@@ -59,18 +75,23 @@ export function DesktopDownload(): JSX.Element {
           Scarica l&apos;installer <span aria-hidden>↓</span>
         </a>
         <a
-          href={RELEASES_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Tutte le versioni e la versione portatile (si apre in una nuova scheda)"
+          href={PORTABLE_URL}
           className="inline-flex min-h-[48px] items-center border border-line px-6 font-mono text-[12px] font-medium uppercase tracking-[0.16em] text-ink transition-colors duration-200 hover:border-accent"
         >
-          Versione portatile e note di rilascio
+          Versione portatile (.zip)
         </a>
       </div>
+      <p className="mt-3 font-mono text-[11px] text-muted">
+        Windows 10/11 a 64 bit, installazione per utente senza permessi di amministratore.{' '}
+        <a href={CHECKSUMS_URL} className="underline hover:text-ink">Checksum SHA-256</a>
+        {' · '}
+        <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-ink">
+          Note di rilascio (nuova scheda)
+        </a>
+      </p>
       <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.28em] text-muted">Oppure dal terminale</p>
       <div className="mt-3 grid gap-3 lg:grid-cols-2">
-        {INSTALL_COMMANDS.map((c) => (
+        {installCommands(currentSiteBase()).map((c) => (
           <CopyableCommand key={c.label} {...c} />
         ))}
       </div>

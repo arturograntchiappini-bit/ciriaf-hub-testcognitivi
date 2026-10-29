@@ -15,15 +15,20 @@ pub fn mulberry32(seed: u32) -> impl FnMut() -> f64 {
 pub fn shuffle<T: Clone>(items: &[T], rand: &mut dyn FnMut() -> f64) -> Vec<T> {
     let mut copy = items.to_vec();
     for i in (1..copy.len()).rev() {
-        let j = (rand() * (i + 1) as f64).floor() as usize;
+        // `min(i)`: un generatore che restituisse 1.0 non deve uscire dai limiti.
+        let j = ((rand() * (i + 1) as f64).floor() as usize).min(i);
         copy.swap(i, j);
     }
     copy
 }
 
-/// Intero uniforme in [min, max] inclusi.
+/// Intero uniforme in [min, max] inclusi. Se `min > max` gli estremi si scambiano (intervallo invertito da
+/// impostazioni incoerenti); l'aritmetica a 128 bit evita overflow con estremi arbitrari.
 pub fn rand_int(min: i64, max: i64, rand: &mut dyn FnMut() -> f64) -> i64 {
-    min + (rand() * (max - min + 1) as f64).floor() as i64
+    let (lo, hi) = if min <= max { (min, max) } else { (max, min) };
+    let span = (i128::from(hi) - i128::from(lo) + 1) as f64;
+    let offset = ((rand() * span).floor() as i128).clamp(0, i128::from(hi) - i128::from(lo));
+    (i128::from(lo) + offset) as i64
 }
 
 /// Sceglie un elemento a caso (`None` se la lista è vuota).
@@ -76,6 +81,27 @@ mod tests {
         let out = shuffle(&items, &mut mulberry32(42));
         assert_eq!(out, [3, 8, 2, 1, 7, 6, 4, 5]);
         assert_eq!(items, [1, 2, 3, 4, 5, 6, 7, 8]);
+    }
+
+    #[test]
+    fn should_rand_int_never_overflow_or_leave_range_with_extreme_or_inverted_bounds() {
+        let mut r = mulberry32(11);
+        for _ in 0..200 {
+            let v = rand_int(i64::MIN, i64::MAX, &mut r);
+            assert!((i64::MIN..=i64::MAX).contains(&v));
+            assert!((300..=1000).contains(&rand_int(1000, 300, &mut r)));
+        }
+        assert_eq!(rand_int(5, 5, &mut || 0.999_999), 5);
+        assert_eq!(
+            rand_int(1, 3, &mut || 1.0),
+            3,
+            "rand = 1.0 non deve sforare il massimo"
+        );
+    }
+
+    #[test]
+    fn should_shuffle_not_panic_when_the_generator_returns_one() {
+        assert_eq!(shuffle(&[1, 2, 3], &mut || 1.0).len(), 3);
     }
 
     #[test]

@@ -21,7 +21,9 @@ const FIGURE_GAP_PX: f32 = 24.0;
 /// Semi-ampiezza del campo in unità cubetto: contiene la figura a qualunque angolo.
 const EXTENT: f32 = 4.6;
 const EDGE_WIDTH_UNITS: f32 = 0.06;
-const FIT_RATIO: f32 = 0.95;
+const FIT_RATIO: f32 = 0.92;
+/// Ingrandimento massimo rispetto al disegno di riferimento.
+const MAX_SCALE: f32 = 2.4;
 const HUE_DEG: f32 = 215.0;
 
 fn to_trials(stimuli: Vec<Stimulus>) -> Vec<RtTrial<Stimulus>> {
@@ -86,7 +88,7 @@ fn draw(ctx: &StimulusCtx, stimulus: &Stimulus) {
     let total_width = FIGURE_PX * 2.0 + FIGURE_GAP_PX;
     let scale = (ctx.area.width() * FIT_RATIO / total_width)
         .min(ctx.area.height() * FIT_RATIO / FIGURE_PX)
-        .min(1.0);
+        .min(MAX_SCALE);
     let size = FIGURE_PX * scale;
     let offset = (size + FIGURE_GAP_PX * scale) / 2.0;
     let center = ctx.center();

@@ -25,11 +25,30 @@ pub mod stimulus {
     pub const ACCENT: Color32 = Color32::from_rgb(31, 95, 168);
     pub const LINE: Color32 = Color32::from_rgb(228, 231, 236);
     pub const MUTED: Color32 = Color32::from_rgb(102, 112, 133);
+    pub const DANGER: Color32 = Color32::from_rgb(208, 2, 27);
 }
+
+/// Scala di spaziatura (4/8/12/16/24/32).
+pub mod space {
+    pub const XS: f32 = 4.0;
+    pub const S: f32 = 8.0;
+    pub const M: f32 = 12.0;
+    pub const L: f32 = 16.0;
+    pub const XL: f32 = 24.0;
+    pub const XXL: f32 = 32.0;
+}
+
+/// Dimensioni del testo: corpo >= 15, etichette >= 12.
+pub const BODY_SIZE: f32 = 15.5;
+pub const LABEL_SIZE: f32 = 12.5;
+/// Altezza minima dei controlli cliccabili.
+pub const CONTROL_HEIGHT: f32 = 38.0;
 
 const FONT_INTER: &str = "inter";
 const FONT_MONO: &str = "jetbrains-mono";
 const FONT_DISPLAY: &str = "big-shoulders-display";
+/// Nome del font Hack tra i font predefiniti di egui.
+const FONT_ARROWS: &str = "Hack";
 
 /// Famiglia dei titoli condensati (Big Shoulders Display).
 pub fn display_family() -> FontFamily {
@@ -69,6 +88,10 @@ pub fn install_fonts(ctx: &egui::Context) {
             .or_default()
             .insert(0, name.to_owned());
     }
+    // Inter non ha le frecce ← →: Hack (già nei font di egui) le fornisce a ogni famiglia, senza «tofu».
+    if let Some(list) = fonts.families.get_mut(&FontFamily::Proportional) {
+        list.push(FONT_ARROWS.to_owned());
+    }
     let mut display = vec![FONT_DISPLAY.to_owned()];
     display.extend(
         fonts
@@ -103,7 +126,8 @@ pub fn apply(ctx: &egui::Context) {
     visuals.window_shadow = egui::Shadow::NONE;
     visuals.popup_shadow = egui::Shadow::NONE;
     visuals.selection.bg_fill = ACCENT_SOFT;
-    visuals.selection.stroke = square_stroke(ACCENT);
+    visuals.selection.stroke = Stroke::new(2.0, ACCENT_GLOW);
+    visuals.interact_cursor = Some(egui::CursorIcon::PointingHand);
 
     let widgets = &mut visuals.widgets;
     for (w, fill, stroke) in [
@@ -119,11 +143,18 @@ pub fn apply(ctx: &egui::Context) {
         w.corner_radius = CornerRadius::ZERO;
         w.fg_stroke = square_stroke(INK);
     }
+    // `bg_fill` colora anche la maniglia delle barre di scorrimento: deve staccarsi dal fondo.
+    visuals.widgets.inactive.bg_fill = Color32::from_rgb(46, 62, 92);
+    visuals.widgets.hovered.bg_fill = Color32::from_rgb(74, 100, 140);
+    visuals.widgets.active.bg_fill = ACCENT;
     ctx.set_visuals(visuals);
 
     let mut style = (*ctx.global_style()).clone();
-    style.spacing.item_spacing = egui::vec2(10.0, 8.0);
-    style.spacing.button_padding = egui::vec2(14.0, 6.0);
+    style.spacing.item_spacing = egui::vec2(space::M, space::S);
+    style.spacing.button_padding = egui::vec2(space::L, space::S);
+    style.spacing.interact_size.y = CONTROL_HEIGHT;
+    style.spacing.scroll = egui::style::ScrollStyle::solid();
+    style.spacing.scroll.bar_width = 12.0;
     style.text_styles = [
         (
             egui::TextStyle::Heading,
@@ -131,19 +162,19 @@ pub fn apply(ctx: &egui::Context) {
         ),
         (
             egui::TextStyle::Body,
-            FontId::new(14.5, FontFamily::Proportional),
+            FontId::new(BODY_SIZE, FontFamily::Proportional),
         ),
         (
             egui::TextStyle::Button,
-            FontId::new(13.5, FontFamily::Proportional),
+            FontId::new(14.5, FontFamily::Proportional),
         ),
         (
             egui::TextStyle::Small,
-            FontId::new(12.0, FontFamily::Monospace),
+            FontId::new(LABEL_SIZE, FontFamily::Monospace),
         ),
         (
             egui::TextStyle::Monospace,
-            FontId::new(13.0, FontFamily::Monospace),
+            FontId::new(14.0, FontFamily::Monospace),
         ),
     ]
     .into();
@@ -170,7 +201,7 @@ pub fn display_text(text: &str, size: f32, color: Color32, tracking: f32) -> Lay
 pub fn eyebrow(text: &str) -> RichText {
     RichText::new(text.to_uppercase())
         .monospace()
-        .size(11.5)
+        .size(LABEL_SIZE)
         .color(MUTED)
 }
 
@@ -180,12 +211,4 @@ pub fn card_frame() -> egui::Frame {
         .fill(SURFACE)
         .stroke(square_stroke(LINE))
         .inner_margin(egui::Margin::same(16))
-}
-
-/// Cornice chiara dell'area stimoli.
-pub fn stimulus_frame() -> egui::Frame {
-    egui::Frame::new()
-        .fill(stimulus::PAPER)
-        .stroke(square_stroke(stimulus::LINE))
-        .inner_margin(egui::Margin::same(24))
 }

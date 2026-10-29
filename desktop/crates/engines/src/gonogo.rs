@@ -82,10 +82,8 @@ fn try_arrange(n_go: u32, n_nogo: u32, rand: &mut dyn FnMut() -> f64) -> Option<
         let can_go = go_left > 0;
         let choose_nogo = if !can_go {
             true
-        } else if i == 0 {
-            false // il primo trial è sempre Go: instaura la risposta prepotente
-        } else if !can_nogo {
-            false
+        } else if i == 0 || !can_nogo {
+            false // il primo trial è sempre Go (risposta prepotente); poi Go finché il vincolo anti-cluster lo impone
         } else {
             rand() < f64::from(nogo_left) / f64::from(go_left + nogo_left)
         };
@@ -106,20 +104,20 @@ fn try_arrange(n_go: u32, n_nogo: u32, rand: &mut dyn FnMut() -> f64) -> Option<
     (go_left == 0 && nogo_left == 0).then_some(seq)
 }
 
+/// Ripiego deterministico: ogni Go è seguito da una quota di No-Go distribuita in modo uniforme, mai più di
+/// `MAX_NOGO_RUN` per volta; i No-Go che non trovano posto (rapporto Go troppo basso per il vincolo) si accodano.
 fn deterministic_arrange(n_go: u32, n_nogo: u32) -> Vec<GoNoGoKind> {
-    let (mut go_left, mut nogo_left) = (n_go, n_nogo);
     let mut seq = Vec::new();
-    while go_left > 0 || nogo_left > 0 {
-        if go_left > 0 {
-            seq.push(GoNoGoKind::Go);
-            go_left -= 1;
-        }
-        // Il TS qui non termina quando i No-Go superano i Go (DIVERGENZE.md): finiti i Go si accodano i No-Go rimasti.
-        if nogo_left > 0 {
+    let mut placed = 0;
+    for go in 1..=n_go {
+        seq.push(GoNoGoKind::Go);
+        let due = (u64::from(go) * u64::from(n_nogo) / u64::from(n_go)) as u32;
+        for _ in 0..(due - placed).min(MAX_NOGO_RUN) {
             seq.push(GoNoGoKind::Nogo);
-            nogo_left -= 1;
+            placed += 1;
         }
     }
+    seq.extend((placed..n_nogo).map(|_| GoNoGoKind::Nogo));
     seq
 }
 
@@ -369,6 +367,26 @@ mod tests {
         assert!(seq
             .windows(2)
             .all(|w| w[0] == GoNoGoKind::Go || w[1] == GoNoGoKind::Go));
+    }
+
+    #[test]
+    fn should_keep_nogo_runs_within_the_limit_in_the_fallback_when_nogo_outnumber_go() {
+        // Rapporto Go 0.45 (fuori dall'interfaccia): 94 No-Go in 77 posti Go, realizzabile con serie di al massimo 2.
+        let seq = deterministic_arrange(77, 94);
+        let longest = seq
+            .split(|k| *k == GoNoGoKind::Go)
+            .map(<[_]>::len)
+            .max()
+            .unwrap_or(0);
+        assert_eq!((seq.len(), longest), (171, 2));
+        assert_eq!(seq[0], GoNoGoKind::Go);
+    }
+
+    #[test]
+    fn should_append_the_nogo_that_cannot_be_placed_when_the_ratio_is_infeasible() {
+        let seq = deterministic_arrange(2, 9);
+        assert_eq!(seq.iter().filter(|k| **k == GoNoGoKind::Nogo).count(), 9);
+        assert_eq!(seq.len(), 11);
     }
 
     #[test]

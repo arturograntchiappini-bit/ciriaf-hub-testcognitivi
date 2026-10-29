@@ -220,7 +220,7 @@ pub fn compute_session_state(
 pub fn phase_index_at_offset(template: &SessionTemplate, offset_ms: f64) -> Option<usize> {
     let spans = phase_spans(template);
     let total = spans.last()?.end_ms;
-    let x = offset_ms.clamp(0.0, total);
+    let x = offset_ms.max(0.0).min(total.max(0.0)); // `f64::clamp` andrebbe in panic con un totale negativo
     Some(
         spans
             .iter()
@@ -246,7 +246,9 @@ pub fn move_pin(
     {
         return next;
     }
-    let clamped = js_round(new_offset_ms).clamp(0.0, session_total_ms(&next));
+    let clamped = js_round(new_offset_ms)
+        .max(0.0)
+        .min(session_total_ms(&next).max(0.0));
     next.phases[from_phase_idx].pins[pin_idx].offset_ms = clamped;
     if let Some(target) = phase_index_at_offset(&next, clamped).filter(|t| *t != from_phase_idx) {
         let pin = next.phases[from_phase_idx].pins.remove(pin_idx);
@@ -482,6 +484,27 @@ mod tests {
 
     fn ids(phase: &SessionPhase) -> Vec<&str> {
         phase.pins.iter().map(|p| p.id.as_str()).collect()
+    }
+
+    #[test]
+    fn should_not_panic_with_negative_or_inverted_durations_from_a_corrupted_protocol() {
+        let mut t = template();
+        t.total_ms = -1.0;
+        for p in &mut t.phases {
+            p.duration_ms = -10.0 * MIN;
+        }
+        assert_eq!(phase_index_at_offset(&t, 5.0 * MIN), Some(1));
+        let moved = move_pin_by_id(&t, "pin-a", 5.0 * MIN);
+        assert_eq!(moved.phases.iter().map(|p| p.pins.len()).sum::<usize>(), 3);
+        t.phases.clear();
+        t.phases.push(SessionPhase {
+            id: "x".into(),
+            name: "X".into(),
+            duration_ms: 0.0,
+            pins: vec![pin("neg", -3.0, TestId::Pvt)],
+        });
+        assert_eq!(session_total_ms(&t), -3.0 * MIN);
+        let _ = move_pin_by_id(&t, "neg", 1.0);
     }
 
     #[test]

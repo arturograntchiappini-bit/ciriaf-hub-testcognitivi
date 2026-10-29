@@ -234,35 +234,103 @@ fn inline(ui: &mut egui::Ui, text: &str, size: f32, color: egui::Color32) {
     ui.add(egui::Label::new(inline_job(text, size, color)).wrap());
 }
 
+const TABLE_COLUMN_GAP: f32 = 16.0;
+const TABLE_MIN_COLUMN: f32 = 64.0;
+const TABLE_MAX_WEIGHT: usize = 36;
+
+/// Larghezze delle colonne di una tabella: proporzionali al testo più lungo di ciascuna (limitato),
+/// con somma che non supera mai `available`.
+pub fn table_column_widths(header: &[String], rows: &[Vec<String>], available: f32) -> Vec<f32> {
+    let cols = header.len().max(1);
+    let weights: Vec<usize> = (0..cols)
+        .map(|c| {
+            let cells = rows.iter().filter_map(|r| r.get(c)).chain(header.get(c));
+            cells
+                .map(|t| t.chars().count())
+                .max()
+                .unwrap_or(1)
+                .clamp(4, TABLE_MAX_WEIGHT)
+        })
+        .collect();
+    let usable = (available - TABLE_COLUMN_GAP * (cols - 1) as f32).max(cols as f32 * 20.0);
+    let total: usize = weights.iter().sum();
+    let widths: Vec<f32> = weights
+        .iter()
+        .map(|w| {
+            (usable * *w as f32 / total as f32).max(TABLE_MIN_COLUMN.min(usable / cols as f32))
+        })
+        .collect();
+    let overshoot = widths.iter().sum::<f32>() - usable;
+    if overshoot > 0.0 {
+        let scale = usable / widths.iter().sum::<f32>();
+        return widths.iter().map(|w| w * scale).collect();
+    }
+    widths
+}
+
+fn fixed_cell(ui: &mut egui::Ui, width: f32, add: impl FnOnce(&mut egui::Ui)) {
+    ui.scope(|ui| {
+        ui.set_min_width(width);
+        ui.set_max_width(width);
+        add(ui);
+    });
+}
+
 fn render_table(ui: &mut egui::Ui, id: usize, header: &[String], rows: &[Vec<String>]) {
     let cols = header.len().max(1);
-    let width = ((ui.available_width() - 12.0 * cols as f32) / cols as f32).max(60.0);
-    egui::Grid::new(("md-table", id))
-        .striped(true)
-        .min_col_width(width)
-        .max_col_width(width)
+    let widths = table_column_widths(header, rows, ui.available_width() - 20.0);
+    egui::Frame::new()
+        .fill(theme::SURFACE)
+        .stroke(egui::Stroke::new(1.0, theme::LINE))
+        .inner_margin(egui::Margin::symmetric(10, 8))
         .show(ui, |ui| {
-            for cell in header {
-                ui.label(
-                    RichText::new(cell.to_uppercase())
-                        .monospace()
-                        .size(11.0)
-                        .color(theme::MUTED),
-                );
-            }
-            ui.end_row();
-            for row in rows {
-                for cell in row.iter().take(cols) {
-                    inline(ui, cell, 13.0, theme::INK);
-                }
-                ui.end_row();
-            }
+            egui::Grid::new(("md-table", id))
+                .striped(true)
+                .spacing([TABLE_COLUMN_GAP, 8.0])
+                .show(ui, |ui| {
+                    for (c, cell) in header.iter().enumerate() {
+                        fixed_cell(ui, widths[c], |ui| {
+                            ui.add(
+                                egui::Label::new(
+                                    RichText::new(cell.to_uppercase())
+                                        .monospace()
+                                        .size(theme::LABEL_SIZE)
+                                        .color(theme::ACCENT_GLOW),
+                                )
+                                .wrap(),
+                            );
+                        });
+                    }
+                    ui.end_row();
+                    for row in rows {
+                        for (c, cell) in row.iter().take(cols).enumerate() {
+                            fixed_cell(ui, widths[c], |ui| inline(ui, cell, 14.0, theme::INK));
+                        }
+                        ui.end_row();
+                    }
+                });
         });
 }
 
 /// Disegna i blocchi nell'`Ui` corrente (da usare dentro una `ScrollArea`).
-pub fn render(ui: &mut egui::Ui, blocks: &[Block]) {
+/// Indici e testo dei titoli di secondo livello (indice delle sezioni).
+pub fn outline(blocks: &[Block]) -> Vec<(usize, &str)> {
+    blocks
+        .iter()
+        .enumerate()
+        .filter_map(|(i, b)| match b {
+            Block::Heading(2, text) => Some((i, text.as_str())),
+            _ => None,
+        })
+        .collect()
+}
+
+/// Come sopra; `jump` è l'indice di un blocco verso cui scorrere la `ScrollArea` circostante.
+pub fn render(ui: &mut egui::Ui, blocks: &[Block], jump: Option<usize>) {
     for (idx, block) in blocks.iter().enumerate() {
+        if jump == Some(idx) {
+            ui.scroll_to_cursor(Some(egui::Align::TOP));
+        }
         match block {
             Block::Heading(level, text) => {
                 ui.add_space(if *level <= 2 { 14.0 } else { 8.0 });
@@ -277,14 +345,14 @@ pub fn render(ui: &mut egui::Ui, blocks: &[Block]) {
                     ui.separator();
                 }
             }
-            Block::Paragraph(text) => inline(ui, text, 14.5, theme::INK),
+            Block::Paragraph(text) => inline(ui, text, 16.0, theme::INK),
             Block::Quote(text) => {
                 egui::Frame::new()
                     .fill(theme::ACCENT_SOFT)
                     .inner_margin(egui::Margin::symmetric(12, 8))
                     .show(ui, |ui| {
                         ui.set_width(ui.available_width());
-                        inline(ui, text, 14.0, theme::MUTED);
+                        inline(ui, text, 15.0, theme::MUTED);
                     });
             }
             Block::List { ordered, items } => {
@@ -296,7 +364,7 @@ pub fn render(ui: &mut egui::Ui, blocks: &[Block]) {
                             "•".to_owned()
                         };
                         ui.label(RichText::new(marker).monospace().color(theme::ACCENT));
-                        inline(ui, item, 14.5, theme::INK);
+                        inline(ui, item, 16.0, theme::INK);
                     });
                 }
             }
@@ -307,7 +375,7 @@ pub fn render(ui: &mut egui::Ui, blocks: &[Block]) {
                     .inner_margin(egui::Margin::same(10))
                     .show(ui, |ui| {
                         ui.set_width(ui.available_width());
-                        ui.add(egui::Label::new(RichText::new(code).monospace().size(12.5)).wrap());
+                        ui.add(egui::Label::new(RichText::new(code).monospace().size(13.5)).wrap());
                     });
             }
             Block::Rule => {
@@ -397,6 +465,40 @@ mod tests {
         assert!(s.iter().all(|s| s.kind == SpanKind::Plain));
         let joined: String = s.iter().map(|s| s.text.as_str()).collect();
         assert_eq!(joined, "costo 5$ e 2 * 3 e **aperto");
+    }
+
+    #[test]
+    fn should_keep_table_columns_within_available_width() {
+        let header = vec![
+            "Id".to_owned(),
+            "Descrizione molto lunga della colonna".to_owned(),
+            "Valore".to_owned(),
+        ];
+        let rows = vec![vec!["1".to_owned(), "x".repeat(200), "9".to_owned()]];
+        for available in [240.0_f32, 500.0, 860.0] {
+            let widths = table_column_widths(&header, &rows, available);
+            let total: f32 = widths.iter().sum::<f32>() + TABLE_COLUMN_GAP * 2.0;
+            assert!(total <= available + 0.5, "{available}: {total}");
+            assert!(widths[1] > widths[0]);
+        }
+    }
+
+    #[test]
+    fn should_list_only_level_two_headings_in_outline() {
+        let b = parse_blocks(
+            "# T
+
+## Uno
+
+testo
+
+### Sub
+
+## Due
+",
+        );
+        let titles: Vec<_> = outline(&b).into_iter().map(|(_, t)| t).collect();
+        assert_eq!(titles, vec!["Uno", "Due"]);
     }
 
     #[test]

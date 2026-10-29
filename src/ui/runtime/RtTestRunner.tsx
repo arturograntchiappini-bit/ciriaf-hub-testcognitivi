@@ -73,6 +73,8 @@ export function RtTestRunner({
   const testCollectedRef = useRef<TrialResult[]>([]);
   const stageRef = useRef<Stage>(stage);
   stageRef.current = stage;
+  // Fase da cui si è entrati in pausa: la ripresa torna lì (la pratica non salta nel test).
+  const pausedFromRef = useRef<'practice' | 'test'>('test');
 
   const buildResult = useCallback((): TestResult => {
     const trials = allTrialsRef.current;
@@ -171,6 +173,7 @@ export function RtTestRunner({
       if (e.repeat) return; // ignora auto-repeat
       if (e.key === 'Escape') {
         if (stageRef.current === 'practice' || stageRef.current === 'test') {
+          pausedFromRef.current = stageRef.current;
           seqRef.current?.cancel();
           setStage('paused');
         }
@@ -193,11 +196,13 @@ export function RtTestRunner({
         seqRef.current?.handleInterrupt();
       }
     }
-    document.addEventListener('visibilitychange', () => {
+    function onVisibility(): void {
       if (document.hidden) onInterrupt();
-    });
+    }
+    document.addEventListener('visibilitychange', onVisibility);
     window.addEventListener('blur', onInterrupt);
     return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('blur', onInterrupt);
     };
   }, []);
@@ -207,14 +212,23 @@ export function RtTestRunner({
   if (stage === 'paused') {
     return (
       <StimulusStage>
-        <div className="mx-auto max-w-md rounded-card border border-line bg-surface p-8 text-center">
-          <h2 className="text-lg font-semibold text-ink">Test in pausa</h2>
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="rt-pause-title"
+          className="mx-auto max-w-md rounded-card border border-line bg-surface p-8 text-center"
+        >
+          <h2 id="rt-pause-title" className="text-lg font-semibold text-ink">
+            Test in pausa
+          </h2>
           <p className="mt-3 text-sm text-muted">
             Puoi riprendere dal punto in cui eri, uscire salvando i dati raccolti finora, oppure
             uscire senza salvare.
           </p>
           <div className="mt-6 flex flex-col gap-2">
-            <Button onClick={() => setStage('test')}>Riprendi il test</Button>
+            <Button autoFocus onClick={() => setStage(pausedFromRef.current)}>
+              Riprendi il test
+            </Button>
             <Button variant="secondary" onClick={() => onComplete(buildResult())}>
               Esci ed esporta i dati parziali
             </Button>

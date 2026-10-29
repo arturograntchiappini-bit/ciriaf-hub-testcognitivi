@@ -15,6 +15,7 @@ pub fn load_fixture(name: &str) -> serde_json::Value {
 }
 
 pub mod evidence;
+pub mod fuzz;
 pub use evidence::{run_prop, Evidence};
 
 pub fn assert_close(actual: f64, expected: f64, what: &str) {

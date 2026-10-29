@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Parametri (da build-installer.ps1): -d Version=x.y.z -d ExePath=... -d LicenseRtf=... -->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <!-- UpgradeCode FISSO: non cambiarlo mai, abilita gli aggiornamenti in-place. -->
+  <Package Name="Sintropia" Manufacturer="Arturo Grant Chiappini" Version="$(Version)"
+           UpgradeCode="6F3C2B1A-8D4E-4F7A-9B05-1E2D3C4B5A69" Scope="perUser" Language="1040">
+    <SummaryInformation Description="Sintropia - Cognitive tests Hub (desktop)" />
+    <MajorUpgrade DowngradeErrorMessage="Una versione piu recente di Sintropia e gia installata." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Icon Id="AppIcon.ico" SourceFile="$(IconPath)" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon.ico" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(LicenseRtf)" />
+    <ui:WixUI Id="WixUI_FeatureTree" />
+
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="ProgramsDir" Name="Programs">
+        <Directory Id="INSTALLFOLDER" Name="Sintropia" />
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder" />
+    <StandardDirectory Id="DesktopFolder" />
+
+    <Feature Id="Main" Title="Sintropia" Level="1" AllowAdvertise="no" Display="expand">
+      <Component Id="MainExe" Directory="INSTALLFOLDER" Guid="*">
+        <File Id="SintropiaExe" Source="$(ExePath)" Name="sintropia-desktop.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="StartMenuShortcut" Directory="ProgramMenuFolder" Guid="*">
+        <Shortcut Id="StartShortcut" Name="Sintropia" Description="Sintropia - Cognitive tests Hub"
+                  Target="[INSTALLFOLDER]sintropia-desktop.exe" WorkingDirectory="INSTALLFOLDER" Icon="AppIcon.ico" />
+        <RegistryValue Root="HKCU" Key="Software\Sintropia" Name="StartMenu" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </Feature>
+    <!-- Level 2 > INSTALLLEVEL: spento di default, selezionabile nella UI (o ADDLOCAL=Main,DesktopIcon). -->
+    <Feature Id="DesktopIcon" Title="Collegamento sul Desktop" Level="2" AllowAdvertise="no">
+      <Component Id="DesktopShortcutComp" Directory="DesktopFolder" Guid="*">
+        <Shortcut Id="DesktopShortcut" Name="Sintropia" Target="[INSTALLFOLDER]sintropia-desktop.exe"
+                  WorkingDirectory="INSTALLFOLDER" Icon="AppIcon.ico" />
+        <RegistryValue Root="HKCU" Key="Software\Sintropia" Name="Desktop" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </Feature>
+  </Package>
+</Wix>

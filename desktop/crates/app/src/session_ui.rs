@@ -2,8 +2,7 @@
 //! tempo e risultati con export. Porta `src/ui/session/*.tsx` sopra `sintropia_core::session`.
 //!
 //! La shell crea un `SessionScreen`, lo tiene nell'app e chiama `ui` sulla schermata «Sessione»
-//! passando la fabbrica dei runner di test (vedi `default_runner_factory`).
-#![allow(dead_code)] // finché la shell non aggancia SessionScreen
+//! passando la fabbrica dei runner di test (vedi `runner::session_factory`).
 
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
@@ -22,7 +21,7 @@ use sintropia_core::session::{
 use sintropia_core::{TestId, TestResult};
 
 use crate::runner::{RunnerStatus, TestRunner};
-use crate::views_custom::{self, numbers_to_params, RunnerSpec};
+use crate::views_custom::{numbers_to_params, RunnerSpec};
 use crate::{data, storage, theme};
 
 const MINUTE_MS: f64 = 60_000.0;
@@ -31,11 +30,6 @@ const USER_AGENT: &str = "Sintropia Desktop";
 
 /// Costruisce il runner di un test della batteria; `None` se il test non è disponibile.
 pub type RunnerFactory<'a> = &'a dyn Fn(&RunnerSpec) -> Option<Box<dyn TestRunner>>;
-
-/// Fabbrica con i soli runner di questo modulo (Corsi, WCST): la shell la affianca agli altri.
-pub fn default_runner_factory(spec: &RunnerSpec) -> Option<Box<dyn TestRunner>> {
-    views_custom::create_custom_runner(spec)
-}
 
 // ───────────────────────── Logica pura ─────────────────────────
 
@@ -113,6 +107,38 @@ pub fn empty_template(now_iso: &str, rand: &mut dyn FnMut() -> f64) -> SessionTe
             duration_ms: DEFAULT_TOTAL_MS,
             pins: Vec::new(),
         }],
+    }
+}
+
+/// Protocollo di esempio a tre fasi (solo per gli screenshot).
+fn demo_template(rand: &mut dyn FnMut() -> f64) -> SessionTemplate {
+    let mut pin = |minutes: f64, tests: &[TestId]| TimePin {
+        id: make_local_id("pin", rand),
+        offset_ms: minutes * MINUTE_MS,
+        label: None,
+        battery: tests.iter().map(|t| default_battery_item(*t)).collect(),
+    };
+    let pins = [
+        pin(3.0, &[TestId::Stroop1, TestId::Pvt]),
+        pin(14.0, &[TestId::Nback, TestId::Corsi]),
+        pin(25.0, &[TestId::Sart]),
+    ];
+    let phases = ["Baseline", "Carico", "Recupero"]
+        .into_iter()
+        .zip(pins)
+        .map(|(name, pin)| SessionPhase {
+            id: format!("ph_{name}"),
+            name: name.into(),
+            duration_ms: 10.0 * MINUTE_MS,
+            pins: vec![pin],
+        })
+        .collect();
+    SessionTemplate {
+        id: "tpl_demo".into(),
+        name: "Protocollo affaticamento cognitivo".into(),
+        created_at: iso_now(),
+        total_ms: DEFAULT_TOTAL_MS,
+        phases,
     }
 }
 
@@ -443,7 +469,30 @@ impl Default for SessionScreen {
 
 impl SessionScreen {
     pub fn new() -> Self {
-        Self::with_store(SessionStore::new(SessionStore::default_dir()))
+        match std::env::var("SINTROPIA_SHOT").as_deref() {
+            Ok(mode @ ("session-builder" | "session-wait")) => Self::demo(mode),
+            _ => Self::with_store(SessionStore::new(SessionStore::default_dir())),
+        }
+    }
+
+    /// Solo per gli screenshot (`SINTROPIA_SHOT`): protocollo di esempio in una cartella temporanea.
+    fn demo(mode: &str) -> Self {
+        let dir = std::env::temp_dir().join("sintropia-demo-session");
+        let mut screen = Self::with_store(SessionStore::new(dir));
+        let template = demo_template(&mut *screen.rand);
+        screen.view = if mode == "session-builder" {
+            let mut builder = BuilderState::new(template);
+            builder.selected_pin = builder.draft.phases[0].pins.first().map(|p| p.id.clone());
+            View::Builder(Box::new(builder))
+        } else {
+            let now = now_epoch_ms() - 20_000.0;
+            View::Run(Box::new(ActiveRun::new(new_run(
+                &template,
+                now,
+                &mut *screen.rand,
+            ))))
+        };
+        screen
     }
 
     pub fn with_store(store: SessionStore) -> Self {
@@ -457,6 +506,11 @@ impl SessionScreen {
             rand: Box::new(mulberry32(entropy_seed())),
             feedback_during_test: false,
         }
+    }
+
+    /// Vero mentre un test della batteria è in corso: va mostrato a tutta finestra, senza header né margini.
+    pub fn is_running(&self) -> bool {
+        matches!(&self.view, View::Run(r) if r.mode == RunMode::Test)
     }
 
     /// Disegna la schermata corrente della modalità Sessione.
@@ -509,6 +563,51 @@ fn duration_edit(ui: &mut egui::Ui, ms: &mut f64) -> bool {
     response.changed()
 }
 
+/// Colonna centrata di larghezza massima `width`: i contenuti restano leggibili su finestre larghe.
+fn column<R>(ui: &mut egui::Ui, width: f32, add: impl FnOnce(&mut egui::Ui) -> R) -> R {
+    let width = width.min(ui.available_width());
+    let margin = ((ui.available_width() - width) / 2.0).max(0.0);
+    ui.horizontal_top(|ui| {
+        ui.add_space(margin);
+        ui.vertical(|ui| {
+            ui.set_width(width);
+            add(ui)
+        })
+        .inner
+    })
+    .inner
+}
+
+fn primary_button(ui: &mut egui::Ui, text: &str, size: egui::Vec2) -> egui::Response {
+    ui.add_sized(
+        size,
+        egui::Button::new(RichText::new(text).size(15.0).strong().color(theme::PAPER))
+            .fill(theme::ACCENT_GLOW)
+            .stroke(Stroke::new(1.0, theme::ACCENT_GLOW)),
+    )
+}
+
+fn secondary_button(ui: &mut egui::Ui, text: &str) -> egui::Response {
+    ui.add(egui::Button::new(RichText::new(text).size(14.0)).min_size(vec2(0.0, 30.0)))
+}
+
+fn field_label(ui: &mut egui::Ui, text: &str) {
+    ui.label(theme::eyebrow(text));
+    ui.add_space(2.0);
+}
+
+/// Messaggio di errore/avviso su banda colorata.
+fn banner(ui: &mut egui::Ui, text: &str, color: egui::Color32) {
+    egui::Frame::new()
+        .fill(color.gamma_multiply(0.14))
+        .stroke(Stroke::new(1.0, color))
+        .inner_margin(egui::Margin::symmetric(12, 8))
+        .show(ui, |ui| {
+            ui.set_width(ui.available_width());
+            ui.label(RichText::new(text).color(color));
+        });
+}
+
 enum TimelineEvent {
     None,
     Select(String),
@@ -516,19 +615,22 @@ enum TimelineEvent {
     AddAt(f64),
 }
 
-/// Linea temporale: fasi come segmenti, pin trascinabili, click su un punto vuoto per aggiungerne uno.
+const TIMELINE_HEIGHT: f32 = 132.0;
+
+/// Linea temporale: fasi come segmenti con nome e orari, pin come bandierine trascinabili,
+/// clic su un punto vuoto per aggiungerne uno.
 fn timeline(
     ui: &mut egui::Ui,
     template: &SessionTemplate,
     selected: Option<&str>,
 ) -> TimelineEvent {
-    const PAD: f32 = 12.0;
+    const PAD: f32 = 18.0;
     let total = session_total_ms(template).max(1.0);
     let (rect, background) =
-        ui.allocate_exact_size(vec2(ui.available_width(), 84.0), Sense::click());
+        ui.allocate_exact_size(vec2(ui.available_width(), TIMELINE_HEIGHT), Sense::click());
     let track = Rect::from_min_max(
-        pos2(rect.left() + PAD, rect.top() + 18.0),
-        pos2(rect.right() - PAD, rect.bottom() - 22.0),
+        pos2(rect.left() + PAD, rect.top() + 44.0),
+        pos2(rect.right() - PAD, rect.top() + 84.0),
     );
     let x_of = |ms: f64| track.left() + (ms / total) as f32 * track.width();
     let offset_of = |x: f32| {
@@ -543,59 +645,27 @@ fn timeline(
         Stroke::new(1.0, theme::LINE),
         egui::StrokeKind::Inside,
     );
-    for (i, span) in phase_spans(template).iter().enumerate() {
-        let segment = Rect::from_min_max(
-            pos2(x_of(span.start_ms), track.top()),
-            pos2(x_of(span.end_ms), track.bottom()),
-        );
-        let fill = if i % 2 == 0 {
-            theme::ACCENT_SOFT
-        } else {
-            theme::ELEVATED
-        };
-        painter.rect(
-            segment,
-            0.0,
-            fill,
-            Stroke::new(1.0, theme::LINE),
-            egui::StrokeKind::Inside,
-        );
-        painter.text(
-            pos2(segment.left() + 4.0, rect.top() + 3.0),
-            Align2::LEFT_TOP,
-            &span.phase.name,
-            FontId::monospace(11.0),
-            theme::MUTED,
-        );
-        painter.text(
-            pos2(segment.left() + 2.0, rect.bottom() - 3.0),
-            Align2::LEFT_BOTTOM,
-            fmt_clock(span.start_ms),
-            FontId::monospace(10.0),
-            theme::MUTED,
-        );
-    }
+    paint_phase_segments(&painter, template, track, rect, &x_of);
     let mut event = TimelineEvent::None;
     for flat in flatten_pins(template) {
         let x = x_of(flat.pin.offset_ms);
-        let hit =
-            Rect::from_center_size(pos2(x, track.center().y), vec2(16.0, track.height() + 8.0));
+        let hit = Rect::from_center_size(pos2(x, track.center().y), vec2(22.0, 70.0));
         let response = ui.interact(
             hit,
             ui.make_persistent_id(("session-pin", &flat.pin.id)),
             Sense::click_and_drag(),
         );
-        let is_selected = selected == Some(flat.pin.id.as_str());
-        let color = if is_selected || response.hovered() {
-            theme::ACCENT_GLOW
-        } else {
-            theme::ACCENT
-        };
-        painter.line_segment(
-            [pos2(x, track.top() - 4.0), pos2(x, track.bottom() + 4.0)],
-            Stroke::new(2.0, color),
+        if response.hovered() || response.dragged() {
+            ui.ctx().set_cursor_icon(egui::CursorIcon::Grab);
+        }
+        let active = selected == Some(flat.pin.id.as_str());
+        paint_pin(
+            &painter,
+            x,
+            track,
+            flat.pin.offset_ms,
+            active || response.hovered(),
         );
-        painter.circle_filled(pos2(x, track.top() - 4.0), 4.5, color);
         if response.dragged() {
             if let Some(p) = response.interact_pointer_pos() {
                 event = TimelineEvent::Move(flat.pin.id.clone(), offset_of(p.x));
@@ -613,6 +683,124 @@ fn timeline(
         }
     }
     event
+}
+
+fn paint_phase_segments(
+    painter: &egui::Painter,
+    template: &SessionTemplate,
+    track: Rect,
+    rect: Rect,
+    x_of: &dyn Fn(f64) -> f32,
+) {
+    for (i, span) in phase_spans(template).iter().enumerate() {
+        let segment = Rect::from_min_max(
+            pos2(x_of(span.start_ms), track.top()),
+            pos2(x_of(span.end_ms), track.bottom()),
+        );
+        let fill = if i % 2 == 0 {
+            egui::Color32::from_rgb(24, 46, 78)
+        } else {
+            egui::Color32::from_rgb(34, 58, 94)
+        };
+        painter.rect(
+            segment,
+            0.0,
+            fill,
+            Stroke::new(1.0, theme::ACCENT.gamma_multiply(0.5)),
+            egui::StrokeKind::Inside,
+        );
+        painter.with_clip_rect(segment).text(
+            pos2(segment.left() + 10.0, segment.bottom() - 11.0),
+            Align2::LEFT_CENTER,
+            &span.phase.name,
+            FontId::proportional(13.5),
+            theme::INK,
+        );
+        painter.text(
+            pos2(segment.left() + 2.0, rect.bottom() - 10.0),
+            Align2::LEFT_CENTER,
+            fmt_clock(span.start_ms),
+            FontId::monospace(11.0),
+            theme::MUTED,
+        );
+    }
+    if let Some(last) = phase_spans(template).last() {
+        painter.text(
+            pos2(x_of(last.end_ms) - 2.0, rect.bottom() - 10.0),
+            Align2::RIGHT_CENTER,
+            fmt_clock(last.end_ms),
+            FontId::monospace(11.0),
+            theme::MUTED,
+        );
+    }
+}
+
+fn paint_pin(painter: &egui::Painter, x: f32, track: Rect, offset_ms: f64, active: bool) {
+    let color = if active {
+        theme::ACCENT_GLOW
+    } else {
+        theme::ACCENT
+    };
+    painter.line_segment(
+        [pos2(x, track.top() - 8.0), pos2(x, track.bottom() + 4.0)],
+        Stroke::new(if active { 3.0 } else { 2.0 }, color),
+    );
+    let flag = Rect::from_center_size(pos2(x, track.top() - 20.0), vec2(52.0, 20.0));
+    painter.rect_filled(flag, egui::CornerRadius::same(4), color);
+    painter.text(
+        flag.center(),
+        Align2::CENTER_CENTER,
+        fmt_clock(offset_ms),
+        FontId::monospace(12.0),
+        theme::PAPER,
+    );
+}
+
+/// Mini linea temporale della sessione in corso: fasi e cursore sul tempo trascorso.
+fn progress_timeline(ui: &mut egui::Ui, template: &SessionTemplate, elapsed_ms: f64) {
+    let total = session_total_ms(template).max(1.0);
+    let (rect, _) = ui.allocate_exact_size(vec2(ui.available_width(), 34.0), Sense::hover());
+    let painter = ui.painter_at(rect);
+    let bar = Rect::from_min_max(
+        pos2(rect.left(), rect.top() + 8.0),
+        pos2(rect.right(), rect.top() + 20.0),
+    );
+    let x_of = |ms: f64| bar.left() + (ms / total).clamp(0.0, 1.0) as f32 * bar.width();
+    for (i, span) in phase_spans(template).iter().enumerate() {
+        let segment = Rect::from_min_max(
+            pos2(x_of(span.start_ms), bar.top()),
+            pos2(x_of(span.end_ms) - 2.0, bar.bottom()),
+        );
+        painter.rect_filled(
+            segment,
+            3.0,
+            if i % 2 == 0 {
+                theme::ELEVATED
+            } else {
+                theme::ACCENT_SOFT
+            },
+        );
+        painter.text(
+            pos2(segment.left(), rect.bottom() - 2.0),
+            Align2::LEFT_BOTTOM,
+            &span.phase.name,
+            FontId::proportional(11.5),
+            theme::MUTED,
+        );
+    }
+    let done = Rect::from_min_max(bar.min, pos2(x_of(elapsed_ms), bar.bottom()));
+    painter.rect_filled(done, 3.0, theme::ACCENT.gamma_multiply(0.75));
+    for flat in flatten_pins(template) {
+        let x = x_of(flat.pin.offset_ms);
+        painter.circle_filled(pos2(x, bar.center().y), 4.5, theme::ACCENT_GLOW);
+    }
+    painter.line_segment(
+        [
+            pos2(x_of(elapsed_ms), bar.top() - 4.0),
+            pos2(x_of(elapsed_ms), bar.bottom() + 4.0),
+        ],
+        Stroke::new(2.0, theme::INK),
+    );
 }
 
 // ───────────────────────── Menu ─────────────────────────
@@ -870,42 +1058,36 @@ impl SessionScreen {
         egui::ScrollArea::vertical()
             .auto_shrink(false)
             .show(ui, |ui| {
-                page_title(ui, "Modalità Sessione", "Costruttore sessione");
-                self.builder_toolbar(ui, &mut b);
-                builder_header(ui, &mut b.draft);
-                ui.add_space(10.0);
-                match timeline(ui, &b.draft, b.selected_pin.as_deref()) {
-                    TimelineEvent::Select(id) => ops.push(Op::Select(Some(id))),
-                    TimelineEvent::Move(id, offset) => ops.push(Op::MovePin(id, offset)),
-                    TimelineEvent::AddAt(offset) => ops.push(Op::AddPinAt(offset)),
-                    TimelineEvent::None => {}
-                }
-                ui.add_space(10.0);
-                ui.horizontal(|ui| {
-                    ui.label(theme::eyebrow("Fasi e pin"));
-                    if ui.small_button("Riparti durate equamente").clicked() {
-                        ops.push(Op::Distribute);
+                column(ui, 1040.0, |ui| {
+                    page_title(ui, "Modalità Sessione", "Costruttore sessione");
+                    self.builder_toolbar(ui, &mut b);
+                    ui.add_space(6.0);
+                    builder_header(ui, &mut b.draft);
+                    ui.add_space(14.0);
+                    ui.label(theme::eyebrow("Linea temporale"));
+                    ui.label(muted("Clicca un punto vuoto per aggiungere un pin t, trascina una bandierina per spostarla."));
+                    ui.add_space(4.0);
+                    match timeline(ui, &b.draft, b.selected_pin.as_deref()) {
+                        TimelineEvent::Select(id) => ops.push(Op::Select(Some(id))),
+                        TimelineEvent::Move(id, offset) => ops.push(Op::MovePin(id, offset)),
+                        TimelineEvent::AddAt(offset) => ops.push(Op::AddPinAt(offset)),
+                        TimelineEvent::None => {}
                     }
-                });
-                phases_ui(ui, &mut b, &mut ops);
-                if ui.button("+ Aggiungi fase").clicked() {
-                    ops.push(Op::AddPhase);
-                }
-                ui.add_space(12.0);
-                let error = validate_template(&b.draft);
-                ui.horizontal(|ui| {
-                    if ui
-                        .add_enabled(error.is_none(), egui::Button::new("Salva modello"))
-                        .clicked()
-                    {
-                        finish = Some(true);
+                    ui.add_space(14.0);
+                    ui.horizontal(|ui| {
+                        ui.label(theme::eyebrow("Fasi e pin"));
+                        if secondary_button(ui, "Ripartisci le durate equamente").clicked() {
+                            ops.push(Op::Distribute);
+                        }
+                    });
+                    ui.add_space(4.0);
+                    phases_ui(ui, &mut b, &mut ops);
+                    if secondary_button(ui, "+ Aggiungi fase").clicked() {
+                        ops.push(Op::AddPhase);
                     }
-                    if ui.button("Annulla").clicked() {
-                        finish = Some(false);
-                    }
-                    if let Some(error) = &error {
-                        ui.label(muted(error));
-                    }
+                    ui.add_space(16.0);
+                    finish = builder_footer(ui, validate_template(&b.draft));
+                    ui.add_space(24.0);
                 });
             });
         for op in ops {
@@ -927,16 +1109,16 @@ impl SessionScreen {
         ui.horizontal_wrapped(|ui| {
             ui.add(
                 egui::TextEdit::singleline(&mut b.path_input)
-                    .hint_text("Percorso di un protocollo .json")
-                    .desired_width(320.0),
+                    .hint_text("Percorso di un protocollo .json da importare")
+                    .desired_width(360.0),
             );
-            if ui.button("Importa JSON").clicked() {
+            if secondary_button(ui, "Importa JSON").clicked() {
                 b.message = Some(match b.import_from_path(&mut *self.rand) {
                     Ok(()) => "Protocollo importato.".to_string(),
                     Err(e) => format!("Errore: {e}"),
                 });
             }
-            if ui.button("Esporta JSON").clicked() {
+            if secondary_button(ui, "Esporta JSON").clicked() {
                 b.message = Some(match b.export_to_dir(&storage::export_dir()) {
                     Ok(path) => format!("Salvato: {}", path.display()),
                     Err(e) => format!("Errore: {e}"),
@@ -949,35 +1131,81 @@ impl SessionScreen {
     }
 }
 
+/// Barra azioni in fondo: validazione con messaggio chiaro, Salva e Annulla.
+fn builder_footer(ui: &mut egui::Ui, error: Option<String>) -> Option<bool> {
+    let mut finish = None;
+    match &error {
+        Some(message) => banner(ui, message, theme::DANGER),
+        None => banner(
+            ui,
+            "Il protocollo è valido e pronto per essere salvato.",
+            theme::ACCENT_GLOW,
+        ),
+    }
+    ui.add_space(8.0);
+    ui.horizontal(|ui| {
+        let save = egui::Button::new(
+            RichText::new("Salva modello")
+                .size(15.0)
+                .strong()
+                .color(theme::PAPER),
+        )
+        .fill(theme::ACCENT_GLOW)
+        .min_size(vec2(160.0, 36.0));
+        if ui.add_enabled(error.is_none(), save).clicked() {
+            finish = Some(true);
+        }
+        if ui
+            .add(egui::Button::new("Annulla").min_size(vec2(100.0, 36.0)))
+            .clicked()
+        {
+            finish = Some(false);
+        }
+    });
+    finish
+}
+
 fn builder_header(ui: &mut egui::Ui, draft: &mut SessionTemplate) {
-    ui.horizontal_wrapped(|ui| {
-        ui.vertical(|ui| {
-            ui.label(theme::eyebrow("Nome della sessione"));
-            ui.add(
-                egui::TextEdit::singleline(&mut draft.name)
-                    .hint_text("es. Protocollo affaticamento cognitivo")
-                    .desired_width(320.0),
-            );
+    theme::card_frame().show(ui, |ui| {
+        ui.set_width(ui.available_width());
+        ui.horizontal_top(|ui| {
+            ui.vertical(|ui| {
+                field_label(ui, "Nome della sessione");
+                ui.add(
+                    egui::TextEdit::singleline(&mut draft.name)
+                        .hint_text("es. Protocollo affaticamento cognitivo")
+                        .desired_width(380.0),
+                );
+            });
+            ui.add_space(20.0);
+            ui.vertical(|ui| {
+                field_label(ui, "Durata totale (m:ss)");
+                duration_edit(ui, &mut draft.total_ms);
+            });
+            ui.add_space(20.0);
+            ui.vertical(|ui| {
+                let allocated: f64 = draft.phases.iter().map(|p| p.duration_ms).sum();
+                let over = allocated > draft.total_ms;
+                field_label(ui, "Fasi allocate");
+                ui.label(
+                    RichText::new(format!(
+                        "{} / {}",
+                        fmt_clock(allocated),
+                        fmt_clock(draft.total_ms)
+                    ))
+                    .monospace()
+                    .size(16.0)
+                    .color(if over { theme::DANGER } else { theme::INK }),
+                );
+                let fraction = (allocated / draft.total_ms.max(1.0)).min(1.0) as f32;
+                ui.add(
+                    egui::ProgressBar::new(fraction)
+                        .desired_width(180.0)
+                        .desired_height(6.0)
+                        .fill(if over { theme::DANGER } else { theme::ACCENT }),
+                );
+            });
         });
-        ui.vertical(|ui| {
-            ui.label(theme::eyebrow("Durata totale (m:ss)"));
-            duration_edit(ui, &mut draft.total_ms);
-        });
-        let allocated: f64 = draft.phases.iter().map(|p| p.duration_ms).sum();
-        let color = if allocated > draft.total_ms {
-            theme::DANGER
-        } else {
-            theme::MUTED
-        };
-        ui.label(
-            RichText::new(format!(
-                "Fasi allocate: {} / {}",
-                fmt_clock(allocated),
-                fmt_clock(draft.total_ms)
-            ))
-            .monospace()
-            .color(color),
-        );
     });
 }
 
@@ -997,6 +1225,7 @@ fn phases_ui(ui: &mut egui::Ui, b: &mut BuilderState, ops: &mut Vec<Op>) {
         theme::card_frame().show(ui, |ui| {
             ui.set_width(ui.available_width());
             phase_header(ui, pi, phase, span, ops);
+            ui.add_space(4.0);
             let mut order: Vec<usize> = (0..phase.pins.len()).collect();
             order.sort_by(|a, b| {
                 phase.pins[*a]
@@ -1004,7 +1233,9 @@ fn phases_ui(ui: &mut egui::Ui, b: &mut BuilderState, ops: &mut Vec<Op>) {
                     .total_cmp(&phase.pins[*b].offset_ms)
             });
             if order.is_empty() {
-                ui.label(muted("Nessun pin: clicca sulla timeline o «+ pin»."));
+                ui.label(muted(
+                    "Nessun pin: clicca sulla timeline oppure usa «+ pin t».",
+                ));
             }
             for ti in order {
                 pin_row(
@@ -1016,10 +1247,12 @@ fn phases_ui(ui: &mut egui::Ui, b: &mut BuilderState, ops: &mut Vec<Op>) {
                     ops,
                 );
             }
-            if ui.small_button("+ pin \"t\" in questa fase").clicked() {
+            ui.add_space(4.0);
+            if secondary_button(ui, "+ pin t in questa fase").clicked() {
                 ops.push(Op::AddPin(pi));
             }
         });
+        ui.add_space(6.0);
     }
 }
 
@@ -1031,23 +1264,31 @@ fn phase_header(
     ops: &mut Vec<Op>,
 ) {
     ui.horizontal(|ui| {
-        ui.label(muted(&format!("{}.", pi + 1)));
-        ui.add(egui::TextEdit::singleline(&mut phase.name).desired_width(160.0));
+        ui.label(
+            RichText::new(format!("{}", pi + 1))
+                .monospace()
+                .size(18.0)
+                .color(theme::ACCENT_GLOW),
+        );
+        ui.add(egui::TextEdit::singleline(&mut phase.name).desired_width(200.0));
+        ui.label(muted("durata"));
         duration_edit(ui, &mut phase.duration_ms);
         ui.label(muted(&format!(
-            "{}–{}",
+            "({}–{})",
             fmt_clock(span.0),
             fmt_clock(span.1)
         )));
-        if ui.small_button("↑").clicked() {
-            ops.push(Op::MovePhase(pi, -1));
-        }
-        if ui.small_button("↓").clicked() {
-            ops.push(Op::MovePhase(pi, 1));
-        }
-        if ui.small_button("Elimina fase").clicked() {
-            ops.push(Op::RemovePhase(pi));
-        }
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            if ui.small_button("Elimina fase").clicked() {
+                ops.push(Op::RemovePhase(pi));
+            }
+            if ui.small_button("↓").clicked() {
+                ops.push(Op::MovePhase(pi, 1));
+            }
+            if ui.small_button("↑").clicked() {
+                ops.push(Op::MovePhase(pi, -1));
+            }
+        });
     });
 }
 
@@ -1060,37 +1301,54 @@ fn pin_row(
     ops: &mut Vec<Op>,
 ) {
     let open = selected_pin.as_deref() == Some(pin.id.as_str());
-    ui.horizontal_wrapped(|ui| {
-        let arrow = if open { "▾" } else { "▸" };
-        if ui
-            .button(format!("{arrow} pin t = {}", fmt_clock(pin.offset_ms)))
-            .clicked()
-        {
-            ops.push(Op::Select(if open { None } else { Some(pin.id.clone()) }));
-        }
-        ui.label(muted("a"));
-        let mut relative = pin.offset_ms - start;
-        if duration_edit(ui, &mut relative) {
-            pin.offset_ms = (start + relative).clamp(start, end);
-        }
-        ui.label(muted("nella fase"));
-        if pin.battery.is_empty() {
-            ui.label(RichText::new("batteria vuota").color(theme::DANGER));
-        }
-        for item in &pin.battery {
-            ui.label(
-                RichText::new(test_title(item.test_id))
-                    .small()
-                    .background_color(theme::ELEVATED),
-            );
-        }
-        if ui.small_button("Rimuovi pin").clicked() {
-            ops.push(Op::RemovePin(pin.id.clone()));
-        }
-    });
-    if open {
-        battery_editor(ui, &mut pin.battery, &pin.id, expanded_item);
-    }
+    egui::Frame::new()
+        .fill(if open {
+            theme::ACCENT_SOFT
+        } else {
+            theme::PAPER
+        })
+        .stroke(Stroke::new(
+            1.0,
+            if open { theme::ACCENT } else { theme::LINE },
+        ))
+        .inner_margin(egui::Margin::same(8))
+        .show(ui, |ui| {
+            ui.set_width(ui.available_width());
+            ui.horizontal_wrapped(|ui| {
+                if ui
+                    .button(RichText::new(format!("pin t = {}", fmt_clock(pin.offset_ms))).strong())
+                    .clicked()
+                {
+                    ops.push(Op::Select(if open { None } else { Some(pin.id.clone()) }));
+                }
+                ui.label(muted("a"));
+                let mut relative = pin.offset_ms - start;
+                if duration_edit(ui, &mut relative) {
+                    pin.offset_ms = (start + relative).clamp(start, end);
+                }
+                ui.label(muted("dall’inizio della fase"));
+                if pin.battery.is_empty() {
+                    ui.label(RichText::new("batteria vuota").color(theme::DANGER));
+                }
+                for item in &pin.battery {
+                    ui.label(
+                        RichText::new(format!(" {} ", test_title(item.test_id)))
+                            .small()
+                            .background_color(theme::ELEVATED),
+                    );
+                }
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if ui.small_button("Rimuovi pin").clicked() {
+                        ops.push(Op::RemovePin(pin.id.clone()));
+                    }
+                });
+            });
+            if open {
+                ui.add_space(6.0);
+                battery_editor(ui, &mut pin.battery, &pin.id, expanded_item);
+            }
+        });
+    ui.add_space(4.0);
 }
 
 /// Batteria di un pin: test in ordine, con impostazioni congelate e interruttore di pratica.
@@ -1100,13 +1358,17 @@ fn battery_editor(
     pin_id: &str,
     expanded: &mut Option<(String, usize)>,
 ) {
-    ui.horizontal_wrapped(|ui| {
-        ui.label(theme::eyebrow("Aggiungi:"));
-        for meta in data::TEST_CATALOG.iter() {
-            if ui.small_button(format!("+ {}", meta.title)).clicked() {
-                battery.push(default_battery_item(meta.id));
-            }
-        }
+    ui.horizontal(|ui| {
+        ui.label(theme::eyebrow("Batteria"));
+        egui::ComboBox::from_id_salt(("add-test", pin_id))
+            .selected_text("+ Aggiungi test…")
+            .show_ui(ui, |ui| {
+                for meta in data::TEST_CATALOG.iter() {
+                    if ui.selectable_label(false, meta.title).clicked() {
+                        battery.push(default_battery_item(meta.id));
+                    }
+                }
+            });
     });
     let mut remove = None;
     let mut swap = None;
@@ -1116,27 +1378,38 @@ fn battery_editor(
             .is_some_and(|(id, idx)| id == pin_id && *idx == i);
         let last = battery.len() - 1;
         ui.horizontal(|ui| {
-            ui.label(format!("{}. {}", i + 1, test_title(battery[i].test_id)));
-            if ui.small_button("↑").clicked() && i > 0 {
-                swap = Some((i, i - 1));
-            }
-            if ui.small_button("↓").clicked() && i < last {
-                swap = Some((i, i + 1));
-            }
-            if ui
-                .small_button(if is_open { "Chiudi" } else { "Impostazioni" })
-                .clicked()
-            {
-                *expanded = if is_open {
-                    None
-                } else {
-                    Some((pin_id.to_string(), i))
-                };
-            }
-            if ui.small_button("Rimuovi test").clicked() {
-                remove = Some(i);
-            }
-            ui.checkbox(&mut battery[i].practice, "Includi pratica");
+            ui.label(
+                RichText::new(format!("{}.", i + 1))
+                    .monospace()
+                    .color(theme::ACCENT_GLOW),
+            );
+            ui.label(test_title(battery[i].test_id));
+            ui.checkbox(&mut battery[i].practice, "con pratica");
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if ui.small_button("Rimuovi").clicked() {
+                    remove = Some(i);
+                }
+                if ui
+                    .small_button(if is_open {
+                        "Chiudi impostazioni"
+                    } else {
+                        "Impostazioni"
+                    })
+                    .clicked()
+                {
+                    *expanded = if is_open {
+                        None
+                    } else {
+                        Some((pin_id.to_string(), i))
+                    };
+                }
+                if ui.small_button("↓").clicked() && i < last {
+                    swap = Some((i, i + 1));
+                }
+                if ui.small_button("↑").clicked() && i > 0 {
+                    swap = Some((i, i - 1));
+                }
+            });
         });
         if is_open {
             params_grid(ui, &mut battery[i], pin_id, i);
@@ -1153,7 +1426,7 @@ fn battery_editor(
 }
 
 fn params_grid(ui: &mut egui::Ui, item: &mut BatteryItem, pin_id: &str, index: usize) {
-    let Some(section) = data::param_sections()
+    let Some(section) = data::PARAM_SECTIONS
         .iter()
         .find(|s| s.test_key == item.test_id.as_str())
     else {
@@ -1162,23 +1435,24 @@ fn params_grid(ui: &mut egui::Ui, item: &mut BatteryItem, pin_id: &str, index: u
     egui::Grid::new(("battery-params", pin_id, index))
         .num_columns(2)
         .show(ui, |ui| {
-            for field in &section.fields {
-                ui.label(&field.label);
+            for field in section.fields {
+                ui.label(field.label);
                 let mut value = item
                     .params
-                    .get(&field.key)
+                    .get(field.key)
                     .and_then(Value::as_f64)
                     .unwrap_or(field.min);
-                let step = field.step.unwrap_or(1.0);
+                let step = field.step;
                 let mut drag = egui::DragValue::new(&mut value)
                     .range(field.min..=field.max)
                     .speed(step)
                     .fixed_decimals(if step >= 1.0 { 0 } else { 2 });
-                if let Some(unit) = &field.unit {
+                if let Some(unit) = field.unit {
                     drag = drag.suffix(format!(" {unit}"));
                 }
                 if ui.add(drag).changed() {
-                    item.params.insert(field.key.clone(), number_value(value));
+                    item.params
+                        .insert(field.key.to_string(), number_value(value));
                 }
                 ui.end_row();
             }
@@ -1284,7 +1558,7 @@ impl SessionScreen {
             .anchor(Align2::CENTER_CENTER, vec2(0.0, 0.0))
             .show(ui.ctx(), |ui| {
                 ui.label(muted("Puoi riprendere più tardi (la sessione resta salvata), vedere i risultati parziali raccolti finora, oppure restare."));
-                if ui.button("Resta nella sessione").clicked() {
+                if primary_button(ui, "Resta nella sessione", vec2(280.0, 34.0)).clicked() {
                     r.exiting = false;
                 }
                 if ui.button("Vedi risultati parziali").clicked() {
@@ -1309,12 +1583,10 @@ impl SessionScreen {
             return;
         };
         let total = r.active.as_ref().map_or(0, |a| a.pin.battery.len());
-        let hints = data::instructions_for(item.test_id, &numeric_params(&item.params))
-            .map(|i| i.key_hints)
-            .unwrap_or_default();
+        let hints = data::instructions_for(item.test_id, &numeric_params(&item.params)).key_hints;
         let mut start = false;
         ui.vertical_centered(|ui| {
-            ui.add_space((ui.available_height() * 0.15).max(10.0));
+            ui.add_space((ui.available_height() * 0.12).max(10.0));
             ui.label(theme::eyebrow(&format!(
                 "Test {} di {}",
                 r.battery_idx + 1,
@@ -1322,21 +1594,21 @@ impl SessionScreen {
             )));
             ui.label(theme::display_text(
                 &test_title(item.test_id),
-                44.0,
+                64.0,
                 theme::INK,
-                3.0,
+                4.0,
             ));
-            ui.add_space(14.0);
+            ui.add_space(16.0);
+            ui.label(muted("Tasti da usare"));
             theme::card_frame().fill(theme::ACCENT_SOFT).show(ui, |ui| {
                 for hint in &hints {
-                    ui.label(RichText::new(hint).monospace().color(theme::INK));
+                    ui.label(RichText::new(hint).monospace().size(15.0).color(theme::INK));
                 }
             });
-            ui.add_space(18.0);
-            start = ui
-                .button(RichText::new("Inizia il test").size(18.0))
-                .clicked();
+            ui.add_space(22.0);
+            start = primary_button(ui, "Inizia il test", vec2(280.0, 56.0)).clicked();
             if let Some(notice) = &r.notice {
+                ui.add_space(8.0);
                 ui.label(RichText::new(notice).color(theme::DANGER));
             }
         });
@@ -1373,12 +1645,8 @@ impl SessionScreen {
             r.mode = RunMode::Wait;
             return;
         };
-        let status = theme::stimulus_frame()
-            .show(ui, |ui| {
-                ui.set_min_size(ui.available_size());
-                runner.ui(ui)
-            })
-            .inner;
+        ui.set_min_size(ui.available_size());
+        let status = runner.ui(ui);
         match status {
             RunnerStatus::Running => {}
             RunnerStatus::Aborted => {
@@ -1414,12 +1682,12 @@ impl SessionScreen {
 
 fn wait_top_bar(ui: &mut egui::Ui, r: &mut ActiveRun, state: &SessionState) {
     ui.horizontal(|ui| {
-        ui.label(muted("Fase:"));
-        ui.label(RichText::new(&state.current_phase_name).strong());
-        ui.add_space(24.0);
+        ui.label(theme::eyebrow("Fase"));
+        ui.label(RichText::new(&state.current_phase_name).size(18.0).strong());
+        ui.add_space(20.0);
         ui.label(
             RichText::new(format!(
-                "Sessione {} / {} · batteria {} di {}",
+                "{} / {}   ·   batteria {} di {}",
                 fmt_countdown(r.elapsed_ms()),
                 fmt_countdown(session_total_ms(&r.run.template)),
                 (state.position_index + 1).min(state.total),
@@ -1428,32 +1696,41 @@ fn wait_top_bar(ui: &mut egui::Ui, r: &mut ActiveRun, state: &SessionState) {
             .monospace()
             .color(theme::MUTED),
         );
-        if ui.small_button("Esci").clicked() {
-            r.exiting = true;
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            if secondary_button(ui, "Esci").clicked() {
+                r.exiting = true;
+            }
+        });
+    });
+    ui.add_space(6.0);
+    progress_timeline(ui, &r.run.template, r.elapsed_ms());
+}
+
+fn test_chips(ui: &mut egui::Ui, tests: &[TestId]) {
+    ui.horizontal_wrapped(|ui| {
+        for (i, test) in tests.iter().enumerate() {
+            if i > 0 {
+                ui.label(RichText::new("›").color(theme::MUTED));
+            }
+            ui.label(
+                RichText::new(format!("  {}  ", test_title(*test)))
+                    .size(16.0)
+                    .background_color(theme::ELEVATED),
+            );
         }
     });
 }
 
 fn wait_center(ui: &mut egui::Ui, r: &mut ActiveRun, state: &SessionState) {
-    let upcoming = state
-        .upcoming_tests
-        .iter()
-        .map(|t| test_title(*t))
-        .collect::<Vec<_>>()
-        .join(" → ");
     ui.vertical_centered(|ui| {
-        ui.add_space((ui.available_height() * 0.12).max(10.0));
+        ui.add_space((ui.available_height() * 0.10).max(10.0));
         if state.due {
-            ui.label(theme::display_text(
-                "È ora dei test",
-                96.0,
-                theme::ACCENT_GLOW,
-                3.0,
-            ));
-            ui.label(muted("Batteria in arrivo:"));
-            ui.label(RichText::new(&upcoming).size(18.0));
-            ui.add_space(24.0);
-            if ui.button(RichText::new("Inizia").size(20.0)).clicked() {
+            ui.label(theme::display_text("È ora dei test", 110.0, theme::ACCENT_GLOW, 4.0));
+            ui.add_space(8.0);
+            ui.label(muted("Batteria in arrivo"));
+            test_chips(ui, &state.upcoming_tests);
+            ui.add_space(26.0);
+            if primary_button(ui, "Inizia la batteria", vec2(300.0, 60.0)).clicked() {
                 if let Some(pin) = &state.next_pin {
                     r.active = Some(ActiveContext {
                         phase_id: state.current_phase_id.clone(),
@@ -1466,21 +1743,21 @@ fn wait_center(ui: &mut egui::Ui, r: &mut ActiveRun, state: &SessionState) {
             }
         } else {
             ui.label(theme::eyebrow("Prossima batteria tra"));
-            ui.label(theme::display_text(
-                &fmt_countdown(state.countdown_ms),
-                200.0,
-                theme::INK,
-                4.0,
-            ));
-            ui.label(muted("In arrivo:"));
-            ui.label(RichText::new(&upcoming).size(16.0));
-            ui.add_space(20.0);
-            ui.label(muted(
-                "Puoi allontanarti: un avviso sonoro ti richiamerà quando è il momento dei test.",
-            ));
+            ui.label(theme::display_text(&fmt_countdown(state.countdown_ms), 220.0, theme::INK, 6.0));
+            ui.add_space(4.0);
+            ui.label(muted("In arrivo"));
+            test_chips(ui, &state.upcoming_tests);
+            ui.add_space(22.0);
+            banner(
+                ui,
+                "Puoi allontanarti: un avviso sonoro e lampeggiante ti richiamerà quando è il momento dei test.",
+                theme::ACCENT,
+            );
         }
     });
 }
+
+// ───────────────────────── Risultati ─────────────────────────
 
 // ───────────────────────── Risultati ─────────────────────────
 
@@ -1541,37 +1818,47 @@ fn results_ui(ui: &mut egui::Ui, r: &mut ActiveRun) -> Option<Exit> {
     };
     let mut exit = None;
     egui::ScrollArea::vertical().auto_shrink(false).show(ui, |ui| {
-        page_title(ui, eyebrow, &r.run.template.name);
-        theme::card_frame().fill(theme::ACCENT_SOFT).stroke(Stroke::new(1.0, theme::ACCENT)).show(ui, |ui| {
-            ui.horizontal(|ui| {
-                ui.label(theme::eyebrow("Codice sessione"));
-                ui.label(RichText::new(&r.run.run_id).monospace().size(16.0));
+        column(ui, 1000.0, |ui| {
+            page_title(ui, eyebrow, &r.run.template.name);
+            theme::card_frame().fill(theme::ACCENT_SOFT).stroke(Stroke::new(1.0, theme::ACCENT)).show(ui, |ui| {
+                ui.set_width(ui.available_width());
+                ui.horizontal(|ui| {
+                    ui.label(theme::eyebrow("Codice sessione"));
+                    ui.label(RichText::new(&r.run.run_id).monospace().size(20.0).strong());
+                    ui.add_space(24.0);
+                    ui.label(theme::eyebrow("Test completati"));
+                    ui.label(RichText::new(r.run.results.len().to_string()).monospace().size(20.0).strong());
+                });
             });
-        });
-        ui.add_space(10.0);
-        results_table(ui, &r.run);
-        ui.add_space(10.0);
-        ui.horizontal_wrapped(|ui| {
-            for (label, kind) in [
-                ("Salva JSON di sessione", SessionExport::Json),
-                ("Salva CSV combinato", SessionExport::Csv),
-                ("Salva riepilogo metriche", SessionExport::SummaryCsv),
-            ] {
-                if ui.button(label).clicked() {
-                    r.notice = Some(match export_session(&r.run, kind, &storage::export_dir()) {
-                        Ok(path) => format!("Salvato: {}", path.display()),
-                        Err(e) => format!("Errore: {e}"),
-                    });
+            ui.add_space(12.0);
+            results_table(ui, &r.run);
+            ui.add_space(14.0);
+            ui.label(theme::eyebrow("Esporta"));
+            ui.horizontal_wrapped(|ui| {
+                for (label, kind) in [
+                    ("Salva JSON di sessione", SessionExport::Json),
+                    ("Salva CSV combinato", SessionExport::Csv),
+                    ("Salva riepilogo metriche", SessionExport::SummaryCsv),
+                ] {
+                    if secondary_button(ui, label).clicked() {
+                        r.notice = Some(match export_session(&r.run, kind, &storage::export_dir()) {
+                            Ok(path) => format!("Salvato: {}", path.display()),
+                            Err(e) => format!("Errore: {e}"),
+                        });
+                    }
                 }
+            });
+            if let Some(notice) = &r.notice {
+                ui.label(RichText::new(notice).monospace().color(theme::ACCENT_GLOW));
             }
-            if ui.button("← Torna al menu").clicked() {
+            ui.add_space(4.0);
+            ui.label(muted("Il CSV combina tutti i trial con colonne di contesto fase / t / test. Il riepilogo ha una riga per metrica. Il JSON contiene il protocollo e ogni risultato per esteso."));
+            ui.add_space(14.0);
+            if primary_button(ui, "Torna al menu", vec2(180.0, 38.0)).clicked() {
                 exit = Some(Exit::Clear);
             }
+            ui.add_space(24.0);
         });
-        if let Some(notice) = &r.notice {
-            ui.label(RichText::new(notice).monospace().color(theme::ACCENT_GLOW));
-        }
-        ui.label(muted("Il CSV combina tutti i trial con colonne di contesto fase / t / test. Il riepilogo ha una riga per metrica. Il JSON contiene il protocollo e ogni risultato per esteso."));
     });
     exit
 }
@@ -1586,7 +1873,7 @@ fn results_table(ui: &mut egui::Ui, run: &SessionRun) {
         egui::Grid::new("session-results")
             .striped(true)
             .num_columns(4)
-            .spacing([24.0, 6.0])
+            .spacing([28.0, 8.0])
             .show(ui, |ui| {
                 for h in ["Fase", "t", "Test", "Prima metrica"] {
                     ui.label(theme::eyebrow(h));

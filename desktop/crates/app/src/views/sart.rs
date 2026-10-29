@@ -17,7 +17,7 @@ use crate::theme::stimulus::INK;
 const PRACTICE_FEEDBACK_MS: f64 = 700.0;
 /// Lato della maschera: il corpo maggiore ×1,3 (`STAGE_BOX_PX` del TS).
 const MASK_BOX_PX: f32 = 120.0 * 1.3;
-const DEFAULT_FONT_PX: f32 = 94.0;
+const DEFAULT_FONT_PX: f32 = 110.0;
 
 fn to_trials(target_digit: u32, stimuli: Vec<SartStimulus>) -> Vec<RtTrial<SartStimulus>> {
     stimuli
@@ -38,7 +38,7 @@ fn to_trials(target_digit: u32, stimuli: Vec<SartStimulus>) -> Vec<RtTrial<SartS
 
 /// Maschera: cerchio barrato da una croce (viewBox 100×100 dell'SVG del TS, scalato su `MASK_BOX_PX`).
 fn draw_mask(ctx: &StimulusCtx) {
-    let scale = MASK_BOX_PX / 100.0;
+    let scale = MASK_BOX_PX * ctx.scale() / 100.0;
     let center = ctx.center();
     let stroke = Stroke::new(3.0 * scale, INK);
     ctx.painter.circle_stroke(center, 30.0 * scale, stroke);
@@ -64,9 +64,10 @@ fn draw(ctx: &StimulusCtx, stimulus: &SartStimulus) {
         draw_mask(ctx);
         return;
     }
-    let size = SART_FONT_SIZES_PX
+    let base = SART_FONT_SIZES_PX
         .get(stimulus.size_index)
         .map_or(DEFAULT_FONT_PX, |&px| px as f32);
+    let size = base * ctx.scale() * 1.15;
     let font = FontId::new(size, FontFamily::Proportional);
     bold_text(
         ctx.painter,

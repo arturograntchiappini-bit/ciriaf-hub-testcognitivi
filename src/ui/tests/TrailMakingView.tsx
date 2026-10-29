@@ -2,7 +2,7 @@
  * Vista del Trail Making Test A e B: cerchi da collegare con il mouse (o il tocco) nell'ordine corretto.
  * @see docs/scientific/trail-making.md
  */
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { StimulusStage } from '../runtime/StimulusStage';
 import { Button } from '../components/Button';
 import {
@@ -61,6 +61,8 @@ export function TrailMakingView(props: TrailMakingViewProps): JSX.Element {
   const [wrong, setWrong] = useState<number | null>(null);
   const runRef = useRef<TrailRun | null>(null);
   const trialsRef = useRef<TrialResult[]>([]);
+  const flashRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (flashRef.current) clearTimeout(flashRef.current); }, []);
   const block = blocks[index] as Block;
 
   function start(): void {
@@ -95,7 +97,8 @@ export function TrailMakingView(props: TrailMakingViewProps): JSX.Element {
       if (run.done) finishBlock();
     } else {
       setWrong(circleIndex);
-      setTimeout(() => setWrong(null), ERROR_FLASH_MS);
+      if (flashRef.current) clearTimeout(flashRef.current);
+      flashRef.current = setTimeout(() => setWrong(null), ERROR_FLASH_MS);
     }
   }
 
@@ -140,7 +143,9 @@ export function TrailMakingView(props: TrailMakingViewProps): JSX.Element {
           <button
             key={i}
             type="button"
-            onPointerDown={() => click(i)}
+            // Il puntatore registra il tempo al contatto (solo tasto primario); Invio/Spazio da tastiera arrivano come click senza puntatore.
+            onPointerDown={(e) => { if (e.button === 0) click(i); }}
+            onClick={(e) => { if (e.detail === 0) click(i); }}
             aria-label={`Cerchio ${c.label}`}
             className={`absolute flex items-center justify-center rounded-full border-2 bg-paper font-semibold text-ink ${
               wrong === i ? 'border-danger text-danger' : i < reached ? 'border-accent bg-accent-soft' : 'border-ink'

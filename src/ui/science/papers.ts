@@ -103,6 +103,13 @@ export const PAPERS: readonly PaperMeta[] = [
     summary: 'Come si trattano i tempi di reazione prima dell’analisi: anticipazioni, omissioni e valori anomali.',
   },
   {
+    slug: 'migrazione-rust',
+    title: 'Migrazione dei motori da TypeScript a Rust',
+    kind: 'method',
+    testIds: [],
+    summary: 'Dimostrazione sperimentale che i motori Rust riproducono quelli TypeScript: fixture golden, fuzz, proprietà e prestazioni.',
+  },
+  {
     slug: 'bibliography',
     title: 'Bibliografia',
     kind: 'reference',

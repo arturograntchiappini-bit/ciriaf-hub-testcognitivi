@@ -44,9 +44,15 @@ pub fn js_num_string(v: f64) -> String {
     }
 }
 
-/// `Math.round` di JS (arrotonda .5 verso +infinito).
+/// `Math.round` di JS (arrotonda .5 verso +infinito). Esatto anche per 0.49999999999999994 e oltre 2^52,
+/// dove `floor(v + 0.5)` sbaglierebbe per l'arrotondamento della somma.
 pub fn js_round(v: f64) -> f64 {
-    (v + 0.5).floor()
+    let floor = v.floor();
+    if v - floor >= 0.5 {
+        floor + 1.0
+    } else {
+        floor
+    }
 }
 
 /// Esito di validazione di un singolo trial.
@@ -262,6 +268,25 @@ mod tests {
         for (v, expected) in cases {
             assert_eq!(js_num_string(v), expected);
         }
+    }
+
+    #[test]
+    fn should_round_like_math_round_on_the_edge_cases() {
+        let cases = [
+            (0.5, 1.0),
+            (-0.5, 0.0),
+            (1.5, 2.0),
+            (-1.5, -1.0),
+            (2.5, 3.0),
+            (0.49999999999999994, 0.0),
+            (4_503_599_627_370_497.0, 4_503_599_627_370_497.0),
+            (-0.2, 0.0),
+        ];
+        for (v, expected) in cases {
+            assert_eq!(js_round(v), expected, "{v}");
+        }
+        assert!(js_round(f64::NAN).is_nan());
+        assert_eq!(js_round(f64::INFINITY), f64::INFINITY);
     }
 
     #[test]

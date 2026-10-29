@@ -1,0 +1,557 @@
+{
+  "runtime": "typescript-node",
+  "node": "v24.15.0",
+  "sink": 2489734527,
+  "hardware": {
+    "cpu": "Intel(R) Core(TM) Ultra 7 258V",
+    "cores": 8,
+    "ramGb": 32,
+    "os": "win32 10.0.26200"
+  },
+  "results": [
+    {
+      "op": "stroop.gen.default",
+      "medianNs": 647.0676691729324,
+      "p95Ns": 880.3007518796992,
+      "minNs": 568.421052631579,
+      "samples": 100,
+      "batch": 665
+    },
+    {
+      "op": "stroop.gen.default.json",
+      "medianNs": 3600.8,
+      "p95Ns": 4536.2,
+      "minNs": 3374.8,
+      "samples": 100,
+      "batch": 500
+    },
+    {
+      "op": "stroop.gen.x10",
+      "medianNs": 423800,
+      "p95Ns": 573100,
+      "minNs": 396350,
+      "samples": 100,
+      "batch": 2
+    },
+    {
+      "op": "stroop.gen.x10.json",
+      "medianNs": 472260,
+      "p95Ns": 594620,
+      "minNs": 431920,
+      "samples": 100,
+      "batch": 5
+    },
+    {
+      "op": "stroop.score.400",
+      "medianNs": 38490.6976744186,
+      "p95Ns": 49365.11627906977,
+      "minNs": 36146.51162790698,
+      "samples": 100,
+      "batch": 43
+    },
+    {
+      "op": "stroop.score.400.json",
+      "medianNs": 191283.33333333334,
+      "p95Ns": 265700,
+      "minNs": 165291.66666666666,
+      "samples": 100,
+      "batch": 12
+    },
+    {
+      "op": "gonogo.gen.default",
+      "medianNs": 799.6969696969697,
+      "p95Ns": 1164.8484848484848,
+      "minNs": 755.2525252525253,
+      "samples": 100,
+      "batch": 990
+    },
+    {
+      "op": "gonogo.gen.default.json",
+      "medianNs": 4098.523206751055,
+      "p95Ns": 5242.194092827004,
+      "minNs": 3857.383966244726,
+      "samples": 100,
+      "batch": 474
+    },
+    {
+      "op": "gonogo.gen.x10",
+      "medianNs": 8807.425742574258,
+      "p95Ns": 11100,
+      "minNs": 8114.851485148515,
+      "samples": 100,
+      "batch": 202
+    },
+    {
+      "op": "gonogo.gen.x10.json",
+      "medianNs": 41952,
+      "p95Ns": 53894,
+      "minNs": 39178,
+      "samples": 100,
+      "batch": 50
+    },
+    {
+      "op": "gonogo.score.400",
+      "medianNs": 19155.555555555555,
+      "p95Ns": 26488.88888888889,
+      "minNs": 18466.666666666668,
+      "samples": 100,
+      "batch": 18
+    },
+    {
+      "op": "gonogo.score.400.json",
+      "medianNs": 158346.15384615384,
+      "p95Ns": 214146.15384615384,
+      "minNs": 146200,
+      "samples": 100,
+      "batch": 13
+    },
+    {
+      "op": "flanker.gen.default",
+      "medianNs": 9075.757575757576,
+      "p95Ns": 13542.424242424242,
+      "minNs": 8537.878787878788,
+      "samples": 100,
+      "batch": 66
+    },
+    {
+      "op": "flanker.gen.default.json",
+      "medianNs": 21231.91489361702,
+      "p95Ns": 26855.31914893617,
+      "minNs": 19574.468085106382,
+      "samples": 100,
+      "batch": 94
+    },
+    {
+      "op": "flanker.gen.x10",
+      "medianNs": 118753.33333333333,
+      "p95Ns": 157713.33333333334,
+      "minNs": 108506.66666666667,
+      "samples": 100,
+      "batch": 15
+    },
+    {
+      "op": "flanker.gen.x10.json",
+      "medianNs": 270087.5,
+      "p95Ns": 410450,
+      "minNs": 254012.5,
+      "samples": 100,
+      "batch": 8
+    },
+    {
+      "op": "flanker.score.400",
+      "medianNs": 56666.666666666664,
+      "p95Ns": 104800,
+      "minNs": 53333.333333333336,
+      "samples": 100,
+      "batch": 6
+    },
+    {
+      "op": "flanker.score.400.json",
+      "medianNs": 215533.33333333334,
+      "p95Ns": 291955.55555555556,
+      "minNs": 202666.66666666666,
+      "samples": 100,
+      "batch": 9
+    },
+    {
+      "op": "sart.gen.default",
+      "medianNs": 93707.14285714286,
+      "p95Ns": 123785.71428571429,
+      "minNs": 84407.14285714286,
+      "samples": 100,
+      "batch": 14
+    },
+    {
+      "op": "sart.gen.default.json",
+      "medianNs": 145384.2105263158,
+      "p95Ns": 296142.1052631579,
+      "minNs": 109163.15789473684,
+      "samples": 100,
+      "batch": 19
+    },
+    {
+      "op": "sart.gen.x10",
+      "medianNs": 1245900,
+      "p95Ns": 3002050,
+      "minNs": 951000,
+      "samples": 100,
+      "batch": 2
+    },
+    {
+      "op": "sart.gen.x10.json",
+      "medianNs": 1306450,
+      "p95Ns": 2896750,
+      "minNs": 1079500,
+      "samples": 100,
+      "batch": 2
+    },
+    {
+      "op": "sart.score.400",
+      "medianNs": 39472.41379310345,
+      "p95Ns": 50041.379310344826,
+      "minNs": 29434.48275862069,
+      "samples": 100,
+      "batch": 29
+    },
+    {
+      "op": "sart.score.400.json",
+      "medianNs": 238118.18181818182,
+      "p95Ns": 803927.2727272727,
+      "minNs": 171490.9090909091,
+      "samples": 100,
+      "batch": 11
+    },
+    {
+      "op": "visual_search.gen.default",
+      "medianNs": 340000,
+      "p95Ns": 553300,
+      "minNs": 226000,
+      "samples": 100,
+      "batch": 1
+    },
+    {
+      "op": "visual_search.gen.default.json",
+      "medianNs": 586950,
+      "p95Ns": 2014525,
+      "minNs": 460200,
+      "samples": 100,
+      "batch": 4
+    },
+    {
+      "op": "visual_search.gen.x10",
+      "medianNs": 2809900,
+      "p95Ns": 7796700,
+      "minNs": 2194500,
+      "samples": 100,
+      "batch": 1
+    },
+    {
+      "op": "visual_search.gen.x10.json",
+      "medianNs": 6663000,
+      "p95Ns": 15023800,
+      "minNs": 5128600,
+      "samples": 100,
+      "batch": 1
+    },
+    {
+      "op": "visual_search.score.400",
+      "medianNs": 414800,
+      "p95Ns": 598200,
+      "minNs": 376500,
+      "samples": 100,
+      "batch": 1
+    },
+    {
+      "op": "visual_search.score.400.json",
+      "medianNs": 776450,
+      "p95Ns": 1570175,
+      "minNs": 535200,
+      "samples": 100,
+      "batch": 4
+    },
+    {
+      "op": "pvt.gen.default",
+      "medianNs": 5671.428571428572,
+      "p95Ns": 9971.42857142857,
+      "minNs": 4095.2380952380954,
+      "samples": 100,
+      "batch": 420
+    },
+    {
+      "op": "pvt.gen.default.json",
+      "medianNs": 9452.147239263804,
+      "p95Ns": 15438.650306748466,
+      "minNs": 6698.773006134969,
+      "samples": 100,
+      "batch": 163
+    },
+    {
+      "op": "pvt.gen.x10",
+      "medianNs": 50197.5,
+      "p95Ns": 117507.5,
+      "minNs": 37167.5,
+      "samples": 100,
+      "batch": 40
+    },
+    {
+      "op": "pvt.gen.x10.json",
+      "medianNs": 88496.66666666667,
+      "p95Ns": 202470,
+      "minNs": 65053.333333333336,
+      "samples": 100,
+      "batch": 30
+    },
+    {
+      "op": "pvt.score.400",
+      "medianNs": 116250,
+      "p95Ns": 142250,
+      "minNs": 83400,
+      "samples": 100,
+      "batch": 2
+    },
+    {
+      "op": "pvt.score.400.json",
+      "medianNs": 331685.71428571426,
+      "p95Ns": 1137514.2857142857,
+      "minNs": 242414.2857142857,
+      "samples": 100,
+      "batch": 7
+    },
+    {
+      "op": "nback.gen.default",
+      "medianNs": 94950,
+      "p95Ns": 135400,
+      "minNs": 71150,
+      "samples": 100,
+      "batch": 2
+    },
+    {
+      "op": "nback.gen.default.json",
+      "medianNs": 125945.45454545454,
+      "p95Ns": 247481.81818181818,
+      "minNs": 90736.36363636363,
+      "samples": 100,
+      "batch": 11
+    },
+    {
+      "op": "nback.gen.x10",
+      "medianNs": 1219100,
+      "p95Ns": 3312100,
+      "minNs": 973750,
+      "samples": 100,
+      "batch": 2
+    },
+    {
+      "op": "nback.gen.x10.json",
+      "medianNs": 1675100,
+      "p95Ns": 4906900,
+      "minNs": 1258450,
+      "samples": 100,
+      "batch": 2
+    },
+    {
+      "op": "nback.score.400",
+      "medianNs": 10650,
+      "p95Ns": 12200,
+      "minNs": 10200,
+      "samples": 100,
+      "batch": 2
+    },
+    {
+      "op": "nback.score.400.json",
+      "medianNs": 210536.36363636365,
+      "p95Ns": 620754.5454545454,
+      "minNs": 154863.63636363635,
+      "samples": 100,
+      "batch": 11
+    },
+    {
+      "op": "mental_rotation.gen.default",
+      "medianNs": 5460700,
+      "p95Ns": 12485800,
+      "minNs": 3568000,
+      "samples": 100,
+      "batch": 1
+    },
+    {
+      "op": "mental_rotation.gen.default.json",
+      "medianNs": 4968400,
+      "p95Ns": 17078300,
+      "minNs": 3611400,
+      "samples": 100,
+      "batch": 1
+    },
+    {
+      "op": "mental_rotation.gen.x10",
+      "medianNs": 67402800,
+      "p95Ns": 85676500,
+      "minNs": 48186000,
+      "samples": 22,
+      "batch": 1
+    },
+    {
+      "op": "mental_rotation.gen.x10.json",
+      "medianNs": 82043500,
+      "p95Ns": 112262200,
+      "minNs": 58633900,
+      "samples": 18,
+      "batch": 1
+    },
+    {
+      "op": "mental_rotation.score.400",
+      "medianNs": 371000,
+      "p95Ns": 654800,
+      "minNs": 274500,
+      "samples": 100,
+      "batch": 1
+    },
+    {
+      "op": "mental_rotation.score.400.json",
+      "medianNs": 608300,
+      "p95Ns": 2251550,
+      "minNs": 387250,
+      "samples": 100,
+      "batch": 2
+    },
+    {
+      "op": "trail_making.gen.default",
+      "medianNs": 34100,
+      "p95Ns": 47500,
+      "minNs": 22050,
+      "samples": 100,
+      "batch": 2
+    },
+    {
+      "op": "trail_making.gen.default.json",
+      "medianNs": 31012,
+      "p95Ns": 49004,
+      "minNs": 28932,
+      "samples": 100,
+      "batch": 25
+    },
+    {
+      "op": "trail_making.gen.x10",
+      "medianNs": 2278200,
+      "p95Ns": 2974200,
+      "minNs": 1979200,
+      "samples": 100,
+      "batch": 1
+    },
+    {
+      "op": "trail_making.gen.x10.json",
+      "medianNs": 2209200,
+      "p95Ns": 2790100,
+      "minNs": 2045800,
+      "samples": 100,
+      "batch": 1
+    },
+    {
+      "op": "trail_making.score.400",
+      "medianNs": 7939.784946236559,
+      "p95Ns": 11735.483870967742,
+      "minNs": 7592.4731182795695,
+      "samples": 100,
+      "batch": 93
+    },
+    {
+      "op": "trail_making.score.400.json",
+      "medianNs": 134750,
+      "p95Ns": 176925,
+      "minNs": 121900,
+      "samples": 100,
+      "batch": 16
+    },
+    {
+      "op": "corsi.gen.default",
+      "medianNs": 8641900,
+      "p95Ns": 9679300,
+      "minNs": 7858500,
+      "samples": 100,
+      "batch": 1
+    },
+    {
+      "op": "corsi.gen.default.json",
+      "medianNs": 8615100,
+      "p95Ns": 9591600,
+      "minNs": 7879500,
+      "samples": 100,
+      "batch": 1
+    },
+    {
+      "op": "corsi.gen.x10",
+      "medianNs": 85596400,
+      "p95Ns": 87223600,
+      "minNs": 83556700,
+      "samples": 18,
+      "batch": 1
+    },
+    {
+      "op": "corsi.gen.x10.json",
+      "medianNs": 85910700,
+      "p95Ns": 89231100,
+      "minNs": 82745000,
+      "samples": 18,
+      "batch": 1
+    },
+    {
+      "op": "corsi.score.400",
+      "medianNs": 11945.977011494253,
+      "p95Ns": 15337.931034482759,
+      "minNs": 11126.436781609196,
+      "samples": 100,
+      "batch": 87
+    },
+    {
+      "op": "corsi.score.400.json",
+      "medianNs": 145306.66666666666,
+      "p95Ns": 185380,
+      "minNs": 133320,
+      "samples": 100,
+      "batch": 15
+    },
+    {
+      "op": "wcst.gen.default",
+      "medianNs": 824.2489270386266,
+      "p95Ns": 1238.9484978540772,
+      "minNs": 764.8068669527897,
+      "samples": 100,
+      "batch": 932
+    },
+    {
+      "op": "wcst.gen.default.json",
+      "medianNs": 4791.881918819188,
+      "p95Ns": 6501.476014760147,
+      "minNs": 4589.667896678967,
+      "samples": 100,
+      "batch": 271
+    },
+    {
+      "op": "wcst.gen.x10",
+      "medianNs": 5035.872235872236,
+      "p95Ns": 6392.137592137592,
+      "minNs": 4841.277641277641,
+      "samples": 100,
+      "batch": 407
+    },
+    {
+      "op": "wcst.gen.x10.json",
+      "medianNs": 45680,
+      "p95Ns": 56726.666666666664,
+      "minNs": 43342.22222222222,
+      "samples": 100,
+      "batch": 45
+    },
+    {
+      "op": "wcst.score.400",
+      "medianNs": 22390.243902439026,
+      "p95Ns": 33700,
+      "minNs": 21217.073170731706,
+      "samples": 100,
+      "batch": 41
+    },
+    {
+      "op": "wcst.score.400.json",
+      "medianNs": 199690.9090909091,
+      "p95Ns": 243818.18181818182,
+      "minNs": 187445.45454545456,
+      "samples": 100,
+      "batch": 11
+    },
+    {
+      "op": "mental_rotation.project_faces",
+      "medianNs": 114350,
+      "p95Ns": 193350,
+      "minNs": 108750,
+      "samples": 100,
+      "batch": 2
+    },
+    {
+      "op": "mental_rotation.is_chiral",
+      "medianNs": 33593.10344827586,
+      "p95Ns": 42279.31034482759,
+      "minNs": 31546.55172413793,
+      "samples": 100,
+      "batch": 58
+    }
+  ]
+}

@@ -29,7 +29,7 @@ fn evidence_path(test: &str) -> PathBuf {
 }
 
 /// Unisce `patch` al file di evidenza del test (i binari di test girano in sequenza: nessuna corsa).
-fn merge_into_file(test: &str, patch: Map<String, Value>) {
+pub fn merge_into_file(test: &str, patch: Map<String, Value>) {
     let path = evidence_path(test);
     let mut doc = std::fs::read_to_string(&path)
         .ok()
@@ -77,6 +77,16 @@ impl Evidence {
             edge_cases: Vec::new(),
             divergences: Vec::new(),
         }
+    }
+
+    /// Contatori accumulati: (confronti esatti, confronti float, massima deviazione, dove).
+    pub fn stats(&self) -> (u64, u64, f64, &str) {
+        (
+            self.exact,
+            self.floats,
+            self.max_deviation,
+            &self.max_deviation_at,
+        )
     }
 
     /// Registra un caso di fixture (`kind`: "generation" o "scoring").

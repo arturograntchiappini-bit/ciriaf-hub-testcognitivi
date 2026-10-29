@@ -1,0 +1,242 @@
+{
+  "tolerance": {
+    "absolute": 1e-9,
+    "source": "tests/common/mod.rs FLOAT_TOLERANCE"
+  },
+  "regenerate": "node --experimental-transform-types --no-warnings desktop/tools/fuzz/fuzz.mjs",
+  "rerun": "cd desktop && SINTROPIA_WRITE_EVIDENCE=1 cargo test -p sintropia-engines --test 'fuzz_*' --release",
+  "tests": {
+    "corsi": {
+      "sequenceCases": 500,
+      "scoringCases": 500,
+      "casesBySection": {
+        "generation": 500,
+        "geometry": 500,
+        "scoring": 500,
+        "spans": 500,
+        "stops": 500
+      },
+      "exactComparisons": 16413,
+      "floatComparisons": 9394,
+      "maxAbsoluteDeviation": 5.684341886080804e-14,
+      "maxAbsoluteDeviationAt": "generation/seq-22.L8[2].pathLength",
+      "divergencesFound": [],
+      "expectedDivergenceCases": {},
+      "tsHang": 0,
+      "tsHangIds": [],
+      "tsErrors": 0,
+      "masterSeed": 20308537,
+      "rustSeconds": 8.989
+    },
+    "flanker": {
+      "sequenceCases": 500,
+      "scoringCases": 500,
+      "casesBySection": {
+        "generation": 500,
+        "scoring": 500
+      },
+      "exactComparisons": 289100,
+      "floatComparisons": 6880,
+      "maxAbsoluteDeviation": 3.410605131648481e-13,
+      "maxAbsoluteDeviationAt": "scoring/score-456.conflictAdaptation",
+      "divergencesFound": [],
+      "expectedDivergenceCases": {},
+      "tsHang": 0,
+      "tsHangIds": [],
+      "tsErrors": 0,
+      "masterSeed": 20276861,
+      "rustSeconds": 0.789
+    },
+    "gonogo": {
+      "sequenceCases": 500,
+      "scoringCases": 500,
+      "casesBySection": {
+        "generation": 500,
+        "scoring": 500
+      },
+      "exactComparisons": 118895,
+      "floatComparisons": 5393,
+      "maxAbsoluteDeviation": 1.1102230246251563e-16,
+      "maxAbsoluteDeviationAt": "generation/seq-40.nextRand",
+      "divergencesFound": [
+        {
+          "category": "rust-bug: il ripiego deterministico accodava tutti i No-Go rimasti (serie > 2) anche quando il vincolo era realizzabile (goRatio < 0.5)",
+          "resolution": "corretto in src/gonogo.rs (deterministic_arrange)",
+          "cases": 7
+        }
+      ],
+      "expectedDivergenceCases": {
+        "ts-more-than-2-consecutive-nogo": 107
+      },
+      "tsHang": 0,
+      "tsHangIds": [],
+      "tsErrors": 0,
+      "masterSeed": 20268942,
+      "rustSeconds": 0.388
+    },
+    "mental_rotation": {
+      "sequenceCases": 500,
+      "scoringCases": 500,
+      "casesBySection": {
+        "generation": 500,
+        "projections": 300,
+        "regression": 500,
+        "scoring": 500,
+        "shapes": 500
+      },
+      "exactComparisons": 2710950,
+      "floatComparisons": 63726,
+      "maxAbsoluteDeviation": 2.273736754432321e-13,
+      "maxAbsoluteDeviationAt": "regression/regression[6].fit.intercept",
+      "divergencesFound": [],
+      "expectedDivergenceCases": {},
+      "tsHang": 0,
+      "tsHangIds": [],
+      "tsErrors": 0,
+      "masterSeed": 20332294,
+      "rustSeconds": 3.103
+    },
+    "nback": {
+      "sequenceCases": 500,
+      "scoringCases": 500,
+      "casesBySection": {
+        "chunks": 500,
+        "generation": 500,
+        "probit": 500,
+        "scoring": 500,
+        "sdt": 500
+      },
+      "exactComparisons": 70585,
+      "floatComparisons": 8480,
+      "maxAbsoluteDeviation": 4.589661983800397e-13,
+      "maxAbsoluteDeviationAt": "probit/probit[139].probit(0.9745772165257012)",
+      "divergencesFound": [],
+      "expectedDivergenceCases": {},
+      "tsHang": 0,
+      "tsHangIds": [],
+      "tsErrors": 0,
+      "masterSeed": 20316456,
+      "rustSeconds": 0.549
+    },
+    "pvt": {
+      "sequenceCases": 500,
+      "scoringCases": 500,
+      "casesBySection": {
+        "generation": 500,
+        "scoring": 500
+      },
+      "exactComparisons": 117842,
+      "floatComparisons": 6000,
+      "maxAbsoluteDeviation": 1.1102230246251563e-16,
+      "maxAbsoluteDeviationAt": "generation/seq-25.nextRand",
+      "divergencesFound": [],
+      "expectedDivergenceCases": {},
+      "tsHang": 0,
+      "tsHangIds": [],
+      "tsErrors": 0,
+      "masterSeed": 20300618,
+      "rustSeconds": 0.25
+    },
+    "sart": {
+      "sequenceCases": 500,
+      "scoringCases": 500,
+      "casesBySection": {
+        "generation": 500,
+        "scoring": 500
+      },
+      "exactComparisons": 197837,
+      "floatComparisons": 59858,
+      "maxAbsoluteDeviation": 1.1102230246251563e-16,
+      "maxAbsoluteDeviationAt": "generation/seq-44.nextRand",
+      "divergencesFound": [],
+      "expectedDivergenceCases": {},
+      "tsHang": 0,
+      "tsHangIds": [],
+      "tsErrors": 0,
+      "masterSeed": 20284780,
+      "rustSeconds": 0.634
+    },
+    "stroop": {
+      "sequenceCases": 500,
+      "scoringCases": 500,
+      "casesBySection": {
+        "generation": 500,
+        "scoring": 500
+      },
+      "exactComparisons": 351844,
+      "floatComparisons": 6500,
+      "maxAbsoluteDeviation": 1.1102230246251563e-16,
+      "maxAbsoluteDeviationAt": "generation/seq-14.nextRand",
+      "divergencesFound": [],
+      "expectedDivergenceCases": {},
+      "tsHang": 0,
+      "tsHangIds": [],
+      "tsErrors": 0,
+      "masterSeed": 20261023,
+      "rustSeconds": 0.923
+    },
+    "trail_making": {
+      "sequenceCases": 500,
+      "scoringCases": 500,
+      "casesBySection": {
+        "generation": 500,
+        "labels": 500,
+        "runs": 500,
+        "scoring": 500
+      },
+      "exactComparisons": 180390,
+      "floatComparisons": 42422,
+      "maxAbsoluteDeviation": 2.9103830456733704e-11,
+      "maxAbsoluteDeviationAt": "runs/runs[424].steps[85].trial.rtMs",
+      "divergencesFound": [],
+      "expectedDivergenceCases": {},
+      "tsHang": 0,
+      "tsHangIds": [],
+      "tsErrors": 0,
+      "masterSeed": 20340213,
+      "rustSeconds": 0.71
+    },
+    "visual_search": {
+      "sequenceCases": 500,
+      "scoringCases": 500,
+      "casesBySection": {
+        "generation": 500,
+        "regression": 500,
+        "scoring": 500
+      },
+      "exactComparisons": 827390,
+      "floatComparisons": 358626,
+      "maxAbsoluteDeviation": 6.821210263296962e-13,
+      "maxAbsoluteDeviationAt": "scoring/score-391.slope.conjunction-absent.intercept",
+      "divergencesFound": [],
+      "expectedDivergenceCases": {
+        "empty-set-size-condition": 28
+      },
+      "tsHang": 0,
+      "tsHangIds": [],
+      "tsErrors": 0,
+      "masterSeed": 20292699,
+      "rustSeconds": 2.06
+    },
+    "wcst": {
+      "sequenceCases": 500,
+      "scoringCases": 500,
+      "casesBySection": {
+        "generation": 500,
+        "perseveration": 500,
+        "scoring": 500
+      },
+      "exactComparisons": 194844,
+      "floatComparisons": 5500,
+      "maxAbsoluteDeviation": 1.1102230246251565e-16,
+      "maxAbsoluteDeviationAt": "generation/seq-9.nextRand",
+      "divergencesFound": [],
+      "expectedDivergenceCases": {},
+      "tsHang": 0,
+      "tsHangIds": [],
+      "tsErrors": 0,
+      "masterSeed": 20324375,
+      "rustSeconds": 0.56
+    }
+  }
+}

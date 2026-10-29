@@ -15,7 +15,7 @@ use super::{bold_text, boxed_runner, params_object, parse_params, trial_spec};
 use crate::runner::TestRunner;
 
 const PRACTICE_FEEDBACK_MS: f64 = 800.0;
-const WORD_SIZE_PX: f32 = 72.0;
+const WORD_SIZE_PX: f32 = 96.0;
 
 fn ink(color: StroopColor) -> Color32 {
     match color {
@@ -50,7 +50,7 @@ fn draw(ctx: &StimulusCtx, stimulus: &StroopStimulus) {
     if !ctx.show {
         return;
     }
-    let font = FontId::new(WORD_SIZE_PX, FontFamily::Proportional);
+    let font = FontId::new(WORD_SIZE_PX * ctx.scale(), FontFamily::Proportional);
     bold_text(
         ctx.painter,
         ctx.center(),

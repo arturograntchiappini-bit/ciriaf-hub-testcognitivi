@@ -13,8 +13,8 @@ use super::{boxed_runner, params_object, parse_params, trial_spec};
 use crate::runner::TestRunner;
 
 const PRACTICE_FEEDBACK_MS: f64 = 600.0;
-/// Diametro 160 px (`h-40 w-40` del TS).
-const CIRCLE_RADIUS_PX: f32 = 80.0;
+/// Raggio base (diametro 176 pt a scala 1,0).
+const CIRCLE_RADIUS_PX: f32 = 88.0;
 
 fn condition(kind: GoNoGoKind) -> &'static str {
     match kind {
@@ -48,7 +48,7 @@ fn draw(ctx: &StimulusCtx, stimulus: &GoNoGoStimulus) {
         NOGO_RED
     };
     ctx.painter
-        .circle_filled(ctx.center(), CIRCLE_RADIUS_PX, color);
+        .circle_filled(ctx.center(), CIRCLE_RADIUS_PX * ctx.scale(), color);
 }
 
 pub fn plan(params: &GoNoGoParams, run: &RunContext) -> RtPlan<GoNoGoStimulus> {

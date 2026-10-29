@@ -5,7 +5,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use eframe::egui::{self, Align2, Color32, FontFamily, FontId, Pos2, Rect, RichText, Sense, Vec2};
+use eframe::egui::{self, Pos2, Rect, Vec2};
 use serde_json::{Map, Value};
 use sintropia_core::sequencer::{
     create_sequencer, Cancel, Clock, Feedback, Scheduler, Sequencer, SequencerConfig,
@@ -13,17 +13,17 @@ use sintropia_core::sequencer::{
 };
 use sintropia_core::{Phase, SummaryMetric, TestId, TestResult, TrialResult};
 
+use super::chrome::{self, ButtonKind, Hint, PauseChoice};
 use crate::runner::{RunnerStatus, TestRunner};
 use crate::runtime::{key_name, EguiEnv};
-use crate::theme::stimulus;
 
 /// Durata del feedback opzionale durante il test (più breve di quello di pratica).
 const TEST_FEEDBACK_MS: f64 = 450.0;
 /// Scansione del conto alla rovescia 3-2-1 (ms dall'inizio): «2» a 700, «1» a 1400, test a 2100.
 const COUNTDOWN_STEPS: [(f64, Option<u8>); 3] =
     [(700.0, Some(2)), (1400.0, Some(1)), (2100.0, None)];
-const STATUS_BAR_HEIGHT: f32 = 30.0;
-const DANGER: Color32 = Color32::from_rgb(208, 2, 27);
+/// Durata di ogni numero del conto alla rovescia (coerente con `COUNTDOWN_STEPS`).
+const COUNTDOWN_STEP_MS: f64 = 700.0;
 
 /// Dati comuni a ogni somministrazione, passati dal costruttore `create_runner`.
 #[derive(Debug, Clone)]
@@ -61,6 +61,11 @@ pub struct StimulusCtx<'a> {
 }
 
 impl StimulusCtx<'_> {
+    /// Fattore di scala dell'area (1,0 a 900×520 pt): le dimensioni degli stimoli lo moltiplicano.
+    pub fn scale(&self) -> f32 {
+        chrome::scale(self.area)
+    }
+
     pub fn center(&self) -> Pos2 {
         self.area.center()
     }
@@ -397,16 +402,20 @@ enum UiAction {
 pub struct RtRunner<S> {
     machine: RtMachine<S>,
     env: Rc<EguiEnv>,
+    hint: Hint,
     pending: Option<UiAction>,
     was_focused: bool,
     last_frame: u64,
     /// (indice trial, istante frame) del primo frame con lo stimolo visibile.
     shown_since: Option<(usize, f64)>,
+    /// (valore, istante frame) in cui il conto alla rovescia ha mostrato il numero corrente.
+    countdown_since: Option<(u8, f64)>,
 }
 
 impl<S: 'static> RtRunner<S> {
     pub fn new(plan: RtPlan<S>, practice: bool, feedback_during_test: bool) -> Self {
         let env = EguiEnv::new();
+        let hint = Hint::parse(&plan.status_hint);
         let machine = RtMachine::new(
             plan,
             env.clone(),
@@ -417,10 +426,12 @@ impl<S: 'static> RtRunner<S> {
         Self {
             machine,
             env,
+            hint,
             pending: None,
             was_focused: true,
             last_frame: u64::MAX,
             shown_since: None,
+            countdown_since: None,
         }
     }
 
@@ -455,6 +466,9 @@ impl<S: 'static> RtRunner<S> {
         }
         self.was_focused = focused;
         let timestamp = self.env.frame_ms();
+        if chrome::shot_pause_due() {
+            self.machine.pause();
+        }
         for event in events {
             let egui::Event::Key {
                 key,
@@ -466,7 +480,11 @@ impl<S: 'static> RtRunner<S> {
                 continue;
             };
             if key == egui::Key::Escape {
-                self.machine.pause();
+                if self.machine.stage() == Stage::Paused {
+                    self.machine.resume();
+                } else {
+                    self.machine.pause();
+                }
             } else if let Some(name) = key_name(key) {
                 self.machine.handle_key(name, timestamp);
             }
@@ -474,135 +492,63 @@ impl<S: 'static> RtRunner<S> {
     }
 
     fn request_repaint(&self, ctx: &egui::Context) {
-        let running = matches!(self.machine.stage(), Stage::Practice | Stage::Test);
-        if running || self.pending.is_some() {
-            ctx.request_repaint(); // vsync: un frame per refresh, necessario al timing e al contatore PVT
+        let animated = matches!(
+            self.machine.stage(),
+            Stage::Practice | Stage::Test | Stage::Countdown
+        );
+        if animated || self.pending.is_some() {
+            ctx.request_repaint(); // vsync: un frame per refresh (timing, contatore PVT, anello del conto)
         } else {
             self.env.request_repaint(ctx);
         }
     }
 
     fn draw(&mut self, ui: &mut egui::Ui) {
-        let (rect, _) = ui.allocate_exact_size(ui.available_size(), Sense::hover());
+        let stage = chrome::Stage::begin(ui);
         match self.machine.stage() {
-            Stage::Paused => self.draw_pause(ui, rect),
-            Stage::Countdown => self.draw_countdown(ui, rect),
-            Stage::Practice | Stage::Test => self.draw_trial(ui, rect),
+            Stage::Paused => self.draw_pause(ui, &stage),
+            Stage::Countdown => self.draw_countdown(&stage),
+            Stage::Practice | Stage::Test => self.draw_trial(ui, &stage),
         }
     }
 
-    fn draw_countdown(&self, ui: &egui::Ui, rect: Rect) {
-        let painter = ui.painter_at(rect);
-        painter.text(
-            rect.center() - Vec2::new(0.0, 12.0),
-            Align2::CENTER_CENTER,
-            self.machine.countdown(),
-            FontId::new(72.0, FontFamily::Proportional),
-            stimulus::INK,
-        );
-        painter.text(
-            rect.center() + Vec2::new(0.0, 48.0),
-            Align2::CENTER_CENTER,
-            "Preparati…",
-            FontId::new(14.0, FontFamily::Proportional),
-            stimulus::MUTED,
-        );
+    fn draw_countdown(&mut self, stage: &chrome::Stage) {
+        let value = self.machine.countdown();
+        let frame = self.env.frame_ms();
+        let since = match self.countdown_since {
+            Some((shown, at)) if shown == value => at,
+            _ => frame,
+        };
+        self.countdown_since = Some((value, since));
+        let remaining = 1.0 - ((frame - since) / COUNTDOWN_STEP_MS) as f32;
+        let total = self.machine.plan().test.len();
+        stage.status_bar(&self.hint, false, 0, total);
+        chrome::countdown(&stage.painter, stage.area, value, remaining, &self.hint);
     }
 
-    fn draw_pause(&mut self, ui: &mut egui::Ui, rect: Rect) {
-        let card = Rect::from_center_size(rect.center(), Vec2::new(420.0, 300.0));
-        let painter = ui.painter_at(rect);
-        painter.rect_filled(card, 0.0, Color32::from_rgb(247, 248, 250));
-        painter.rect_stroke(
-            card,
-            0.0,
-            egui::Stroke::new(1.0, stimulus::LINE),
-            egui::StrokeKind::Inside,
-        );
-        let inner = card.shrink(28.0);
-        ui.scope_builder(egui::UiBuilder::new().max_rect(inner), |ui| {
-            ui.vertical_centered(|ui| {
-                ui.label(RichText::new("Test in pausa").size(19.0).color(stimulus::INK));
-                ui.add_space(6.0);
-                ui.label(
-                    RichText::new(
-                        "Puoi riprendere dal punto in cui eri, uscire salvando i dati raccolti finora, oppure uscire senza salvare.",
-                    )
-                    .size(13.5)
-                    .color(stimulus::MUTED),
-                );
-                ui.add_space(14.0);
-                for (label, action, primary) in [
-                    ("Riprendi il test", UiAction::Resume, true),
-                    ("Esci ed esporta i dati parziali", UiAction::ExportPartial, false),
-                    ("Esci senza salvare", UiAction::Abort, false),
-                ] {
-                    if light_button(ui, label, primary, Some(inner.width())) {
-                        self.pending = Some(action);
-                    }
-                }
-            });
+    fn draw_pause(&mut self, ui: &mut egui::Ui, stage: &chrome::Stage) {
+        self.pending = chrome::pause_panel(ui, stage).map(|choice| match choice {
+            PauseChoice::Resume => UiAction::Resume,
+            PauseChoice::ExportPartial => UiAction::ExportPartial,
+            PauseChoice::Abort => UiAction::Abort,
         });
     }
 
-    fn draw_trial(&mut self, ui: &mut egui::Ui, rect: Rect) {
-        let painter = ui.painter_at(rect);
-        let area = Rect::from_min_max(
-            rect.min,
-            Pos2::new(rect.max.x, rect.max.y - STATUS_BAR_HEIGHT),
-        );
-        self.draw_status_bar(&painter, rect);
-        painter.text(
-            rect.min + Vec2::splat(4.0),
-            Align2::LEFT_TOP,
-            "Esc per interrompere",
-            FontId::new(12.0, FontFamily::Proportional),
-            stimulus::MUTED,
-        );
-        self.draw_content(&painter, area);
-        if self.machine.stage() == Stage::Practice {
-            let button = Rect::from_min_size(
-                Pos2::new(rect.max.x - 150.0, rect.min.y),
-                Vec2::new(150.0, 32.0),
+    fn draw_trial(&mut self, ui: &mut egui::Ui, stage: &chrome::Stage) {
+        let (_, index, total) = self.machine.progress();
+        let practice = self.machine.stage() == Stage::Practice;
+        stage.status_bar(&self.hint, practice, index, total);
+        stage.esc_hint();
+        self.draw_content(&stage.painter, stage.area);
+        if practice {
+            let rect = Rect::from_min_size(
+                Pos2::new(stage.rect.max.x - 16.0 - 160.0, stage.rect.min.y + 12.0),
+                Vec2::new(160.0, 36.0),
             );
-            let clicked = ui
-                .scope_builder(egui::UiBuilder::new().max_rect(button), |ui| {
-                    light_button(ui, "Salta pratica →", false, Some(150.0))
-                })
-                .inner;
-            if clicked {
+            if chrome::button(ui, rect, "Salta pratica", ButtonKind::Secondary, None) {
                 self.pending = Some(UiAction::SkipPractice);
             }
         }
-    }
-
-    fn draw_status_bar(&self, painter: &egui::Painter, rect: Rect) {
-        let bar = Rect::from_min_max(
-            Pos2::new(rect.min.x, rect.max.y - STATUS_BAR_HEIGHT),
-            rect.max,
-        );
-        painter.hline(
-            bar.x_range(),
-            bar.min.y,
-            egui::Stroke::new(1.0, stimulus::LINE),
-        );
-        let font = FontId::new(12.0, FontFamily::Monospace);
-        let y = bar.center().y;
-        painter.text(
-            Pos2::new(bar.min.x + 4.0, y),
-            Align2::LEFT_CENTER,
-            &self.machine.plan().status_hint,
-            font.clone(),
-            stimulus::MUTED,
-        );
-        let (label, index, total) = self.machine.progress();
-        painter.text(
-            Pos2::new(bar.max.x - 4.0, y),
-            Align2::RIGHT_CENTER,
-            format!("{label} · trial {index}/{total}"),
-            font,
-            stimulus::MUTED,
-        );
     }
 
     fn draw_content(&mut self, painter: &egui::Painter, area: Rect) {
@@ -611,22 +557,9 @@ impl<S: 'static> RtRunner<S> {
         };
         let elapsed_ms = self.track_stimulus_time(&state);
         if state.phase == SequencerPhase::Feedback {
-            let (text, color) = if state.feedback == Some(Feedback::Correct) {
-                ("Corretto", stimulus::ACCENT)
-            } else {
-                ("Errato", DANGER)
-            };
-            let font = FontId::new(32.0, FontFamily::Proportional);
-            super::bold_text(painter, area.center(), text, font, color);
+            chrome::feedback(painter, area, state.feedback == Some(Feedback::Correct));
         } else if state.phase == SequencerPhase::Fixation {
-            let font = FontId::new(40.0, FontFamily::Proportional);
-            painter.text(
-                area.center(),
-                Align2::CENTER_CENTER,
-                "+",
-                font,
-                stimulus::INK,
-            );
+            chrome::fixation_cross(painter, area);
         } else if let Some(current) = self.machine.current_stimulus() {
             let ctx = StimulusCtx {
                 painter,
@@ -652,27 +585,6 @@ impl<S: 'static> RtRunner<S> {
         self.shown_since = Some((state.index, since));
         frame - since
     }
-}
-
-/// Bottone sulla superficie chiara (il tema egui è scuro). `true` se cliccato.
-fn light_button(ui: &mut egui::Ui, label: &str, primary: bool, width: Option<f32>) -> bool {
-    let (fill, text) = if primary {
-        (stimulus::ACCENT, Color32::WHITE)
-    } else {
-        (Color32::from_rgb(238, 241, 245), stimulus::INK)
-    };
-    let button = egui::Button::new(RichText::new(label).size(14.0).color(text))
-        .fill(fill)
-        .stroke(egui::Stroke::new(1.0, stimulus::LINE));
-    let response = match width {
-        Some(w) => ui.add_sized([w, 32.0], button),
-        None => ui.add(button),
-    };
-    // Senza focus da tastiera, Spazio e frecce restano risposte del test e non attivano il bottone.
-    if response.has_focus() {
-        response.surrender_focus();
-    }
-    response.clicked()
 }
 
 impl<S: 'static> TestRunner for RtRunner<S> {

@@ -19,7 +19,9 @@ const PRACTICE_FEEDBACK_MS: f64 = 700.0;
 const FIELD_PX: f32 = 520.0;
 const ITEM_PX: f32 = 30.0;
 /// Quota di area occupata al massimo dal campo quando la finestra è piccola.
-const FIT_RATIO: f32 = 0.95;
+const FIT_RATIO: f32 = 0.92;
+/// Ingrandimento massimo rispetto al disegno di riferimento.
+const MAX_SCALE: f32 = 2.4;
 
 /// Blu e arancione: restano distinguibili anche con le più comuni carenze nella visione dei colori.
 fn fill(color: SearchColor) -> Color32 {
@@ -64,7 +66,7 @@ fn draw(ctx: &StimulusCtx, stimulus: &VisualSearchStimulus) {
     if !ctx.show {
         return;
     }
-    let scale = (ctx.area.width().min(ctx.area.height()) * FIT_RATIO / FIELD_PX).min(1.0);
+    let scale = (ctx.area.width().min(ctx.area.height()) * FIT_RATIO / FIELD_PX).min(MAX_SCALE);
     let field = Rect::from_center_size(ctx.center(), Vec2::splat(FIELD_PX * scale));
     let half = ITEM_PX * scale / 2.0;
     for item in &stimulus.items {

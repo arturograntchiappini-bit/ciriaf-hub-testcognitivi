@@ -1,7 +1,7 @@
 //! Vista del PVT: contatore di millisecondi che parte da 0. Porta `src/ui/tests/PvtView.tsx`.
 use std::collections::BTreeMap;
 
-use eframe::egui::{Align2, Color32, FontFamily, FontId, Vec2};
+use eframe::egui::{Align2, Color32, FontFamily, FontId, Pos2, Vec2};
 use sintropia_core::rng::mulberry32;
 use sintropia_core::TestId;
 use sintropia_engines::pvt::{generate_pvt, score_pvt, Params, Stimulus, LAPSE_THRESHOLD_MS};
@@ -14,7 +14,9 @@ use crate::theme::stimulus::{INK, MUTED};
 const PRACTICE_FEEDBACK_MS: f64 = 1500.0;
 /// Ambra del contatore oltre la soglia di lapse (`#B45309` del TS).
 const LAPSE_AMBER: Color32 = Color32::from_rgb(0xB4, 0x53, 0x09);
-const COUNTER_SIZE_PX: f32 = 96.0;
+const COUNTER_SIZE_PX: f32 = 132.0;
+/// Passo di una cifra in unità di corpo (larghezza delle cifre di Inter).
+const DIGIT_PITCH: f32 = 0.64;
 
 fn to_trials(stimuli: Vec<Stimulus>) -> Vec<RtTrial<Stimulus>> {
     stimuli
@@ -39,13 +41,21 @@ fn draw(ctx: &StimulusCtx, _stimulus: &Stimulus) {
         INK
     };
     let center = ctx.center();
-    let font = FontId::new(COUNTER_SIZE_PX, FontFamily::Monospace);
-    bold_text(ctx.painter, center, &format!("{ms:.0}"), font, color);
+    let size = COUNTER_SIZE_PX * ctx.scale();
+    // Inter ha lo zero senza punto (JetBrains Mono lo ha puntato); ogni cifra va in una cella fissa così il numero non ballonzola.
+    let font = FontId::new(size, FontFamily::Proportional);
+    let digits = format!("{ms:.0}");
+    let pitch = size * DIGIT_PITCH;
+    let left = center.x - pitch * (digits.chars().count() as f32 - 1.0) / 2.0;
+    for (i, digit) in digits.chars().enumerate() {
+        let at = Pos2::new(left + pitch * i as f32, center.y);
+        bold_text(ctx.painter, at, &digit.to_string(), font.clone(), color);
+    }
     ctx.painter.text(
-        center + Vec2::new(0.0, COUNTER_SIZE_PX * 0.7),
+        center + Vec2::new(0.0, size * 0.72),
         Align2::CENTER_CENTER,
         "ms",
-        FontId::new(12.0, FontFamily::Proportional),
+        FontId::new(size * 0.18, FontFamily::Proportional),
         MUTED,
     );
 }

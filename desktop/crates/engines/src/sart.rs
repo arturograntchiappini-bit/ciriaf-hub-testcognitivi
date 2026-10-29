@@ -9,7 +9,7 @@ use sintropia_core::sdt::{criterion_c, d_prime};
 use sintropia_core::types::{
     js_round, MetricValue, Phase, SummaryMetric, TrialResult, ValidationFlag,
 };
-use sintropia_core::validation::{count_flag, mean, standard_deviation};
+use sintropia_core::validation::{mean, standard_deviation};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -150,14 +150,21 @@ fn is_usable_go_rt(t: &TrialResult) -> bool {
 
 /// RT dei Go nei `window` trial che precedono ciascuna commissione (Robertson et al., 1997: gli errori
 /// sono preceduti da risposte anormalmente veloci). Un trial vicino a più errori conta una volta sola.
-pub fn reaction_times_before_commissions(trials: &[TrialResult], window: usize) -> Vec<f64> {
+pub fn reaction_times_before_commissions<'a>(
+    trials: impl IntoIterator<Item = &'a TrialResult>,
+    window: usize,
+) -> Vec<f64> {
+    reaction_times_before_commissions_refs(&trials.into_iter().collect::<Vec<_>>(), window)
+}
+
+fn reaction_times_before_commissions_refs(trials: &[&TrialResult], window: usize) -> Vec<f64> {
     let mut picked: Vec<usize> = Vec::new();
     for (i, t) in trials.iter().enumerate() {
         if t.condition != "nogo" || !is_responded(t) {
             continue;
         }
         for k in i.saturating_sub(window)..i {
-            if is_usable_go_rt(&trials[k]) && !picked.contains(&k) {
+            if is_usable_go_rt(trials[k]) && !picked.contains(&k) {
                 picked.push(k);
             }
         }
@@ -197,13 +204,10 @@ fn num_or_dash(label: String, value: Option<f64>, unit: &str) -> SummaryMetric {
 /// falso allarme = risposta al bersaglio), RT prima delle commissioni. I trial interrotti sono esclusi
 /// da numeratori e denominatori.
 pub fn score_sart(trials: &[TrialResult]) -> Vec<SummaryMetric> {
-    let test: Vec<TrialResult> = trials
-        .iter()
-        .filter(|t| t.phase == Phase::Test)
-        .cloned()
-        .collect();
+    let test: Vec<&TrialResult> = trials.iter().filter(|t| t.phase == Phase::Test).collect();
     let of_condition = |condition: &str| -> Vec<&TrialResult> {
         test.iter()
+            .copied()
             .filter(|t| t.condition == condition && is_valid_trial(t))
             .collect()
     };
@@ -216,12 +220,13 @@ pub fn score_sart(trials: &[TrialResult]) -> Vec<SummaryMetric> {
 
     let go_rts: Vec<f64> = test
         .iter()
+        .copied()
         .filter(|t| is_usable_go_rt(t))
         .filter_map(|t| t.rt_ms)
         .collect();
     let mean_go = mean(&go_rts);
     let sd_go = standard_deviation(&go_rts);
-    let pre_error_rts = reaction_times_before_commissions(&test, PRE_ERROR_WINDOW);
+    let pre_error_rts = reaction_times_before_commissions_refs(&test, PRE_ERROR_WINDOW);
     let has_pre_error = !pre_error_rts.is_empty() && !go_rts.is_empty();
     let pre_error_mean = has_pre_error.then(|| mean(&pre_error_rts));
     let cv_go = if mean_go > 0.0 {
@@ -274,7 +279,9 @@ pub fn score_sart(trials: &[TrialResult]) -> Vec<SummaryMetric> {
         ),
         num(
             "Errori di anticipazione",
-            count_flag(trials, ValidationFlag::Anticipation) as f64,
+            test.iter()
+                .filter(|t| t.flag == ValidationFlag::Anticipation)
+                .count() as f64,
             None,
         ),
     ]

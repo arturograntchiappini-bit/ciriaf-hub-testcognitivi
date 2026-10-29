@@ -8,3 +8,19 @@
   Cache-Control: public, max-age=0, must-revalidate
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+/install.ps1
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=3600
+/download/*.msi
+  Content-Type: application/x-msi
+  Content-Disposition: attachment
+  Cache-Control: public, max-age=3600
+/download/*.zip
+  Content-Type: application/zip
+  Content-Disposition: attachment
+  Cache-Control: public, max-age=3600
+/download/SHA256SUMS.txt
+  Content-Type: text/plain; charset=utf-8
+  Content-Disposition: attachment
+  Cache-Control: public, max-age=3600

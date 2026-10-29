@@ -1,0 +1,1090 @@
+{
+  "meta": {
+    "hardware": {
+      "cpu": "Intel(R) Core(TM) Ultra 7 258V",
+      "cores": 8,
+      "ramGb": 32,
+      "os": "win32 10.0.26200"
+    },
+    "node": "v24.15.0",
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+    "date": "2026-10-23"
+  },
+  "wasmVariants": [
+    {
+      "label": "O3",
+      "sizeBytes": 424069,
+      "gzipBytes": 135012,
+      "compileMsMedian": 0.7391000986099243,
+      "instantiateMsMedian": 0.07019996643066406
+    },
+    {
+      "label": "Os",
+      "sizeBytes": 297710,
+      "gzipBytes": 111477,
+      "compileMsMedian": 0.3851999044418335,
+      "instantiateMsMedian": 0.045599937438964844
+    },
+    {
+      "label": "Oz",
+      "sizeBytes": 281945,
+      "gzipBytes": 106275,
+      "compileMsMedian": 0.3317999839782715,
+      "instantiateMsMedian": 0.037199974060058594
+    }
+  ],
+  "rows": [
+    {
+      "op": "stroop.gen.default",
+      "tsMedianNs": 647.0676691729324,
+      "tsP95Ns": 880.3007518796992,
+      "rustMedianNs": 378.89908256880733,
+      "rustP95Ns": 629.8445983898147,
+      "wasmOsMedianNs": 250,
+      "wasmO3MedianNs": 500,
+      "wasmOsP95Ns": 300,
+      "tsOverRust": 1.7077572866791677,
+      "tsOverWasmOs": 2.5882706766917294,
+      "tsOverWasmO3": 1.2941353383458647
+    },
+    {
+      "op": "stroop.gen.default.json",
+      "tsMedianNs": 3600.8,
+      "tsP95Ns": 4536.2,
+      "rustMedianNs": 2206.6803699897223,
+      "rustP95Ns": 3129.0853031860224,
+      "wasmOsMedianNs": 5113.506493506494,
+      "wasmO3MedianNs": 3600,
+      "wasmOsP95Ns": 6596.883116883117,
+      "tsOverRust": 1.6317723440920313,
+      "tsOverWasmOs": 0.7041743282369076,
+      "tsOverWasmO3": 1.0002222222222223
+    },
+    {
+      "op": "stroop.gen.x10",
+      "tsMedianNs": 423800,
+      "tsP95Ns": 573100,
+      "rustMedianNs": 296216.6666666667,
+      "rustP95Ns": 483116.6666666667,
+      "wasmOsMedianNs": 243275,
+      "wasmO3MedianNs": 342300,
+      "wasmOsP95Ns": 298312.5,
+      "tsOverRust": 1.4307095031789792,
+      "tsOverWasmOs": 1.7420614530880691,
+      "tsOverWasmO3": 1.2380952380952381
+    },
+    {
+      "op": "stroop.gen.x10.json",
+      "tsMedianNs": 472260,
+      "tsP95Ns": 594620,
+      "rustMedianNs": 343442.85714285716,
+      "rustP95Ns": 592442.8571428572,
+      "wasmOsMedianNs": 297571.4285714286,
+      "wasmO3MedianNs": 381166.6666666667,
+      "wasmOsP95Ns": 375800,
+      "tsOverRust": 1.3750759119836944,
+      "tsOverWasmOs": 1.5870475276044167,
+      "tsOverWasmO3": 1.238985570616528
+    },
+    {
+      "op": "stroop.score.400",
+      "tsMedianNs": 38490.6976744186,
+      "tsP95Ns": 49365.11627906977,
+      "rustMedianNs": 4785.714285714285,
+      "rustP95Ns": 6413.919413919414,
+      "wasmOsMedianNs": 4393.518518518518,
+      "wasmO3MedianNs": 6700,
+      "wasmOsP95Ns": 6280.555555555556,
+      "tsOverRust": 8.042832349878514,
+      "tsOverWasmOs": 8.760791040752812,
+      "tsOverWasmO3": 5.7448802499132245
+    },
+    {
+      "op": "stroop.score.400.json",
+      "tsMedianNs": 191283.33333333334,
+      "tsP95Ns": 265700,
+      "rustMedianNs": 122541.17647058824,
+      "rustP95Ns": 151511.76470588235,
+      "wasmOsMedianNs": 145350,
+      "wasmO3MedianNs": 211600,
+      "wasmOsP95Ns": 171300,
+      "tsOverRust": 1.560971902201741,
+      "tsOverWasmOs": 1.3160188051828918,
+      "tsOverWasmO3": 0.9039855072463768
+    },
+    {
+      "op": "gonogo.gen.default",
+      "tsMedianNs": 799.6969696969697,
+      "tsP95Ns": 1164.8484848484848,
+      "rustMedianNs": 634.0358603334382,
+      "rustP95Ns": 787.19723183391,
+      "wasmOsMedianNs": 670.4333333333333,
+      "wasmO3MedianNs": 681.8570318570319,
+      "wasmOsP95Ns": 798.5,
+      "tsOverRust": 1.2612803466296223,
+      "tsOverWasmOs": 1.1928061000800028,
+      "tsOverWasmO3": 1.1728220614210016
+    },
+    {
+      "op": "gonogo.gen.default.json",
+      "tsMedianNs": 4098.523206751055,
+      "tsP95Ns": 5242.194092827004,
+      "rustMedianNs": 2295.8333333333335,
+      "rustP95Ns": 2795.220588235294,
+      "wasmOsMedianNs": 5930.177514792899,
+      "wasmO3MedianNs": 4091.176470588235,
+      "wasmOsP95Ns": 7132.84023668639,
+      "tsOverRust": 1.7852006708171564,
+      "tsOverWasmOs": 0.6911299360815489,
+      "tsOverWasmO3": 1.0017957514704232
+    },
+    {
+      "op": "gonogo.gen.x10",
+      "tsMedianNs": 8807.425742574258,
+      "tsP95Ns": 11100,
+      "rustMedianNs": 5072.33502538071,
+      "rustP95Ns": 6000.253807106599,
+      "wasmOsMedianNs": 6157.894736842105,
+      "wasmO3MedianNs": 6561.414790996784,
+      "wasmOsP95Ns": 7496.594427244582,
+      "tsOverRust": 1.7363651451459885,
+      "tsOverWasmOs": 1.4302657188795804,
+      "tsOverWasmO3": 1.342305893335585
+    },
+    {
+      "op": "gonogo.gen.x10.json",
+      "tsMedianNs": 41952,
+      "tsP95Ns": 53894,
+      "rustMedianNs": 20021.649484536083,
+      "rustP95Ns": 24150.515463917527,
+      "wasmOsMedianNs": 57702.7027027027,
+      "wasmO3MedianNs": 40713.46153846154,
+      "wasmOsP95Ns": 70108.1081081081,
+      "tsOverRust": 2.095331857267906,
+      "tsOverWasmOs": 0.7270370023419204,
+      "tsOverWasmO3": 1.0304208587218364
+    },
+    {
+      "op": "gonogo.score.400",
+      "tsMedianNs": 19155.555555555555,
+      "tsP95Ns": 26488.88888888889,
+      "rustMedianNs": 3081.9805194805194,
+      "rustP95Ns": 3777.1103896103896,
+      "wasmOsMedianNs": 2698.082191780822,
+      "wasmO3MedianNs": 3727.3356401384085,
+      "wasmOsP95Ns": 3352.328767123288,
+      "tsOverRust": 6.215339595587159,
+      "tsOverWasmOs": 7.0996931130968495,
+      "tsOverWasmO3": 5.139208647934975
+    },
+    {
+      "op": "gonogo.score.400.json",
+      "tsMedianNs": 158346.15384615384,
+      "tsP95Ns": 214146.15384615384,
+      "rustMedianNs": 111614.28571428571,
+      "rustP95Ns": 139728.57142857142,
+      "wasmOsMedianNs": 138886.66666666666,
+      "wasmO3MedianNs": 224454.54545454544,
+      "wasmOsP95Ns": 171760,
+      "tsOverRust": 1.4186907422540342,
+      "tsOverWasmOs": 1.1401105494610992,
+      "tsOverWasmO3": 0.7054709162850111
+    },
+    {
+      "op": "flanker.gen.default",
+      "tsMedianNs": 9075.757575757576,
+      "tsP95Ns": 13542.424242424242,
+      "rustMedianNs": 3947.5510204081634,
+      "rustP95Ns": 5165.714285714285,
+      "wasmOsMedianNs": 2661.734693877551,
+      "wasmO3MedianNs": 3252.439024390244,
+      "wasmOsP95Ns": 3169.5578231292516,
+      "tsOverRust": 2.299085566934401,
+      "tsOverWasmOs": 3.4097153246089418,
+      "tsOverWasmO3": 2.790446648714365
+    },
+    {
+      "op": "flanker.gen.default.json",
+      "tsMedianNs": 21231.91489361702,
+      "tsP95Ns": 26855.31914893617,
+      "rustMedianNs": 8767.256637168142,
+      "rustP95Ns": 10667.256637168142,
+      "wasmOsMedianNs": 16115.652173913044,
+      "wasmO3MedianNs": 11750,
+      "wasmOsP95Ns": 21846.08695652174,
+      "tsOverRust": 2.421728457634726,
+      "tsOverWasmOs": 1.3174716520617047,
+      "tsOverWasmO3": 1.8069714803078316
+    },
+    {
+      "op": "flanker.gen.x10",
+      "tsMedianNs": 118753.33333333333,
+      "tsP95Ns": 157713.33333333334,
+      "rustMedianNs": 41768,
+      "rustP95Ns": 51626,
+      "wasmOsMedianNs": 27798.61111111111,
+      "wasmO3MedianNs": 28184.057971014492,
+      "wasmOsP95Ns": 37854.166666666664,
+      "tsOverRust": 2.843165421694439,
+      "tsOverWasmOs": 4.271916062952785,
+      "tsOverWasmO3": 4.213493083766133
+    },
+    {
+      "op": "flanker.gen.x10.json",
+      "tsMedianNs": 270087.5,
+      "tsP95Ns": 410450,
+      "rustMedianNs": 91621.73913043478,
+      "rustP95Ns": 117060.86956521739,
+      "wasmOsMedianNs": 163911.11111111112,
+      "wasmO3MedianNs": 101316.66666666667,
+      "wasmOsP95Ns": 224522.22222222222,
+      "tsOverRust": 2.9478538888625256,
+      "tsOverWasmOs": 1.6477680992407808,
+      "tsOverWasmO3": 2.6657756209902943
+    },
+    {
+      "op": "flanker.score.400",
+      "tsMedianNs": 56666.666666666664,
+      "tsP95Ns": 104800,
+      "rustMedianNs": 10062.82722513089,
+      "rustP95Ns": 12306.28272251309,
+      "wasmOsMedianNs": 14687.394957983193,
+      "wasmO3MedianNs": 13727.659574468085,
+      "wasmOsP95Ns": 18829.41176470588,
+      "tsOverRust": 5.631286853971557,
+      "tsOverWasmOs": 3.858183621314414,
+      "tsOverWasmO3": 4.127918991527175
+    },
+    {
+      "op": "flanker.score.400.json",
+      "tsMedianNs": 215533.33333333334,
+      "tsP95Ns": 291955.55555555556,
+      "rustMedianNs": 128676.92307692308,
+      "rustP95Ns": 163546.15384615384,
+      "wasmOsMedianNs": 162369.23076923078,
+      "wasmO3MedianNs": 160190.9090909091,
+      "wasmOsP95Ns": 207546.15384615384,
+      "tsOverRust": 1.674996014666029,
+      "tsOverWasmOs": 1.3274271997978648,
+      "tsOverWasmO3": 1.345477933526285
+    },
+    {
+      "op": "sart.gen.default",
+      "tsMedianNs": 93707.14285714286,
+      "tsP95Ns": 123785.71428571429,
+      "rustMedianNs": 17473.14814814815,
+      "rustP95Ns": 22058.333333333332,
+      "wasmOsMedianNs": 10639.130434782608,
+      "wasmO3MedianNs": 9200,
+      "wasmOsP95Ns": 13522.282608695652,
+      "tsOverRust": 5.362922700742636,
+      "tsOverWasmOs": 8.807782123883472,
+      "tsOverWasmO3": 10.18555900621118
+    },
+    {
+      "op": "sart.gen.default.json",
+      "tsMedianNs": 145384.2105263158,
+      "tsP95Ns": 296142.1052631579,
+      "rustMedianNs": 21714.893617021276,
+      "rustP95Ns": 27197.872340425532,
+      "wasmOsMedianNs": 23945.3488372093,
+      "wasmO3MedianNs": 16185.833333333334,
+      "wasmOsP95Ns": 30368.60465116279,
+      "tsOverRust": 6.695138050888538,
+      "tsOverWasmOs": 6.071501046599892,
+      "tsOverWasmO3": 8.982188777819026
+    },
+    {
+      "op": "sart.gen.x10",
+      "tsMedianNs": 1245900,
+      "tsP95Ns": 3002050,
+      "rustMedianNs": 182991.66666666666,
+      "rustP95Ns": 219858.33333333334,
+      "wasmOsMedianNs": 115927.77777777778,
+      "wasmO3MedianNs": 107842.85714285714,
+      "wasmOsP95Ns": 145355.55555555556,
+      "tsOverRust": 6.808506762603034,
+      "tsOverWasmOs": 10.74720851104615,
+      "tsOverWasmO3": 11.552920916677705
+    },
+    {
+      "op": "sart.gen.x10.json",
+      "tsMedianNs": 1306450,
+      "tsP95Ns": 2896750,
+      "rustMedianNs": 226480,
+      "rustP95Ns": 288730,
+      "wasmOsMedianNs": 250377.77777777778,
+      "wasmO3MedianNs": 177881.81818181818,
+      "wasmOsP95Ns": 296177.77777777775,
+      "tsOverRust": 5.76850052984811,
+      "tsOverWasmOs": 5.217915150439336,
+      "tsOverWasmO3": 7.344483058210252
+    },
+    {
+      "op": "sart.score.400",
+      "tsMedianNs": 39472.41379310345,
+      "tsP95Ns": 50041.379310344826,
+      "rustMedianNs": 4216.528925619835,
+      "rustP95Ns": 5872.107438016529,
+      "wasmOsMedianNs": 3936.0576923076924,
+      "wasmO3MedianNs": 2989.179104477612,
+      "wasmOsP95Ns": 5132.211538461538,
+      "tsOverRust": 9.361352545992782,
+      "tsOverWasmOs": 10.028413422456966,
+      "tsOverWasmO3": 13.205101605981431
+    },
+    {
+      "op": "sart.score.400.json",
+      "tsMedianNs": 238118.18181818182,
+      "tsP95Ns": 803927.2727272727,
+      "rustMedianNs": 117746.66666666667,
+      "rustP95Ns": 162753.33333333334,
+      "wasmOsMedianNs": 137893.33333333334,
+      "wasmO3MedianNs": 133593.75,
+      "wasmOsP95Ns": 178646.66666666666,
+      "tsOverRust": 2.022292337941755,
+      "tsOverWasmOs": 1.726828818058754,
+      "tsOverWasmO3": 1.7824051036682615
+    },
+    {
+      "op": "visual_search.gen.default",
+      "tsMedianNs": 340000,
+      "tsP95Ns": 553300,
+      "rustMedianNs": 38462.264150943396,
+      "rustP95Ns": 48692.45283018868,
+      "wasmOsMedianNs": 33235.59322033898,
+      "wasmO3MedianNs": 21591.780821917808,
+      "wasmOsP95Ns": 41757.627118644064,
+      "tsOverRust": 8.839833210694138,
+      "tsOverWasmOs": 10.229996430210617,
+      "tsOverWasmO3": 15.7467326481411
+    },
+    {
+      "op": "visual_search.gen.default.json",
+      "tsMedianNs": 586950,
+      "tsP95Ns": 2014525,
+      "rustMedianNs": 104863.15789473684,
+      "rustP95Ns": 134857.8947368421,
+      "wasmOsMedianNs": 255211.11111111112,
+      "wasmO3MedianNs": 144814.2857142857,
+      "wasmOsP95Ns": 328333.3333333333,
+      "tsOverRust": 5.597294719935756,
+      "tsOverWasmOs": 2.2998606817884975,
+      "tsOverWasmO3": 4.053122225510506
+    },
+    {
+      "op": "visual_search.gen.x10",
+      "tsMedianNs": 2809900,
+      "tsP95Ns": 7796700,
+      "rustMedianNs": 387283.3333333333,
+      "rustP95Ns": 498283.3333333333,
+      "wasmOsMedianNs": 315942.85714285716,
+      "wasmO3MedianNs": 226025,
+      "wasmOsP95Ns": 421728.5714285714,
+      "tsOverRust": 7.255411628007058,
+      "tsOverWasmOs": 8.893696871043588,
+      "tsOverWasmO3": 12.431810640415883
+    },
+    {
+      "op": "visual_search.gen.x10.json",
+      "tsMedianNs": 6663000,
+      "tsP95Ns": 15023800,
+      "rustMedianNs": 1264700,
+      "rustP95Ns": 1655400,
+      "wasmOsMedianNs": 2530500,
+      "wasmO3MedianNs": 1471000,
+      "wasmOsP95Ns": 3050900,
+      "tsOverRust": 5.268443109037716,
+      "tsOverWasmOs": 2.6330764671013633,
+      "tsOverWasmO3": 4.5295717199184224
+    },
+    {
+      "op": "visual_search.score.400",
+      "tsMedianNs": 414800,
+      "tsP95Ns": 598200,
+      "rustMedianNs": 74445.83333333333,
+      "rustP95Ns": 91495.83333333333,
+      "wasmOsMedianNs": 102578.94736842105,
+      "wasmO3MedianNs": 92653.33333333333,
+      "wasmOsP95Ns": 135863.15789473685,
+      "tsOverRust": 5.571836346336823,
+      "tsOverWasmOs": 4.043714725500257,
+      "tsOverWasmO3": 4.4769031515325945
+    },
+    {
+      "op": "visual_search.score.400.json",
+      "tsMedianNs": 776450,
+      "tsP95Ns": 1570175,
+      "rustMedianNs": 196209.0909090909,
+      "rustP95Ns": 253181.81818181818,
+      "wasmOsMedianNs": 243485.7142857143,
+      "wasmO3MedianNs": 231266.66666666666,
+      "wasmOsP95Ns": 330300,
+      "tsOverRust": 3.9572580271509983,
+      "tsOverWasmOs": 3.188893452241258,
+      "tsOverWasmO3": 3.357379648313635
+    },
+    {
+      "op": "pvt.gen.default",
+      "tsMedianNs": 5671.428571428572,
+      "tsP95Ns": 9971.42857142857,
+      "rustMedianNs": 193.24090121317158,
+      "rustP95Ns": 225.97727710379357,
+      "wasmOsMedianNs": 601.021021021021,
+      "wasmO3MedianNs": 595.4164170161773,
+      "wasmOsP95Ns": 711.8618618618618,
+      "tsOverRust": 29.349007046764893,
+      "tsOverWasmOs": 9.436323145226913,
+      "tsOverWasmO3": 9.525146451033244
+    },
+    {
+      "op": "pvt.gen.default.json",
+      "tsMedianNs": 9452.147239263804,
+      "tsP95Ns": 15438.650306748466,
+      "rustMedianNs": 1166.0724896019015,
+      "rustP95Ns": 1598.1580510992276,
+      "wasmOsMedianNs": 3809.619238476954,
+      "wasmO3MedianNs": 2323.774509803922,
+      "wasmOsP95Ns": 4627.855711422846,
+      "tsOverRust": 8.105968817162283,
+      "tsOverWasmOs": 2.481126497839368,
+      "tsOverWasmO3": 4.067583665878739
+    },
+    {
+      "op": "pvt.gen.x10",
+      "tsMedianNs": 50197.5,
+      "tsP95Ns": 117507.5,
+      "rustMedianNs": 1588.0154639175257,
+      "rustP95Ns": 2171.778350515464,
+      "wasmOsMedianNs": 5777.586206896552,
+      "wasmO3MedianNs": 5749.068322981367,
+      "wasmOsP95Ns": 6970.977011494253,
+      "tsOverRust": 31.610208553112066,
+      "tsOverWasmOs": 8.688316920322292,
+      "tsOverWasmO3": 8.731414757994814
+    },
+    {
+      "op": "pvt.gen.x10.json",
+      "tsMedianNs": 88496.66666666667,
+      "tsP95Ns": 202470,
+      "rustMedianNs": 10596.315789473685,
+      "rustP95Ns": 13365.78947368421,
+      "wasmOsMedianNs": 37872.72727272727,
+      "wasmO3MedianNs": 23090.909090909092,
+      "wasmOsP95Ns": 46577.27272727273,
+      "tsOverRust": 8.351644894783027,
+      "tsOverWasmOs": 2.3366858697391586,
+      "tsOverWasmO3": 3.83253280839895
+    },
+    {
+      "op": "pvt.score.400",
+      "tsMedianNs": 116250,
+      "tsP95Ns": 142250,
+      "rustMedianNs": 7176.771653543307,
+      "rustP95Ns": 9622.44094488189,
+      "wasmOsMedianNs": 8840.40404040404,
+      "wasmO3MedianNs": 7939.0625,
+      "wasmOsP95Ns": 11284.343434343435,
+      "tsOverRust": 16.198090953974436,
+      "tsOverWasmOs": 13.149851462522852,
+      "tsOverWasmO3": 14.642786852981697
+    },
+    {
+      "op": "pvt.score.400.json",
+      "tsMedianNs": 331685.71428571426,
+      "tsP95Ns": 1137514.2857142857,
+      "rustMedianNs": 126294.11764705883,
+      "rustP95Ns": 164305.88235294117,
+      "wasmOsMedianNs": 148538.46153846153,
+      "wasmO3MedianNs": 136246.66666666666,
+      "wasmOsP95Ns": 191707.6923076923,
+      "tsOverRust": 2.6262958280657394,
+      "tsOverWasmOs": 2.2329954871643114,
+      "tsOverWasmO3": 2.4344501219776458
+    },
+    {
+      "op": "nback.gen.default",
+      "tsMedianNs": 94950,
+      "tsP95Ns": 135400,
+      "rustMedianNs": 7304.878048780488,
+      "rustP95Ns": 9375.203252032521,
+      "wasmOsMedianNs": 8542.211055276382,
+      "wasmO3MedianNs": 4941.993957703928,
+      "wasmOsP95Ns": 10729.64824120603,
+      "tsOverRust": 12.998163606010017,
+      "tsOverWasmOs": 11.115389140537678,
+      "tsOverWasmO3": 19.21289277417777
+    },
+    {
+      "op": "nback.gen.default.json",
+      "tsMedianNs": 125945.45454545454,
+      "tsP95Ns": 247481.81818181818,
+      "rustMedianNs": 16695.934959349594,
+      "rustP95Ns": 21530.08130081301,
+      "wasmOsMedianNs": 42040,
+      "wasmO3MedianNs": 18716.071428571428,
+      "wasmOsP95Ns": 55020,
+      "tsOverRust": 7.543480185572122,
+      "tsOverWasmOs": 2.995848110025084,
+      "tsOverWasmO3": 6.729267679177039
+    },
+    {
+      "op": "nback.gen.x10",
+      "tsMedianNs": 1219100,
+      "tsP95Ns": 3312100,
+      "rustMedianNs": 117156.25,
+      "rustP95Ns": 157406.25,
+      "wasmOsMedianNs": 143330.76923076922,
+      "wasmO3MedianNs": 86025,
+      "wasmOsP95Ns": 180584.61538461538,
+      "tsOverRust": 10.40576153640971,
+      "tsOverWasmOs": 8.505500992862126,
+      "tsOverWasmO3": 14.171461784365011
+    },
+    {
+      "op": "nback.gen.x10.json",
+      "tsMedianNs": 1675100,
+      "tsP95Ns": 4906900,
+      "rustMedianNs": 206800,
+      "rustP95Ns": 275785.71428571426,
+      "wasmOsMedianNs": 479100,
+      "wasmO3MedianNs": 236887.5,
+      "wasmOsP95Ns": 570580,
+      "tsOverRust": 8.10009671179884,
+      "tsOverWasmOs": 3.496347317887706,
+      "tsOverWasmO3": 7.071289114030922
+    },
+    {
+      "op": "nback.score.400",
+      "tsMedianNs": 10650,
+      "tsP95Ns": 12200,
+      "rustMedianNs": 2798.8995873452545,
+      "rustP95Ns": 3599.312242090784,
+      "wasmOsMedianNs": 3758.070500927644,
+      "wasmO3MedianNs": 3542.682926829268,
+      "wasmOsP95Ns": 4864.007421150278,
+      "tsOverRust": 3.805066837035581,
+      "tsOverWasmOs": 2.8339010663507107,
+      "tsOverWasmO3": 3.006196213425129
+    },
+    {
+      "op": "nback.score.400.json",
+      "tsMedianNs": 210536.36363636365,
+      "tsP95Ns": 620754.5454545454,
+      "rustMedianNs": 110870.58823529411,
+      "rustP95Ns": 142005.88235294117,
+      "wasmOsMedianNs": 131950,
+      "wasmO3MedianNs": 121760,
+      "wasmOsP95Ns": 171243.75,
+      "tsOverRust": 1.8989379148016672,
+      "tsOverWasmOs": 1.5955768369561474,
+      "tsOverWasmO3": 1.7291094253972048
+    },
+    {
+      "op": "mental_rotation.gen.default",
+      "tsMedianNs": 5460700,
+      "tsP95Ns": 12485800,
+      "rustMedianNs": 522425,
+      "rustP95Ns": 1166000,
+      "wasmOsMedianNs": 310300,
+      "wasmO3MedianNs": 277025,
+      "wasmOsP95Ns": 389350,
+      "tsOverRust": 10.452600851796909,
+      "tsOverWasmOs": 17.598130841121495,
+      "tsOverWasmO3": 19.711939355653822
+    },
+    {
+      "op": "mental_rotation.gen.default.json",
+      "tsMedianNs": 4968400,
+      "tsP95Ns": 17078300,
+      "rustMedianNs": 552825,
+      "rustP95Ns": 1136725,
+      "wasmOsMedianNs": 421180,
+      "wasmO3MedianNs": 308442.85714285716,
+      "wasmOsP95Ns": 542260,
+      "tsOverRust": 8.987292542848099,
+      "tsOverWasmOs": 11.796381594567643,
+      "tsOverWasmO3": 16.108007966282248
+    },
+    {
+      "op": "mental_rotation.gen.x10",
+      "tsMedianNs": 67402800,
+      "tsP95Ns": 85676500,
+      "rustMedianNs": 5723500,
+      "rustP95Ns": 13012400,
+      "wasmOsMedianNs": 3399700,
+      "wasmO3MedianNs": 2891100,
+      "wasmOsP95Ns": 4257700,
+      "tsOverRust": 11.7765003931161,
+      "tsOverWasmOs": 19.826102303144395,
+      "tsOverWasmO3": 23.31389436546643
+    },
+    {
+      "op": "mental_rotation.gen.x10.json",
+      "tsMedianNs": 82043500,
+      "tsP95Ns": 112262200,
+      "rustMedianNs": 6213100,
+      "rustP95Ns": 12684300,
+      "wasmOsMedianNs": 4198000,
+      "wasmO3MedianNs": 3247800,
+      "wasmOsP95Ns": 4918200,
+      "tsOverRust": 13.20492185865349,
+      "tsOverWasmOs": 19.5434730824202,
+      "tsOverWasmO3": 25.261253771783977
+    },
+    {
+      "op": "mental_rotation.score.400",
+      "tsMedianNs": 371000,
+      "tsP95Ns": 654800,
+      "rustMedianNs": 91400,
+      "rustP95Ns": 115750,
+      "wasmOsMedianNs": 51169.230769230766,
+      "wasmO3MedianNs": 46317.24137931035,
+      "wasmOsP95Ns": 67065.38461538461,
+      "tsOverRust": 4.059080962800875,
+      "tsOverWasmOs": 7.250450992182802,
+      "tsOverWasmO3": 8.009976176295414
+    },
+    {
+      "op": "mental_rotation.score.400.json",
+      "tsMedianNs": 608300,
+      "tsP95Ns": 2251550,
+      "rustMedianNs": 292714.28571428574,
+      "rustP95Ns": 482228.5714285714,
+      "wasmOsMedianNs": 196512.5,
+      "wasmO3MedianNs": 185970,
+      "wasmOsP95Ns": 267012.5,
+      "tsOverRust": 2.0781356759394827,
+      "tsOverWasmOs": 3.0954773869346734,
+      "tsOverWasmO3": 3.2709576813464536
+    },
+    {
+      "op": "trail_making.gen.default",
+      "tsMedianNs": 34100,
+      "tsP95Ns": 47500,
+      "rustMedianNs": 7192.602739726028,
+      "rustP95Ns": 14022.191780821919,
+      "wasmOsMedianNs": 5356.25,
+      "wasmO3MedianNs": 4019.2118226600987,
+      "wasmOsP95Ns": 7358.423913043478,
+      "tsOverRust": 4.740981983011465,
+      "tsOverWasmOs": 6.366394399066511,
+      "tsOverWasmO3": 8.484250520897168
+    },
+    {
+      "op": "trail_making.gen.default.json",
+      "tsMedianNs": 31012,
+      "tsP95Ns": 49004,
+      "rustMedianNs": 11279.69543147208,
+      "rustP95Ns": 21662.43654822335,
+      "wasmOsMedianNs": 13496.153846153846,
+      "wasmO3MedianNs": 9489.247311827958,
+      "wasmOsP95Ns": 16867.69230769231,
+      "tsOverRust": 2.7493650150758295,
+      "tsOverWasmOs": 2.2978398404103735,
+      "tsOverWasmO3": 3.2681201133144473
+    },
+    {
+      "op": "trail_making.gen.x10",
+      "tsMedianNs": 2278200,
+      "tsP95Ns": 2974200,
+      "rustMedianNs": 740033.3333333334,
+      "rustP95Ns": 1788733.3333333333,
+      "wasmOsMedianNs": 770700,
+      "wasmO3MedianNs": 611400,
+      "wasmOsP95Ns": 950466.6666666666,
+      "tsOverRust": 3.0785099770280615,
+      "tsOverWasmOs": 2.9560140132347215,
+      "tsOverWasmO3": 3.7262021589793917
+    },
+    {
+      "op": "trail_making.gen.x10.json",
+      "tsMedianNs": 2209200,
+      "tsP95Ns": 2790100,
+      "rustMedianNs": 797733.3333333334,
+      "rustP95Ns": 1376700,
+      "wasmOsMedianNs": 860300,
+      "wasmO3MedianNs": 689533.3333333334,
+      "wasmOsP95Ns": 1224800,
+      "tsOverRust": 2.7693464816981446,
+      "tsOverWasmOs": 2.5679414157851914,
+      "tsOverWasmO3": 3.2039060233974666
+    },
+    {
+      "op": "trail_making.score.400",
+      "tsMedianNs": 7939.784946236559,
+      "tsP95Ns": 11735.483870967742,
+      "rustMedianNs": 3821.3093709884465,
+      "rustP95Ns": 8213.093709884468,
+      "wasmOsMedianNs": 1859.7802197802198,
+      "wasmO3MedianNs": 1598.7951807228915,
+      "wasmOsP95Ns": 2262.4175824175823,
+      "tsOverRust": 2.0777655445842114,
+      "tsOverWasmOs": 4.269206039396874,
+      "tsOverWasmO3": 4.966105128392121
+    },
+    {
+      "op": "trail_making.score.400.json",
+      "tsMedianNs": 134750,
+      "tsP95Ns": 176925,
+      "rustMedianNs": 180713.33333333334,
+      "rustP95Ns": 359800,
+      "wasmOsMedianNs": 134822.22222222222,
+      "wasmO3MedianNs": 126411.76470588235,
+      "wasmOsP95Ns": 172577.77777777778,
+      "tsOverRust": 0.7456561035894786,
+      "tsOverWasmOs": 0.9994643151475194,
+      "tsOverWasmO3": 1.0659609120521172
+    },
+    {
+      "op": "corsi.gen.default",
+      "tsMedianNs": 8641900,
+      "tsP95Ns": 9679300,
+      "rustMedianNs": 2214400,
+      "rustP95Ns": 2740100,
+      "wasmOsMedianNs": 2173000,
+      "wasmO3MedianNs": 1678700,
+      "wasmOsP95Ns": 2691000,
+      "tsOverRust": 3.9025921242774566,
+      "tsOverWasmOs": 3.9769443166129776,
+      "tsOverWasmO3": 5.147971644725085
+    },
+    {
+      "op": "corsi.gen.default.json",
+      "tsMedianNs": 8615100,
+      "tsP95Ns": 9591600,
+      "rustMedianNs": 2185300,
+      "rustP95Ns": 2980500,
+      "wasmOsMedianNs": 2172400,
+      "wasmO3MedianNs": 1720850,
+      "wasmOsP95Ns": 2707300,
+      "tsOverRust": 3.942296252230815,
+      "tsOverWasmOs": 3.9657061314675013,
+      "tsOverWasmO3": 5.006305023680158
+    },
+    {
+      "op": "corsi.gen.x10",
+      "tsMedianNs": 85596400,
+      "tsP95Ns": 87223600,
+      "rustMedianNs": 23285400,
+      "rustP95Ns": 24999800,
+      "wasmOsMedianNs": 22842500,
+      "wasmO3MedianNs": 18325800,
+      "wasmOsP95Ns": 23880000,
+      "tsOverRust": 3.675968632705472,
+      "tsOverWasmOs": 3.7472430775965853,
+      "tsOverWasmO3": 4.670813825317312
+    },
+    {
+      "op": "corsi.gen.x10.json",
+      "tsMedianNs": 85910700,
+      "tsP95Ns": 89231100,
+      "rustMedianNs": 23212800,
+      "rustP95Ns": 24304000,
+      "wasmOsMedianNs": 22840300,
+      "wasmO3MedianNs": 18200600,
+      "wasmOsP95Ns": 23875200,
+      "tsOverRust": 3.7010054797353185,
+      "tsOverWasmOs": 3.7613647806727584,
+      "tsOverWasmO3": 4.720212520466358
+    },
+    {
+      "op": "corsi.score.400",
+      "tsMedianNs": 11945.977011494253,
+      "tsP95Ns": 15337.931034482759,
+      "rustMedianNs": 1900.4664179104477,
+      "rustP95Ns": 2533.582089552239,
+      "wasmOsMedianNs": 6359.375,
+      "wasmO3MedianNs": 2011.3796576032225,
+      "wasmOsP95Ns": 8430.9375,
+      "tsOverRust": 6.2858132608461394,
+      "tsOverWasmOs": 1.87848287158632,
+      "tsOverWasmO3": 5.939195500132075
+    },
+    {
+      "op": "corsi.score.400.json",
+      "tsMedianNs": 145306.66666666666,
+      "tsP95Ns": 185380,
+      "rustMedianNs": 114247.05882352941,
+      "rustP95Ns": 164182.35294117648,
+      "wasmOsMedianNs": 136683.33333333334,
+      "wasmO3MedianNs": 125711.76470588235,
+      "wasmOsP95Ns": 174541.66666666666,
+      "tsOverRust": 1.271863522465932,
+      "tsOverWasmOs": 1.0630898670893791,
+      "tsOverWasmO3": 1.1558716640930855
+    },
+    {
+      "op": "wcst.gen.default",
+      "tsMedianNs": 824.2489270386266,
+      "tsP95Ns": 1238.9484978540772,
+      "rustMedianNs": 427.2504892367906,
+      "rustP95Ns": 742.0499021526418,
+      "wasmOsMedianNs": 335.8716545911578,
+      "wasmO3MedianNs": 227.26537216828478,
+      "wasmOsP95Ns": 408.4134259943812,
+      "tsOverRust": 1.9291936412080073,
+      "tsOverWasmOs": 2.4540592091403175,
+      "tsOverWasmO3": 3.626812651547677
+    },
+    {
+      "op": "wcst.gen.default.json",
+      "tsMedianNs": 4791.881918819188,
+      "tsP95Ns": 6501.476014760147,
+      "rustMedianNs": 2454.858548585486,
+      "rustP95Ns": 3628.9052890528906,
+      "wasmOsMedianNs": 7117.8694158075605,
+      "wasmO3MedianNs": 2696.6189856957085,
+      "wasmOsP95Ns": 8529.896907216495,
+      "tsOverRust": 1.9519991983164644,
+      "tsOverWasmOs": 0.6732185769209597,
+      "tsOverWasmO3": 1.7769962846949685
+    },
+    {
+      "op": "wcst.gen.x10",
+      "tsMedianNs": 5035.872235872236,
+      "tsP95Ns": 6392.137592137592,
+      "rustMedianNs": 3415.7039711191337,
+      "rustP95Ns": 4589.350180505415,
+      "wasmOsMedianNs": 2081.2045690550362,
+      "wasmO3MedianNs": 1858.2720588235295,
+      "wasmOsP95Ns": 2595.4309449636553,
+      "tsOverRust": 1.474329238848607,
+      "tsOverWasmOs": 2.419691130199064,
+      "tsOverWasmO3": 2.709975760524776
+    },
+    {
+      "op": "wcst.gen.x10.json",
+      "tsMedianNs": 45680,
+      "tsP95Ns": 56726.666666666664,
+      "rustMedianNs": 32236.06557377049,
+      "rustP95Ns": 38578.688524590165,
+      "wasmOsMedianNs": 71793.10344827586,
+      "wasmO3MedianNs": 30650,
+      "wasmOsP95Ns": 86427.58620689655,
+      "tsOverRust": 1.417046379170057,
+      "tsOverWasmOs": 0.6362728146013449,
+      "tsOverWasmO3": 1.4903752039151712
+    },
+    {
+      "op": "wcst.score.400",
+      "tsMedianNs": 22390.243902439026,
+      "tsP95Ns": 33700,
+      "rustMedianNs": 10226.699029126214,
+      "rustP95Ns": 12586.40776699029,
+      "wasmOsMedianNs": 7729.130434782609,
+      "wasmO3MedianNs": 5822.377622377622,
+      "wasmOsP95Ns": 9636.08695652174,
+      "tsOverRust": 2.1893911064235247,
+      "tsOverWasmOs": 2.8968645427017923,
+      "tsOverWasmO3": 3.845549937603628
+    },
+    {
+      "op": "wcst.score.400.json",
+      "tsMedianNs": 199690.9090909091,
+      "tsP95Ns": 243818.18181818182,
+      "rustMedianNs": 246311.11111111112,
+      "rustP95Ns": 961422.2222222222,
+      "wasmOsMedianNs": 173245.45454545456,
+      "wasmO3MedianNs": 162200,
+      "wasmOsP95Ns": 221209.0909090909,
+      "tsOverRust": 0.81072635412224,
+      "tsOverWasmOs": 1.1526473211943118,
+      "tsOverWasmO3": 1.2311400067257035
+    },
+    {
+      "op": "mental_rotation.project_faces",
+      "tsMedianNs": 114350,
+      "tsP95Ns": 193350,
+      "rustMedianNs": 17251.376146788993,
+      "rustP95Ns": 32103.669724770643,
+      "wasmOsMedianNs": 22637.28813559322,
+      "wasmO3MedianNs": 15325,
+      "wasmOsP95Ns": 28488.13559322034,
+      "tsOverRust": 6.628456711338012,
+      "tsOverWasmOs": 5.051400119796346,
+      "tsOverWasmO3": 7.4616639477977165
+    },
+    {
+      "op": "mental_rotation.is_chiral",
+      "tsMedianNs": 33593.10344827586,
+      "tsP95Ns": 42279.31034482759,
+      "rustMedianNs": 3528.0575539568345,
+      "rustP95Ns": 5615.107913669065,
+      "wasmOsMedianNs": 2174.318181818182,
+      "wasmO3MedianNs": 1639.1269199676638,
+      "wasmOsP95Ns": 2764.5454545454545,
+      "tsOverRust": 9.521699386848175,
+      "tsOverWasmOs": 15.44994827766424,
+      "tsOverWasmO3": 20.49451024142693
+    }
+  ],
+  "wasmOnly": [
+    {
+      "op": "stroop.gen.default.json+parse",
+      "wasmOsMedianNs": 11195.061728395061,
+      "wasmO3MedianNs": 11044.444444444445
+    },
+    {
+      "op": "stroop.gen.x10.json+parse",
+      "wasmOsMedianNs": 351333.3333333333,
+      "wasmO3MedianNs": 498940
+    },
+    {
+      "op": "stroop.score.400.json+js",
+      "wasmOsMedianNs": 342266.6666666667,
+      "wasmO3MedianNs": 538425
+    },
+    {
+      "op": "gonogo.gen.default.json+parse",
+      "wasmOsMedianNs": 12551.552795031055,
+      "wasmO3MedianNs": 14225
+    },
+    {
+      "op": "gonogo.gen.x10.json+parse",
+      "wasmOsMedianNs": 119072.22222222222,
+      "wasmO3MedianNs": 141466.66666666666
+    },
+    {
+      "op": "gonogo.score.400.json+js",
+      "wasmOsMedianNs": 322357.14285714284,
+      "wasmO3MedianNs": 579400
+    },
+    {
+      "op": "flanker.gen.default.json+parse",
+      "wasmOsMedianNs": 35366.101694915254,
+      "wasmO3MedianNs": 31771.428571428572
+    },
+    {
+      "op": "flanker.gen.x10.json+parse",
+      "wasmOsMedianNs": 381183.3333333333,
+      "wasmO3MedianNs": 340700
+    },
+    {
+      "op": "flanker.score.400.json+js",
+      "wasmOsMedianNs": 453275,
+      "wasmO3MedianNs": 448800
+    },
+    {
+      "op": "sart.gen.default.json+parse",
+      "wasmOsMedianNs": 38024.39024390244,
+      "wasmO3MedianNs": 31341.53846153846
+    },
+    {
+      "op": "sart.gen.x10.json+parse",
+      "wasmOsMedianNs": 386766.6666666667,
+      "wasmO3MedianNs": 321371.4285714286
+    },
+    {
+      "op": "sart.score.400.json+js",
+      "wasmOsMedianNs": 325971.4285714286,
+      "wasmO3MedianNs": 319171.4285714286
+    },
+    {
+      "op": "visual_search.gen.default.json+parse",
+      "wasmOsMedianNs": 451960,
+      "wasmO3MedianNs": 350800
+    },
+    {
+      "op": "visual_search.gen.x10.json+parse",
+      "wasmOsMedianNs": 4772300,
+      "wasmO3MedianNs": 3687700
+    },
+    {
+      "op": "visual_search.score.400.json+js",
+      "wasmOsMedianNs": 463700,
+      "wasmO3MedianNs": 443125
+    },
+    {
+      "op": "pvt.gen.default.json+parse",
+      "wasmOsMedianNs": 8686.46288209607,
+      "wasmO3MedianNs": 7175.091575091575
+    },
+    {
+      "op": "pvt.gen.x10.json+parse",
+      "wasmOsMedianNs": 84279.16666666667,
+      "wasmO3MedianNs": 69337.03703703704
+    },
+    {
+      "op": "pvt.score.400.json+js",
+      "wasmOsMedianNs": 336328.5714285714,
+      "wasmO3MedianNs": 325900
+    },
+    {
+      "op": "corsi.gen.default.json+parse",
+      "wasmOsMedianNs": 2185400,
+      "wasmO3MedianNs": 1692600
+    },
+    {
+      "op": "corsi.gen.x10.json+parse",
+      "wasmOsMedianNs": 22903400,
+      "wasmO3MedianNs": 18404200
+    },
+    {
+      "op": "corsi.score.400.json+js",
+      "wasmOsMedianNs": 298600,
+      "wasmO3MedianNs": 285987.5
+    },
+    {
+      "op": "nback.gen.default.json+parse",
+      "wasmOsMedianNs": 72051.85185185185,
+      "wasmO3MedianNs": 49138.46153846154
+    },
+    {
+      "op": "nback.gen.x10.json+parse",
+      "wasmOsMedianNs": 832900,
+      "wasmO3MedianNs": 590725
+    },
+    {
+      "op": "nback.score.400.json+js",
+      "wasmOsMedianNs": 291975,
+      "wasmO3MedianNs": 280885.71428571426
+    },
+    {
+      "op": "wcst.gen.default.json+parse",
+      "wasmOsMedianNs": 15057.462686567163,
+      "wasmO3MedianNs": 11260
+    },
+    {
+      "op": "wcst.gen.x10.json+parse",
+      "wasmOsMedianNs": 149485.7142857143,
+      "wasmO3MedianNs": 108183.33333333333
+    },
+    {
+      "op": "wcst.score.400.json+js",
+      "wasmOsMedianNs": 367483.3333333333,
+      "wasmO3MedianNs": 358033.3333333333
+    },
+    {
+      "op": "mental_rotation.gen.default.json+parse",
+      "wasmOsMedianNs": 509800,
+      "wasmO3MedianNs": 396660
+    },
+    {
+      "op": "mental_rotation.gen.x10.json+parse",
+      "wasmOsMedianNs": 5369100,
+      "wasmO3MedianNs": 4259200
+    },
+    {
+      "op": "mental_rotation.score.400.json+js",
+      "wasmOsMedianNs": 405160,
+      "wasmO3MedianNs": 389266.6666666667
+    },
+    {
+      "op": "trail_making.gen.default.json+parse",
+      "wasmOsMedianNs": 21033.684210526317,
+      "wasmO3MedianNs": 16476.785714285714
+    },
+    {
+      "op": "trail_making.gen.x10.json+parse",
+      "wasmOsMedianNs": 936900,
+      "wasmO3MedianNs": 750700
+    },
+    {
+      "op": "trail_making.score.400.json+js",
+      "wasmOsMedianNs": 296700,
+      "wasmO3MedianNs": 286212.5
+    }
+  ]
+}

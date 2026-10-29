@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use sintropia_core::rng::{pick, shuffle};
 use sintropia_core::types::{js_round, Phase, SummaryMetric, TrialResult, ValidationFlag};
 use sintropia_core::validation::{mean, standard_deviation};
-use std::collections::HashSet;
 
 // Riesportati per compatibilità: la logica vive in `sintropia_core::sdt`.
 pub use sintropia_core::sdt::{criterion_c, d_prime, probit};
@@ -41,12 +40,10 @@ pub const NBACK_LETTERS: [char; 16] = [
 
 type Rand<'a> = &'a mut dyn FnMut() -> f64;
 
-/// Lag dei lure rispetto a n: n−1 e n+1 (solo se positivi).
-fn lure_lags(n: usize) -> Vec<usize> {
-    [n.wrapping_sub(1), n + 1]
-        .into_iter()
-        .filter(|&lag| lag > 0 && lag != usize::MAX)
-        .collect()
+/// Lag dei lure rispetto a n: n−1 e n+1; 0 segna un lag non valido (solo lag positivi).
+fn lure_lags(n: usize) -> [usize; 2] {
+    let below = n.wrapping_sub(1);
+    [if below == usize::MAX { 0 } else { below }, n + 1]
 }
 
 /// Genera lo stream: ~target_rate target (letter[i]==letter[i-n]), nessun target nelle prime n
@@ -57,14 +54,14 @@ pub fn generate_nback(params: &Params, rand: Rand) -> Vec<Stimulus> {
     let lure_rate = params.lure_rate.unwrap_or(0.0);
     let n_targets = js_round((n_trials as f64 - n as f64) * params.target_rate).max(0.0) as usize;
 
-    let target_positions = choose_target_positions(n, n_trials, n_targets, rand);
-    let lure_positions = choose_lure_positions(n, n_trials, &target_positions, lure_rate, rand);
+    let targets = choose_target_positions(n, n_trials, n_targets, rand);
+    let lure_marks = choose_lure_positions(n, n_trials, &targets, lure_rate, rand);
 
     let mut letters: Vec<char> = Vec::with_capacity(n_trials);
     for i in 0..n_trials {
-        let letter = if target_positions.contains(&i) {
+        let letter = if targets.marks[i] {
             letters[i - n]
-        } else if lure_positions.contains(&i) {
+        } else if lure_marks[i] {
             pick_lure(&letters, i, n, rand)
         } else {
             pick_non_target(&letters, i, n, rand)
@@ -81,7 +78,7 @@ pub fn generate_nback(params: &Params, rand: Rand) -> Vec<Stimulus> {
             let is_lure = !is_target
                 && lags
                     .iter()
-                    .any(|&lag| i >= lag && letters[i - lag] == letter);
+                    .any(|&lag| lag > 0 && i >= lag && letters[i - lag] == letter);
             Stimulus {
                 letter,
                 is_target,
@@ -91,36 +88,62 @@ pub fn generate_nback(params: &Params, rand: Rand) -> Vec<Stimulus> {
         .collect()
 }
 
+/// Posizioni dei target: maschera per indice (con margine per il vicino `p + 1`) e conteggio
+/// distinto, che include anche posizioni oltre lo stream (come l'insieme del TS).
+struct TargetPositions {
+    marks: Vec<bool>,
+    count: usize,
+}
+
+impl TargetPositions {
+    fn new(n: usize, n_trials: usize) -> Self {
+        Self {
+            marks: vec![false; n.max(n_trials) + 2],
+            count: 0,
+        }
+    }
+
+    fn insert(&mut self, p: usize) {
+        if !self.marks[p] {
+            self.marks[p] = true;
+            self.count += 1;
+        }
+    }
+}
+
 /// Sceglie a caso le posizioni dei lure fra i non-target che hanno disponibili entrambi i lag.
 fn choose_lure_positions(
     n: usize,
     n_trials: usize,
-    target_positions: &HashSet<usize>,
+    targets: &TargetPositions,
     lure_rate: f64,
     rand: Rand,
-) -> HashSet<usize> {
-    let candidates: Vec<usize> = ((n + 1)..n_trials)
-        .filter(|i| !target_positions.contains(i))
-        .collect();
-    let non_targets = n_trials as f64 - n as f64 - target_positions.len() as f64;
+) -> Vec<bool> {
+    let candidates: Vec<usize> = ((n + 1)..n_trials).filter(|&i| !targets.marks[i]).collect();
+    let non_targets = n_trials as f64 - n as f64 - targets.count as f64;
     let wanted = candidates
         .len()
         .min(js_round(non_targets * lure_rate).max(0.0) as usize);
-    shuffle(&candidates, rand)
-        .into_iter()
-        .take(wanted)
-        .collect()
+    let mut marks = vec![false; n_trials];
+    for i in shuffle(&candidates, rand).into_iter().take(wanted) {
+        marks[i] = true;
+    }
+    marks
 }
 
 /// Lettera di un lure: ripete quella a lag n−1 o n+1 purché non coincida con quella a lag n.
 fn pick_lure(letters: &[char], i: usize, n: usize, rand: Rand) -> char {
     let target_letter = letters[i - n];
-    let options: Vec<char> = lure_lags(n)
-        .into_iter()
-        .map(|lag| letters[i - lag])
-        .filter(|&l| l != target_letter)
-        .collect();
-    match pick(&options, rand) {
+    let mut options = [target_letter; 2];
+    let mut len = 0;
+    for lag in lure_lags(n).into_iter().filter(|&lag| lag > 0) {
+        let letter = letters[i - lag];
+        if letter != target_letter {
+            options[len] = letter;
+            len += 1;
+        }
+    }
+    match pick(&options[..len], rand) {
         Some(&letter) => letter,
         None => pick_non_target(letters, i, n, rand),
     }
@@ -131,22 +154,22 @@ fn choose_target_positions(
     n_trials: usize,
     n_targets: usize,
     rand: Rand,
-) -> HashSet<usize> {
-    let mut positions: HashSet<usize> = HashSet::new();
+) -> TargetPositions {
+    let mut positions = TargetPositions::new(n, n_trials);
     let span = n_trials.saturating_sub(n) as f64;
     let mut guard = 0usize;
     let max_guard = n_trials * 50;
-    while positions.len() < n_targets && guard < max_guard {
+    while positions.count < n_targets && guard < max_guard {
         guard += 1;
         let p = n + (rand() * span).floor() as usize;
-        let adjacent = p > 0 && positions.contains(&(p - 1));
-        if positions.contains(&p) || adjacent || positions.contains(&(p + 1)) {
+        let adjacent = p > 0 && positions.marks[p - 1];
+        if positions.marks[p] || adjacent || positions.marks[p + 1] {
             continue;
         }
         positions.insert(p);
     }
     // Rilassa il vincolo di non-adiacenza se non abbiamo abbastanza target.
-    while positions.len() < n_targets && guard < max_guard * 2 {
+    while positions.count < n_targets && guard < max_guard * 2 {
         guard += 1;
         positions.insert(n + (rand() * span).floor() as usize);
     }
@@ -156,28 +179,30 @@ fn choose_target_positions(
 /// Sceglie una lettera che NON crea un target e limita i lure a lag n−1 / n+1.
 fn pick_non_target(letters: &[char], i: usize, n: usize, rand: Rand) -> char {
     let forbidden: Option<char> = (i >= n).then(|| letters[i - n]);
-    let soft_forbidden: HashSet<char> = lure_lags(n)
-        .into_iter()
-        .filter(|&lag| i >= lag)
-        .map(|lag| letters[i - lag])
-        .collect();
-    let strict: Vec<char> = NBACK_LETTERS
-        .iter()
-        .copied()
-        .filter(|l| Some(*l) != forbidden && !soft_forbidden.contains(l))
-        .collect();
-    if let Some(&letter) = pick(&strict, rand) {
+    let soft = lure_lags(n).map(|lag| (lag > 0 && i >= lag).then(|| letters[i - lag]));
+    let mut strict = [NBACK_LETTERS[0]; NBACK_LETTERS.len()];
+    let mut len = 0;
+    for l in NBACK_LETTERS {
+        if Some(l) != forbidden && !soft.contains(&Some(l)) {
+            strict[len] = l;
+            len += 1;
+        }
+    }
+    if let Some(&letter) = pick(&strict[..len], rand) {
         return letter;
     }
-    let relaxed: Vec<char> = NBACK_LETTERS
-        .iter()
-        .copied()
-        .filter(|l| Some(*l) != forbidden)
-        .collect();
-    let pool: &[char] = if relaxed.is_empty() {
+    let mut relaxed = [NBACK_LETTERS[0]; NBACK_LETTERS.len()];
+    let mut len = 0;
+    for l in NBACK_LETTERS {
+        if Some(l) != forbidden {
+            relaxed[len] = l;
+            len += 1;
+        }
+    }
+    let pool: &[char] = if len == 0 {
         &NBACK_LETTERS
     } else {
-        &relaxed
+        &relaxed[..len]
     };
     pick(pool, rand).copied().unwrap_or(NBACK_LETTERS[0])
 }
@@ -269,7 +294,10 @@ pub fn score_nback(trials: &[TrialResult], n_quartiles: usize) -> Vec<SummaryMet
         ),
     ];
 
-    for (idx, chunk) in split_into_chunks(&test, n_quartiles).iter().enumerate() {
+    // Stessa partizione di `split_into_chunks`, ma per sottofette (nessuna copia).
+    let size = test.len().div_ceil(n_quartiles.max(1));
+    for idx in 0..n_quartiles {
+        let chunk = &test[(idx * size).min(test.len())..((idx + 1) * size).min(test.len())];
         let cc = count_hits_fa(chunk.iter().copied());
         metrics.push(SummaryMetric::new(
             format!("d' quartile {}", idx + 1),

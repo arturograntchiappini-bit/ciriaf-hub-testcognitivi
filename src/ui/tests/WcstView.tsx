@@ -3,7 +3,7 @@
  * cambio di regola segreto dopo N corrette consecutive.
  * @see docs/scientific/wcst.md
  */
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StimulusStage } from '../runtime/StimulusStage';
 import { CardFace } from './WcstCard';
 import {
@@ -44,6 +44,9 @@ export function WcstView(props: WcstViewProps): JSX.Element {
   const categoriesRef = useRef(0);
   const consecutiveRef = useRef(0);
   const onsetRef = useRef(performanceClock.now());
+  const cancelRef = useRef<(() => void) | null>(null);
+  // Il timer del feedback non deve completare il test dopo l'uscita.
+  useEffect(() => () => cancelRef.current?.(), []);
 
   const finish = useCallback(() => {
     props.onComplete({
@@ -95,8 +98,7 @@ export function WcstView(props: WcstViewProps): JSX.Element {
       setFeedback(correct ? 'correct' : 'wrong');
 
       const done = categoriesRef.current >= params.maxCategories || deckIndex + 1 >= deck.length;
-      const sched = realScheduler();
-      sched.timeout(900, () => {
+      cancelRef.current = realScheduler().timeout(900, () => {
         setFeedback(null);
         if (done) {
           finish();

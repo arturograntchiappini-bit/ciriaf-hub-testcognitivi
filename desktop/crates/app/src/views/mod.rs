@@ -12,6 +12,7 @@ use sintropia_core::sequencer::TrialSpec;
 
 use crate::runner::TestRunner;
 
+pub mod chrome;
 pub mod flanker;
 pub mod gonogo;
 pub mod mental_rotation;
@@ -28,7 +29,8 @@ use rt::{RtPlan, RtRunner};
 
 /// Grassetto simulato (Inter è incorporato solo nel peso Regular): il testo disegnato due volte con 1 px di scarto.
 pub fn bold_text(painter: &egui::Painter, pos: Pos2, text: &str, font: FontId, color: Color32) {
-    for dx in [-0.5, 0.5] {
+    let dx_px = (font.size * 0.006).max(0.5);
+    for dx in [-dx_px, dx_px] {
         painter.text(
             pos + egui::vec2(dx, 0.0),
             Align2::CENTER_CENTER,
@@ -103,7 +105,7 @@ mod smoke_tests {
     use crate::runner::{create_runner, RunnerStatus};
     use crate::settings::Settings;
 
-    const RT_TESTS: [TestId; 9] = [
+    const ALL_TESTS: [TestId; 12] = [
         TestId::Stroop1,
         TestId::Stroop2,
         TestId::Gonogo,
@@ -113,9 +115,13 @@ mod smoke_tests {
         TestId::Nback,
         TestId::VisualSearch,
         TestId::MentalRotation,
+        TestId::Corsi,
+        TestId::Wcst,
+        TestId::TrailMaking,
     ];
+    const SIZES: [(f32, f32); 3] = [(900.0, 600.0), (1280.0, 800.0), (2560.0, 1440.0)];
 
-    fn run_frames(test: TestId, frames: usize) {
+    fn run_frames(test: TestId, frames: usize, size: (f32, f32)) {
         let ctx = egui::Context::default();
         crate::theme::install_fonts(&ctx);
         let mut params = Settings::default().effective(test.as_str());
@@ -136,12 +142,12 @@ mod smoke_tests {
             let input = egui::RawInput {
                 screen_rect: Some(egui::Rect::from_min_size(
                     egui::Pos2::ZERO,
-                    egui::vec2(1000.0, 700.0),
+                    egui::vec2(size.0, size.1),
                 )),
                 ..Default::default()
             };
             let mut output = ctx.run_ui(input, |ui| {
-                egui::CentralPanel::default().show_inside(ui, |ui| {
+                egui::CentralPanel::default().show(ui, |ui| {
                     assert!(
                         matches!(runner.ui(ui), RunnerStatus::Running),
                         "{test} frame {frame}"
@@ -154,9 +160,11 @@ mod smoke_tests {
     }
 
     #[test]
-    fn should_draw_every_rt_test_for_several_frames_without_panic() {
-        for test in RT_TESTS {
-            run_frames(test, 12);
+    fn should_draw_every_test_for_several_frames_at_any_window_size_without_panic() {
+        for test in ALL_TESTS {
+            for size in SIZES {
+                run_frames(test, 8, size);
+            }
         }
     }
 }

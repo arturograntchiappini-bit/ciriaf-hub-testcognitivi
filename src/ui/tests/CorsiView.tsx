@@ -15,7 +15,7 @@ import {
   type CorsiSequence,
 } from '../../engine/tests/corsi';
 import { mulberry32 } from '../../engine/rng';
-import { realScheduler, performanceClock } from '../../engine/clock';
+import { realScheduler, performanceClock, type Cancel } from '../../engine/clock';
 import { UI_COLORS } from '../theme';
 import type { TestResult, TrialResult } from '../../engine/types';
 
@@ -54,6 +54,11 @@ export function CorsiView(props: CorsiViewProps): JSX.Element {
   const trialInLevelRef = useRef<number>(0);
   const practiceQueueRef = useRef<PlannedTrial[]>([]);
   const inputStartRef = useRef<number>(0);
+  const cancelsRef = useRef<Cancel[]>([]);
+  const sched = useRef(realScheduler()).current;
+  // Timer annullati allo smontaggio: niente onComplete/setState dopo l'uscita dal test.
+  const later = useCallback((ms: number, fn: () => void) => { cancelsRef.current.push(sched.timeout(ms, fn)); }, [sched]);
+  useEffect(() => () => { cancelsRef.current.forEach((c) => c()); cancelsRef.current = []; }, []);
 
   // Prepara i trial di pratica (2 a lunghezza 2).
   useEffect(() => {
@@ -66,18 +71,17 @@ export function CorsiView(props: CorsiViewProps): JSX.Element {
     setCurrent(trial);
     setClicked([]);
     setPhase('presenting');
-    const sched = realScheduler();
     const per = params.presentMsPerBlock;
     trial.seq.indices.forEach((blockIdx, i) => {
-      sched.timeout(i * per, () => setLitIndex(blockIdx));
-      sched.timeout(i * per + per * 0.7, () => setLitIndex(null));
+      later(i * per, () => setLitIndex(blockIdx));
+      later(i * per + per * 0.7, () => setLitIndex(null));
     });
-    sched.timeout(trial.seq.indices.length * per + 200, () => {
+    later(trial.seq.indices.length * per + 200, () => {
       setLitIndex(null);
       inputStartRef.current = performanceClock.now();
       setPhase('input');
     });
-  }, [params.presentMsPerBlock]);
+  }, [params.presentMsPerBlock, later]);
 
   // Avvia il prossimo trial di pratica o passa al test.
   const nextPractice = useCallback(() => {
@@ -172,13 +176,12 @@ export function CorsiView(props: CorsiViewProps): JSX.Element {
 
       setLastCorrect(correct);
       setPhase('feedback');
-      const sched = realScheduler();
-      sched.timeout(900, () => {
+      later(900, () => {
         if (trial.isPractice) nextPractice();
         else presentNextTestTrial();
       });
     },
-    [current, sessionId, nextPractice, presentNextTestTrial],
+    [current, sessionId, nextPractice, presentNextTestTrial, later],
   );
 
   function handleBlockClick(blockIdx: number): void {

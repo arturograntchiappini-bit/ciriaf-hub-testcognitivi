@@ -16,10 +16,10 @@ use crate::theme::stimulus::INK;
 const KEY_LEFT: &str = "arrowleft";
 const KEY_RIGHT: &str = "arrowright";
 const PRACTICE_FEEDBACK_MS: f64 = 700.0;
-const GLYPH_WIDTH: f32 = 64.0;
-const GLYPH_HEIGHT: f32 = 48.0;
-const GLYPH_GAP: f32 = 8.0;
-const STROKE_PX: f32 = 7.0;
+const GLYPH_WIDTH: f32 = 72.0;
+const GLYPH_HEIGHT: f32 = 54.0;
+const GLYPH_GAP: f32 = 10.0;
+const STROKE_PX: f32 = 8.0;
 
 fn correct_key(direction: FlankerDirection) -> &'static str {
     match direction {
@@ -44,8 +44,8 @@ fn to_trials(stimuli: Vec<FlankerStimulus>) -> Vec<RtTrial<FlankerStimulus>> {
 }
 
 /// Polilinea con estremi «square» (il tratto sporge di mezzo spessore, come `stroke-linecap: square` dell'SVG).
-fn square_capped(mut points: Vec<Pos2>) -> Vec<Pos2> {
-    let half = STROKE_PX / 2.0;
+fn square_capped(mut points: Vec<Pos2>, stroke_px: f32) -> Vec<Pos2> {
+    let half = stroke_px / 2.0;
     let n = points.len();
     if n >= 2 {
         let start_dir = (points[0] - points[1]).normalized();
@@ -56,11 +56,12 @@ fn square_capped(mut points: Vec<Pos2>) -> Vec<Pos2> {
     points
 }
 
-/// Un elemento 64×48: freccia a destra, a sinistra (specchiata) o trattino neutro.
-fn draw_glyph(painter: &Painter, origin: Pos2, symbol: char) {
-    let stroke = Stroke::new(STROKE_PX, INK);
-    let flip = |x: f32| if symbol == '←' { GLYPH_WIDTH - x } else { x };
-    let at = |x: f32, y: f32| origin + Vec2::new(flip(x), y);
+/// Un elemento: freccia a destra, a sinistra (specchiata) o trattino neutro. `k` scala il disegno 64×48 originale.
+fn draw_glyph(painter: &Painter, origin: Pos2, symbol: char, k: f32) {
+    let stroke_px = STROKE_PX * k;
+    let stroke = Stroke::new(stroke_px, INK);
+    let flip = |x: f32| if symbol == '←' { 64.0 - x } else { x };
+    let at = |x: f32, y: f32| origin + Vec2::new(flip(x), y) * k;
     let paths: Vec<Vec<Pos2>> = if symbol == '–' {
         vec![vec![at(10.0, 24.0), at(54.0, 24.0)]]
     } else {
@@ -70,7 +71,7 @@ fn draw_glyph(painter: &Painter, origin: Pos2, symbol: char) {
         ]
     };
     for path in paths {
-        painter.add(Shape::line(square_capped(path), stroke));
+        painter.add(Shape::line(square_capped(path, stroke_px), stroke));
     }
 }
 
@@ -78,18 +79,25 @@ fn draw(ctx: &StimulusCtx, stimulus: &FlankerStimulus) {
     if !ctx.show {
         return;
     }
+    let k = ctx.scale() * GLYPH_WIDTH / 64.0;
+    let (width, height, gap) = (
+        GLYPH_WIDTH * ctx.scale(),
+        GLYPH_HEIGHT * ctx.scale(),
+        GLYPH_GAP * ctx.scale(),
+    );
     let symbols: Vec<char> = stimulus.arrows.chars().collect();
     let count = symbols.len() as f32;
-    let total = count * GLYPH_WIDTH + (count - 1.0).max(0.0) * GLYPH_GAP;
+    let total = count * width + (count - 1.0).max(0.0) * gap;
     let center = ctx.center();
     let mut x = center.x - total / 2.0;
     for symbol in symbols {
         draw_glyph(
             ctx.painter,
-            Pos2::new(x, center.y - GLYPH_HEIGHT / 2.0),
+            Pos2::new(x, center.y - height / 2.0),
             symbol,
+            k,
         );
-        x += GLYPH_WIDTH + GLYPH_GAP;
+        x += width + gap;
     }
 }
 
@@ -163,7 +171,7 @@ mod tests {
 
     #[test]
     fn should_extend_line_ends_by_half_the_stroke_width() {
-        let pts = square_capped(vec![Pos2::new(10.0, 0.0), Pos2::new(20.0, 0.0)]);
+        let pts = square_capped(vec![Pos2::new(10.0, 0.0), Pos2::new(20.0, 0.0)], STROKE_PX);
         assert_eq!(pts[0].x, 10.0 - STROKE_PX / 2.0);
         assert_eq!(pts[1].x, 20.0 + STROKE_PX / 2.0);
     }

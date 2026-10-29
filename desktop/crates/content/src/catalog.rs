@@ -371,8 +371,22 @@ const TRIAL: Option<&str> = Some("trial");
 const MS: Option<&str> = Some("ms");
 
 const TRAIL_MAKING_FIELDS: &[FieldDesc] = &[
-    fd("nTargets", "Cerchi per parte", Some("cerchi"), 8.0, 51.0, 1.0),
-    fd("practiceTargets", "Cerchi di pratica", Some("cerchi"), 0.0, 15.0, 1.0),
+    fd(
+        "nTargets",
+        "Cerchi per parte",
+        Some("cerchi"),
+        8.0,
+        51.0,
+        1.0,
+    ),
+    fd(
+        "practiceTargets",
+        "Cerchi di pratica",
+        Some("cerchi"),
+        0.0,
+        15.0,
+        1.0,
+    ),
 ];
 
 const STROOP_FIELDS: &[FieldDesc] = &[

@@ -3,7 +3,10 @@
 use std::collections::VecDeque;
 use std::time::{Duration, Instant};
 
-use eframe::egui::{self, vec2, CornerRadius, Rect, Sense, Stroke, StrokeKind};
+use eframe::egui::{
+    self, pos2, vec2, Align2, CornerRadius, FontFamily, FontId, Rect, Sense, Stroke, StrokeKind,
+    Vec2,
+};
 use serde_json::{Map, Value};
 use sintropia_core::rng::mulberry32;
 use sintropia_core::{Phase, TestId, TestResult, TrialResult, ValidationFlag};
@@ -13,15 +16,27 @@ use sintropia_engines::corsi::{
 
 use super::{ms_between, FEEDBACK_MS};
 use crate::runner::{RunnerStatus, TestRunner};
-use crate::theme;
+use crate::theme::{self, stimulus::INK};
+use crate::views::chrome::{self, ButtonKind, Hint, PauseChoice, PauseTimer};
 
 const PRACTICE_LENGTH: usize = 2;
+/// Prove di pratica a lunghezza fissa (come in `CorsiView.tsx`).
+const PRACTICE_TRIALS: usize = 2;
 const LIT_FRACTION: f64 = 0.7;
 const TAIL_MS: f64 = 200.0;
-const AREA_SIZE: f32 = 420.0;
-const BLOCK_SIZE: f32 = 56.0;
+/// Lato del blocco e ingombro del layout Kessels (x 8–92, y 18–82 %) in «unità»: il campo scala per intero.
+const BLOCK_UNITS: f32 = 14.0;
+const KESSELS_X_MIN: f32 = 8.0;
+const KESSELS_Y_MAX: f32 = 82.0;
+const BBOX_W: f32 = 84.0 + BLOCK_UNITS;
+const BBOX_H: f32 = 64.0 + BLOCK_UNITS;
+const MAX_UNIT_PX: f32 = 11.0;
+/// Spazio riservato in alto all'intestazione (titolo, sottotitolo, puntini).
+const HEADER_HEIGHT: f32 = 130.0;
 const BLOCK_IDLE: egui::Color32 = egui::Color32::from_rgb(0xF2, 0xF4, 0xF7);
 const BLOCK_CLICKED: egui::Color32 = egui::Color32::from_rgb(0xEA, 0xF2, 0xFB);
+const BLOCK_SHADOW: egui::Color32 = egui::Color32::from_rgb(0xDD, 0xE1, 0xE8);
+const KEY_EDGE: egui::Color32 = egui::Color32::from_rgb(190, 197, 208);
 
 #[derive(Debug, Clone)]
 struct PlannedTrial {
@@ -62,6 +77,8 @@ pub struct CorsiRunner {
     level_results: Vec<bool>,
     level: usize,
     result: Option<TestResult>,
+    hint: Hint,
+    pause: PauseTimer,
 }
 
 /// Blocco illuminato dopo `elapsed_ms` dall'inizio della presentazione (`None` se spento).
@@ -87,14 +104,19 @@ impl CorsiRunner {
         _feedback: bool,
     ) -> Self {
         let mut rand: Box<dyn FnMut() -> f64> = Box::new(mulberry32(seed));
-        let practice_queue =
-            generate_balanced_sequences(PRACTICE_LENGTH, 2, &params, &mut *rand, &CORSI_BLOCKS)
-                .into_iter()
-                .map(|seq| PlannedTrial {
-                    seq,
-                    is_practice: true,
-                })
-                .collect();
+        let practice_queue = generate_balanced_sequences(
+            PRACTICE_LENGTH,
+            PRACTICE_TRIALS,
+            &params,
+            &mut *rand,
+            &CORSI_BLOCKS,
+        )
+        .into_iter()
+        .map(|seq| PlannedTrial {
+            seq,
+            is_practice: true,
+        })
+        .collect();
         let now = Instant::now();
         let mut runner = Self {
             level: params.start_length as usize,
@@ -109,6 +131,8 @@ impl CorsiRunner {
             level_queue: VecDeque::new(),
             level_results: Vec::new(),
             result: None,
+            hint: Hint::parse("Clicca i blocchi nell’ordine in cui si sono illuminati"),
+            pause: PauseTimer::default(),
         };
         if !practice {
             runner.practice_queue.clear();
@@ -165,21 +189,17 @@ impl CorsiRunner {
 
     fn finish(&mut self) {
         self.stage = Stage::Done;
-        let params = serde_json::to_value(&self.params)
-            .ok()
-            .and_then(|v| match v {
-                Value::Object(map) => Some(map),
-                _ => None,
-            })
-            .unwrap_or_else(Map::new);
-        self.result = Some(TestResult {
-            test_id: TestId::Corsi,
-            session_id: self.session_id.clone(),
-            started_at: self.started_at.clone(),
-            params,
-            summary: score_corsi(&self.trials, f64::from(self.params.start_length)),
-            trials: std::mem::take(&mut self.trials),
-        });
+        self.result = Some(self.build_result());
+    }
+
+    /// Vero in pratica (anche nella schermata iniziale); `None` a test concluso.
+    fn in_practice(&self) -> Option<bool> {
+        match &self.stage {
+            Stage::Presenting { trial, .. } | Stage::Input { trial, .. } => Some(trial.is_practice),
+            Stage::Feedback { was_practice, .. } => Some(*was_practice),
+            Stage::Ready => Some(true),
+            Stage::Done => None,
+        }
     }
 
     /// Avanza le transizioni a tempo (fine presentazione, fine feedback).
@@ -267,47 +287,185 @@ impl CorsiRunner {
         };
     }
 
-    fn status_text(&self) -> String {
+    /// Titolo e sottotitolo dell'intestazione per la fase corrente.
+    fn header_text(&self) -> (&'static str, &'static str) {
         match &self.stage {
-            Stage::Presenting { .. } => "Osserva la sequenza…".to_string(),
-            Stage::Input { trial, clicked, .. } => format!(
-                "Riproduci la sequenza — {}/{}",
-                clicked.len(),
-                trial.seq.indices.len()
+            Stage::Presenting { .. } => (
+                "Osserva la sequenza",
+                "Memorizza l’ordine in cui i blocchi si illuminano",
             ),
-            Stage::Feedback { correct: true, .. } => "Corretto".to_string(),
-            Stage::Feedback { correct: false, .. } => "Errato".to_string(),
-            Stage::Ready | Stage::Done => String::new(),
+            Stage::Input { .. } => ("Tocca a te", "Clicca i blocchi nello stesso ordine"),
+            Stage::Feedback { correct: true, .. } => ("Corretto", ""),
+            Stage::Feedback { correct: false, .. } => ("Errato", ""),
+            Stage::Ready | Stage::Done => ("", ""),
         }
     }
 
-    fn ready_ui(&mut self, ui: &mut egui::Ui, now: Instant) {
-        ui.vertical_centered(|ui| {
-            ui.add_space(60.0);
-            ui.label(
-                egui::RichText::new(
-                    "Memorizza l’ordine in cui i blocchi si illuminano, poi riproducilo cliccando.\nIniziamo con una breve pratica.",
-                )
-                .size(16.0)
-                .color(theme::stimulus::MUTED),
+    fn build_result(&self) -> TestResult {
+        let params = match serde_json::to_value(&self.params) {
+            Ok(Value::Object(map)) => map,
+            _ => Map::new(),
+        };
+        TestResult {
+            test_id: TestId::Corsi,
+            session_id: self.session_id.clone(),
+            started_at: self.started_at.clone(),
+            params,
+            summary: score_corsi(&self.trials, f64::from(self.params.start_length)),
+            trials: self.trials.clone(),
+        }
+    }
+
+    /// Sposta in avanti gli istanti pendenti della durata della pausa (il tempo fermo non conta).
+    fn shift_clocks(&mut self, paused_for: Duration) {
+        self.t0 += paused_for;
+        match &mut self.stage {
+            Stage::Presenting { since, .. } | Stage::Input { since, .. } => *since += paused_for,
+            Stage::Feedback { until, .. } => *until += paused_for,
+            Stage::Ready | Stage::Done => {}
+        }
+    }
+
+    /// Gestisce Esc e il pannello di pausa; `Some` se il frame è già stato consumato dalla pausa.
+    fn pause_step(&mut self, ui: &mut egui::Ui, stage: &chrome::Stage) -> Option<RunnerStatus> {
+        if chrome::escape_pressed(ui) {
+            if self.pause.is_paused() {
+                let paused_for = self.pause.resume();
+                self.shift_clocks(paused_for);
+            } else {
+                self.pause.pause();
+            }
+        }
+        if !self.pause.is_paused() {
+            return None;
+        }
+        Some(match chrome::pause_panel(ui, stage) {
+            Some(PauseChoice::Resume) => {
+                let paused_for = self.pause.resume();
+                self.shift_clocks(paused_for);
+                RunnerStatus::Running
+            }
+            Some(PauseChoice::ExportPartial) => {
+                RunnerStatus::Finished(Box::new(self.build_result()))
+            }
+            Some(PauseChoice::Abort) => RunnerStatus::Aborted,
+            None => RunnerStatus::Running,
+        })
+    }
+
+    fn ready_ui(&mut self, ui: &mut egui::Ui, stage: &chrome::Stage, now: Instant) {
+        let center = stage.area.center();
+        let p = &stage.painter;
+        p.text(
+            center - vec2(0.0, 120.0),
+            Align2::CENTER_CENTER,
+            "CORSI BLOCK TASK",
+            FontId::new(46.0, theme::display_family()),
+            INK,
+        );
+        let text = "Memorizza l’ordine in cui i blocchi si illuminano, poi riproducilo cliccando.\nIniziamo con una breve pratica.";
+        p.text(
+            center - vec2(0.0, 40.0),
+            Align2::CENTER_CENTER,
+            text,
+            FontId::proportional(17.0),
+            chrome::TEXT,
+        );
+        let size = vec2(210.0, 46.0);
+        let row =
+            Rect::from_center_size(center + vec2(0.0, 50.0), vec2(size.x * 2.0 + 14.0, size.y));
+        let start = Rect::from_min_size(row.min, size);
+        let skip = Rect::from_min_size(row.min + vec2(size.x + 14.0, 0.0), size);
+        if chrome::button(ui, start, "Inizia la pratica", ButtonKind::Primary, None) {
+            self.next_practice(now);
+        }
+        if chrome::button(ui, skip, "Salta pratica", ButtonKind::Secondary, None) {
+            self.practice_queue.clear();
+            self.start_test_level(now);
+        }
+    }
+
+    /// Campo dei blocchi: rettangolo centrato nell'area sotto l'intestazione.
+    fn field_rect(area: Rect) -> Rect {
+        let avail = Rect::from_min_max(
+            pos2(area.min.x, area.min.y + HEADER_HEIGHT),
+            pos2(area.max.x, area.max.y - 12.0),
+        );
+        let unit = (avail.width() * 0.94 / BBOX_W)
+            .min(avail.height() / BBOX_H)
+            .clamp(3.0, MAX_UNIT_PX);
+        Rect::from_center_size(avail.center(), vec2(BBOX_W * unit, BBOX_H * unit))
+    }
+
+    /// Quadrato del blocco `idx` nel disposizione Kessels (coordinate in percentuale, y verso l'alto).
+    fn block_rect(field: Rect, idx: usize) -> Rect {
+        let unit = field.width() / BBOX_W;
+        let block = &CORSI_BLOCKS[idx];
+        let center = field.min
+            + vec2(
+                (block.x as f32 - KESSELS_X_MIN + BLOCK_UNITS / 2.0) * unit,
+                (KESSELS_Y_MAX - block.y as f32 + BLOCK_UNITS / 2.0) * unit,
             );
-            ui.add_space(20.0);
-            ui.horizontal(|ui| {
-                ui.add_space((ui.available_width() / 2.0 - 140.0).max(0.0));
-                if ui.button("Inizia la pratica").clicked() {
-                    self.next_practice(now);
+        Rect::from_center_size(center, Vec2::splat(BLOCK_UNITS * unit))
+    }
+
+    fn header_ui(&self, stage: &chrome::Stage) {
+        let (title, subtitle) = self.header_text();
+        let p = &stage.painter;
+        let top = stage.area.min.y + 34.0;
+        if let Stage::Feedback { correct, .. } = &self.stage {
+            let color = if *correct {
+                chrome::GREEN
+            } else {
+                theme::stimulus::DANGER
+            };
+            chrome::outcome_mark(
+                p,
+                pos2(stage.area.center().x - 78.0, top + 26.0),
+                22.0,
+                *correct,
+            );
+            p.text(
+                pos2(stage.area.center().x - 44.0, top + 26.0),
+                Align2::LEFT_CENTER,
+                title,
+                FontId::new(40.0, theme::display_family()),
+                color,
+            );
+            return;
+        }
+        p.text(
+            pos2(stage.area.center().x, top + 18.0),
+            Align2::CENTER_CENTER,
+            title.to_uppercase(),
+            FontId::new(36.0, theme::display_family()),
+            INK,
+        );
+        p.text(
+            pos2(stage.area.center().x, top + 50.0),
+            Align2::CENTER_CENTER,
+            subtitle,
+            FontId::proportional(15.0),
+            theme::stimulus::MUTED,
+        );
+        if let Stage::Input { trial, clicked, .. } = &self.stage {
+            let n = trial.seq.indices.len();
+            let step = 20.0;
+            let x0 = stage.area.center().x - step * (n as f32 - 1.0) / 2.0;
+            for i in 0..n {
+                let c = pos2(x0 + step * i as f32, top + 78.0);
+                if i < clicked.len() {
+                    p.circle_filled(c, 5.5, theme::stimulus::ACCENT);
+                } else {
+                    p.circle_stroke(c, 5.0, Stroke::new(1.5, KEY_EDGE));
                 }
-                if ui.button("Salta pratica →").clicked() {
-                    self.practice_queue.clear();
-                    self.start_test_level(now);
-                }
-            });
-        });
+            }
+        }
     }
 
     /// Disegna i 9 blocchi e ritorna quello cliccato (solo in fase di input).
-    fn blocks_ui(&self, ui: &mut egui::Ui, now: Instant) -> Option<usize> {
-        let (area, _) = ui.allocate_exact_size(vec2(AREA_SIZE, AREA_SIZE), Sense::hover());
+    fn blocks_ui(&self, ui: &mut egui::Ui, stage: &chrome::Stage, now: Instant) -> Option<usize> {
+        let field = Self::field_rect(stage.area);
         let lit = match &self.stage {
             Stage::Presenting { trial, since } => lit_block(
                 &trial.seq.indices,
@@ -321,35 +479,21 @@ impl CorsiRunner {
             _ => (&[][..], false),
         };
         let mut hit = None;
-        for (idx, block) in CORSI_BLOCKS.iter().enumerate() {
-            let center = area.min
-                + vec2(
-                    (block.x / 100.0) as f32 * AREA_SIZE,
-                    ((100.0 - block.y) / 100.0) as f32 * AREA_SIZE,
-                );
-            let rect = Rect::from_center_size(center, vec2(BLOCK_SIZE, BLOCK_SIZE));
-            let sense = if accepting {
-                Sense::click()
-            } else {
-                Sense::hover()
-            };
-            let response = ui.interact(rect, ui.make_persistent_id(("corsi-block", idx)), sense);
-            let is_lit = lit == Some(idx);
-            let (fill, border) = if is_lit {
-                (theme::ACCENT, theme::ACCENT)
-            } else if clicked_so_far.contains(&idx) {
-                (BLOCK_CLICKED, theme::stimulus::LINE)
-            } else {
-                (BLOCK_IDLE, theme::stimulus::LINE)
-            };
-            ui.painter().rect(
+        for idx in 0..CORSI_BLOCKS.len() {
+            let rect = Self::block_rect(field, idx);
+            let response = ui.interact(
                 rect,
-                CornerRadius::same(6),
-                fill,
-                Stroke::new(1.0, border),
-                StrokeKind::Inside,
+                ui.make_persistent_id(("corsi-block", idx)),
+                if accepting {
+                    Sense::CLICK
+                } else {
+                    Sense::hover()
+                },
             );
-            if accepting && response.hovered() {
+            let hovered = accepting && response.hovered();
+            let order = clicked_so_far.iter().position(|&c| c == idx);
+            paint_block(&stage.painter, rect, lit == Some(idx), hovered, order);
+            if hovered {
                 ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
             }
             if accepting && response.clicked() {
@@ -357,6 +501,73 @@ impl CorsiRunner {
             }
         }
         hit
+    }
+
+    fn counter(&self) -> (String, f32) {
+        let levels = (self.params.max_length - self.params.start_length + 1).max(1) as f32;
+        let done = self.level.saturating_sub(self.params.start_length as usize) as f32;
+        let length = match &self.stage {
+            Stage::Presenting { trial, .. } | Stage::Input { trial, .. } => trial.seq.indices.len(),
+            _ => self.level,
+        };
+        let label = if self.in_practice() == Some(true) {
+            let total = PRACTICE_TRIALS;
+            format!(
+                "{} / {total}",
+                total.saturating_sub(self.practice_queue.len()).max(1)
+            )
+        } else {
+            let total = self.params.trials_per_level as usize;
+            let current = (total - self.level_queue.len().min(total)).max(1);
+            format!("{current} / {total} · lunghezza {length}")
+        };
+        (label, done / levels)
+    }
+}
+
+fn paint_block(
+    painter: &egui::Painter,
+    rect: Rect,
+    lit: bool,
+    hovered: bool,
+    order: Option<usize>,
+) {
+    let radius = CornerRadius::same((rect.width() * 0.12) as u8);
+    painter.rect_filled(rect.translate(vec2(0.0, 3.0)), radius, BLOCK_SHADOW);
+    if lit {
+        for (grow, alpha) in [(14.0, 28.0), (7.0, 60.0)] {
+            let glow = theme::stimulus::ACCENT.gamma_multiply(alpha / 255.0);
+            painter.rect_filled(
+                rect.expand(grow),
+                CornerRadius::same(((rect.width() + grow) * 0.14) as u8),
+                glow,
+            );
+        }
+    }
+    let (fill, border, width) = if lit {
+        (theme::stimulus::ACCENT, theme::stimulus::ACCENT, 2.0)
+    } else if order.is_some() {
+        (BLOCK_CLICKED, theme::stimulus::ACCENT, 2.0)
+    } else if hovered {
+        (BLOCK_CLICKED, theme::stimulus::ACCENT, 3.0)
+    } else {
+        (BLOCK_IDLE, KEY_EDGE, 1.5)
+    };
+    painter.rect(
+        rect,
+        radius,
+        fill,
+        Stroke::new(width, border),
+        StrokeKind::Inside,
+    );
+    if let Some(order) = order {
+        painter.text(
+            rect.center(),
+            Align2::CENTER_CENTER,
+            (order + 1).to_string(),
+            FontId::new(rect.width() * 0.34, FontFamily::Monospace),
+            theme::stimulus::ACCENT,
+        );
     }
 }
 
@@ -374,33 +585,29 @@ impl TestRunner for CorsiRunner {
     }
 
     fn ui(&mut self, ui: &mut egui::Ui) -> RunnerStatus {
+        let stage = chrome::Stage::begin(ui);
+        if let Some(status) = self.pause_step(ui, &stage) {
+            return status;
+        }
         let now = Instant::now();
         self.tick(now);
         if let Some(result) = self.result.take() {
             return RunnerStatus::Finished(Box::new(result));
         }
+        stage.esc_hint();
+        let practice = self.in_practice();
+        let (counter, fraction) = self.counter();
+        stage.status_bar_with(&self.hint, practice, &counter, fraction);
         if matches!(self.stage, Stage::Ready) {
-            self.ready_ui(ui, now);
+            self.ready_ui(ui, &stage, now);
         } else {
-            ui.vertical_centered(|ui| {
-                ui.label(
-                    egui::RichText::new(self.status_text())
-                        .size(16.0)
-                        .color(theme::stimulus::MUTED),
-                );
-                ui.add_space(8.0);
-                if let Some(block) = self.blocks_ui(ui, now) {
-                    self.on_block_click(block, Instant::now());
-                }
-            });
+            self.header_ui(&stage);
+            if let Some(block) = self.blocks_ui(ui, &stage, now) {
+                self.on_block_click(block, Instant::now());
+            }
             ui.ctx().request_repaint_after(Duration::from_millis(16));
         }
-        let mut status = RunnerStatus::Running;
-        ui.add_space(12.0);
-        if ui.small_button("Interrompi il test").clicked() {
-            status = RunnerStatus::Aborted;
-        }
-        status
+        RunnerStatus::Running
     }
 }
 

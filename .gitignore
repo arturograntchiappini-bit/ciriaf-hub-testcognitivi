@@ -15,3 +15,4 @@ coverage
 dist-desktop/
 desktop/target/
 *.msi
+!public/download/*.msi

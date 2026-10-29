@@ -11,6 +11,9 @@ use std::rc::{Rc, Weak};
 /// Annulla un timer schedulato.
 pub type Cancel = Box<dyn FnOnce()>;
 
+/// Valuta la correttezza dato lo stimolo e il tasto premuto (`None` se nessuna risposta).
+pub type EvaluateFn = Box<dyn Fn(&TrialSpec, Option<&str>) -> bool>;
+
 /// Cronometro ad alta risoluzione (ms).
 pub trait Clock {
     fn now(&self) -> f64;
@@ -132,7 +135,7 @@ pub struct SequencerConfig {
     /// True se il trial richiede una risposta; false per withhold (No-Go/non-target).
     pub expects_response: Box<dyn Fn(&TrialSpec) -> bool>,
     /// Correttezza dato lo stimolo e il tasto premuto (`None` se nessuna risposta).
-    pub evaluate: Box<dyn Fn(&TrialSpec, Option<&str>) -> bool>,
+    pub evaluate: EvaluateFn,
     pub clock: Rc<dyn Clock>,
     pub scheduler: Rc<dyn Scheduler>,
     pub on_state: Box<dyn Fn(&SequencerState)>,
@@ -451,7 +454,7 @@ impl FakeEnv {
                 timers.retain(|t| !t.cancelled.get());
                 let mut best: Option<usize> = None;
                 for (i, t) in timers.iter().enumerate() {
-                    if t.at <= target && best.map_or(true, |b| t.at < timers[b].at) {
+                    if t.at <= target && best.is_none_or(|b| t.at < timers[b].at) {
                         best = Some(i);
                     }
                 }

@@ -3,7 +3,8 @@
 use std::time::{Duration, Instant};
 
 use eframe::egui::{
-    self, pos2, vec2, Color32, CornerRadius, Painter, Pos2, Rect, Sense, Shape, Stroke, StrokeKind,
+    self, epaint::Mesh, pos2, vec2, Align2, Color32, CornerRadius, FontId, Painter, Pos2, Rect,
+    Sense, Shape, Stroke, StrokeKind,
 };
 use serde_json::{Map, Value};
 use sintropia_core::rng::mulberry32;
@@ -16,11 +17,15 @@ use sintropia_engines::wcst::{
 use super::{ms_between, FEEDBACK_MS};
 use crate::runner::{RunnerStatus, TestRunner};
 use crate::theme;
+use crate::views::chrome::{self, Hint, PauseChoice, PauseTimer};
 
-const CARD_SIZE: egui::Vec2 = vec2(96.0, 128.0);
-const GLYPH_SIZE: f32 = 22.0;
-const GLYPH_GAP: f32 = 4.0;
-const CORRECT_COLOR: Color32 = theme::stimulus::ACCENT;
+/// Proporzioni delle carte (larghezza / altezza), distanza fra i riferimenti e altezza massima.
+const CARD_ASPECT: f32 = 0.76;
+const CARD_GAP: f32 = 22.0;
+const MAX_CARD_HEIGHT: f32 = 270.0;
+/// Spazio in alto per titolo e istruzione.
+const HEADER_HEIGHT: f32 = 120.0;
+const CARD_BORDER: Color32 = Color32::from_rgb(190, 197, 208);
 const WRONG_COLOR: Color32 = Color32::from_rgb(208, 2, 27);
 
 pub struct WcstRunner {
@@ -37,6 +42,10 @@ pub struct WcstRunner {
     categories: usize,
     consecutive: usize,
     result: Option<TestResult>,
+    /// Indice del riferimento scelto, per evidenziarne l'esito durante il feedback.
+    last_chosen: Option<usize>,
+    hint: Hint,
+    pause: PauseTimer,
 }
 
 struct Feedback {
@@ -102,6 +111,9 @@ impl WcstRunner {
             categories: 0,
             consecutive: 0,
             result: None,
+            last_chosen: None,
+            hint: Hint::parse("Abbina per colore, forma o numero: scopri la regola dal feedback"),
+            pause: PauseTimer::default(),
         }
     }
 
@@ -171,74 +183,228 @@ impl WcstRunner {
     }
 
     fn finish(&mut self) {
+        self.result = Some(self.build_result());
+    }
+
+    fn build_result(&self) -> TestResult {
         let params = match serde_json::to_value(&self.params) {
             Ok(Value::Object(map)) => map,
             _ => Map::new(),
         };
-        self.result = Some(TestResult {
+        TestResult {
             test_id: TestId::Wcst,
             session_id: self.session_id.clone(),
             started_at: self.started_at.clone(),
             params,
             summary: score_wcst(&self.trials, &self.metas, &self.params),
-            trials: std::mem::take(&mut self.trials),
-        });
+            trials: self.trials.clone(),
+        }
     }
 
-    fn feedback_row(&self, ui: &mut egui::Ui) {
-        ui.allocate_ui(vec2(ui.available_width(), 28.0), |ui| {
-            ui.set_min_height(28.0);
-            if let Some(feedback) = &self.feedback {
-                let (text, color) = if feedback.correct {
-                    ("Corretto", CORRECT_COLOR)
-                } else {
-                    ("Errato", WRONG_COLOR)
-                };
-                ui.label(egui::RichText::new(text).size(20.0).strong().color(color));
+    /// Sposta in avanti gli istanti pendenti della durata della pausa (il tempo fermo non conta).
+    fn shift_clocks(&mut self, paused_for: Duration) {
+        self.t0 += paused_for;
+        self.onset += paused_for;
+        if let Some(feedback) = &mut self.feedback {
+            feedback.until += paused_for;
+        }
+    }
+
+    fn pause_step(&mut self, ui: &mut egui::Ui, stage: &chrome::Stage) -> Option<RunnerStatus> {
+        if chrome::escape_pressed(ui) {
+            if self.pause.is_paused() {
+                let paused_for = self.pause.resume();
+                self.shift_clocks(paused_for);
+            } else {
+                self.pause.pause();
             }
-        });
+        }
+        if !self.pause.is_paused() {
+            return None;
+        }
+        Some(match chrome::pause_panel(ui, stage) {
+            Some(PauseChoice::Resume) => {
+                let paused_for = self.pause.resume();
+                self.shift_clocks(paused_for);
+                RunnerStatus::Running
+            }
+            Some(PauseChoice::ExportPartial) => {
+                RunnerStatus::Finished(Box::new(self.build_result()))
+            }
+            Some(PauseChoice::Abort) => RunnerStatus::Aborted,
+            None => RunnerStatus::Running,
+        })
+    }
+
+    fn header_ui(&self, stage: &chrome::Stage) {
+        let p = &stage.painter;
+        let x = stage.area.center().x;
+        let top = stage.area.min.y + 40.0;
+        match &self.feedback {
+            Some(feedback) => {
+                let color = if feedback.correct {
+                    chrome::GREEN
+                } else {
+                    WRONG_COLOR
+                };
+                let word = if feedback.correct {
+                    "Corretto"
+                } else {
+                    "Errato"
+                };
+                chrome::outcome_mark(p, pos2(x - 70.0, top + 14.0), 20.0, feedback.correct);
+                p.text(
+                    pos2(x - 40.0, top + 14.0),
+                    Align2::LEFT_CENTER,
+                    word,
+                    FontId::new(38.0, theme::display_family()),
+                    color,
+                );
+            }
+            None => {
+                p.text(
+                    pos2(x, top + 8.0),
+                    Align2::CENTER_CENTER,
+                    "ABBINA LA CARTA",
+                    FontId::new(34.0, theme::display_family()),
+                    theme::stimulus::INK,
+                );
+                p.text(
+                    pos2(x, top + 40.0),
+                    Align2::CENTER_CENTER,
+                    "Clicca la carta di riferimento a cui abbinare quella da smistare",
+                    FontId::proportional(15.0),
+                    theme::stimulus::MUTED,
+                );
+            }
+        }
+    }
+
+    /// Dimensioni delle carte: stessa altezza per la riga dei riferimenti e per la carta da smistare.
+    fn card_size(area: Rect) -> egui::Vec2 {
+        let by_height =
+            ((area.height() - HEADER_HEIGHT - 70.0) / 2.0).clamp(110.0, MAX_CARD_HEIGHT);
+        let by_width = (area.width() * 0.9 - 3.0 * CARD_GAP) / 4.0 / CARD_ASPECT;
+        let height = by_height.min(by_width);
+        vec2(height * CARD_ASPECT, height)
+    }
+
+    fn cards_ui(&mut self, ui: &mut egui::Ui, stage: &chrome::Stage) -> Option<usize> {
+        let size = Self::card_size(stage.area);
+        let row_top = stage.area.min.y + HEADER_HEIGHT;
+        let row_width = 4.0 * size.x + 3.0 * CARD_GAP;
+        let left = stage.area.center().x - row_width / 2.0;
+        let mut chosen = None;
+        for (i, card) in WCST_STIMULUS_CARDS.iter().enumerate() {
+            let rect =
+                Rect::from_min_size(pos2(left + i as f32 * (size.x + CARD_GAP), row_top), size);
+            let outcome = match (&self.feedback, self.last_chosen) {
+                (Some(f), Some(c)) if c == i => Some(f.correct),
+                _ => None,
+            };
+            let response = ui.interact(
+                rect,
+                ui.make_persistent_id(("wcst-ref", i)),
+                if self.feedback.is_none() {
+                    Sense::CLICK
+                } else {
+                    Sense::hover()
+                },
+            );
+            let hovered = self.feedback.is_none() && response.hovered();
+            paint_card(&stage.painter, rect, card, CardLook { hovered, outcome });
+            if hovered {
+                ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
+            }
+            if response.clicked() {
+                chosen = Some(i);
+            }
+        }
+        let sort_top = row_top + size.y + 46.0;
+        stage.painter.text(
+            pos2(stage.area.center().x, row_top + size.y + 22.0),
+            Align2::CENTER_CENTER,
+            "CARTA DA SMISTARE",
+            FontId::monospace(12.5),
+            theme::stimulus::MUTED,
+        );
+        if let Some(target) = self.deck.get(self.deck_index) {
+            let rect =
+                Rect::from_min_size(pos2(stage.area.center().x - size.x / 2.0, sort_top), size);
+            paint_card(
+                &stage.painter,
+                rect,
+                target,
+                CardLook {
+                    hovered: false,
+                    outcome: None,
+                },
+            );
+        }
+        chosen
     }
 }
 
-/// Faccia della carta: `number` simboli di `shape` nel colore `color`, in colonna centrata.
-fn card_face(ui: &mut egui::Ui, card: &Card, interactive: bool) -> egui::Response {
-    let sense = if interactive {
-        Sense::click()
-    } else {
-        Sense::hover()
+/// Aspetto di una carta: evidenziazione al passaggio e, dopo la scelta, esito sul bordo.
+#[derive(Clone, Copy)]
+struct CardLook {
+    hovered: bool,
+    outcome: Option<bool>,
+}
+
+/// Faccia della carta: i simboli sono disposti in colonna (1–3) o in griglia 2×2 (4).
+fn paint_card(painter: &Painter, rect: Rect, card: &Card, look: CardLook) {
+    let radius = CornerRadius::same((rect.width() * 0.07) as u8);
+    painter.rect_filled(
+        rect.translate(vec2(0.0, 4.0)),
+        radius,
+        Color32::from_rgb(0xDD, 0xE1, 0xE8),
+    );
+    let (border, width) = match (look.outcome, look.hovered) {
+        (Some(true), _) => (chrome::GREEN, 4.0),
+        (Some(false), _) => (WRONG_COLOR, 4.0),
+        (None, true) => (theme::stimulus::ACCENT, 3.5),
+        (None, false) => (CARD_BORDER, 1.5),
     };
-    let (rect, response) = ui.allocate_exact_size(CARD_SIZE, sense);
-    let border = if interactive && response.hovered() {
-        theme::stimulus::ACCENT
+    let fill = if look.hovered {
+        Color32::from_rgb(0xF4, 0xF8, 0xFD)
     } else {
-        theme::stimulus::LINE
+        Color32::WHITE
     };
-    ui.painter().rect(
+    painter.rect(
         rect,
-        CornerRadius::same(4),
-        Color32::WHITE,
-        Stroke::new(1.0, border),
+        radius,
+        fill,
+        Stroke::new(width, border),
         StrokeKind::Inside,
     );
-    let count = f32::from(card.number);
-    let column = count * GLYPH_SIZE + (count - 1.0) * GLYPH_GAP;
-    let top = rect.center().y - column / 2.0;
-    for i in 0..card.number {
-        let center = pos2(
-            rect.center().x,
-            top + GLYPH_SIZE / 2.0 + f32::from(i) * (GLYPH_SIZE + GLYPH_GAP),
-        );
-        draw_glyph(ui.painter(), card.shape, color_rgb(card.color), center);
+    let glyph = (rect.width() * 0.36).min(rect.height() * 0.22);
+    let gap = glyph * 0.2;
+    let color = color_rgb(card.color);
+    for center in glyph_centers(rect.center(), card.number, glyph, gap) {
+        draw_glyph(painter, card.shape, color, center, glyph);
     }
-    if interactive && response.hovered() {
-        ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
-    }
-    response
 }
 
-/// Simbolo nel box 24×24 del SVG originale, scalato a `GLYPH_SIZE`.
-fn draw_glyph(painter: &Painter, shape: CardShape, fill: Color32, center: Pos2) {
-    let scale = GLYPH_SIZE / 24.0;
+/// Centri dei `count` simboli: colonna centrata, oppure griglia 2×2 per quattro.
+fn glyph_centers(middle: Pos2, count: u8, glyph: f32, gap: f32) -> Vec<Pos2> {
+    let step = glyph + gap;
+    if count == 4 {
+        let half = step / 2.0;
+        return [(-1.0, -1.0), (1.0, -1.0), (-1.0, 1.0), (1.0, 1.0)]
+            .iter()
+            .map(|&(dx, dy)| middle + vec2(dx * half, dy * half))
+            .collect();
+    }
+    let top = -step * (f32::from(count) - 1.0) / 2.0;
+    (0..count)
+        .map(|i| middle + vec2(0.0, top + f32::from(i) * step))
+        .collect()
+}
+
+/// Simbolo nel box 24×24 del SVG originale, scalato a `size`.
+fn draw_glyph(painter: &Painter, shape: CardShape, fill: Color32, center: Pos2, size: f32) {
+    let scale = size / 24.0;
     let at = |x: f32, y: f32| pos2(center.x + (x - 12.0) * scale, center.y + (y - 12.0) * scale);
     let polygon = |points: &[(f32, f32)]| {
         Shape::convex_polygon(
@@ -249,14 +415,14 @@ fn draw_glyph(painter: &Painter, shape: CardShape, fill: Color32, center: Pos2) 
     };
     match shape {
         CardShape::Circle => {
-            painter.circle_filled(center, 9.0 * scale, fill);
+            painter.circle_filled(center, 10.0 * scale, fill);
         }
         CardShape::Triangle => {
-            painter.add(polygon(&[(12.0, 3.0), (22.0, 21.0), (2.0, 21.0)]));
+            painter.add(polygon(&[(12.0, 2.5), (23.0, 21.5), (1.0, 21.5)]));
         }
         CardShape::Cross => {
-            painter.rect_filled(Rect::from_two_pos(at(9.0, 2.0), at(15.0, 22.0)), 0.0, fill);
-            painter.rect_filled(Rect::from_two_pos(at(2.0, 9.0), at(22.0, 15.0)), 0.0, fill);
+            painter.rect_filled(Rect::from_two_pos(at(8.5, 1.5), at(15.5, 22.5)), 0.0, fill);
+            painter.rect_filled(Rect::from_two_pos(at(1.5, 8.5), at(22.5, 15.5)), 0.0, fill);
         }
         CardShape::Star => draw_star(painter, fill, &at),
     }
@@ -265,26 +431,31 @@ fn draw_glyph(painter: &Painter, shape: CardShape, fill: Color32, center: Pos2) 
 /// Stella concava: triangolata a ventaglio dal centro (convessa per ogni spicchio).
 fn draw_star(painter: &Painter, fill: Color32, at: &dyn Fn(f32, f32) -> Pos2) {
     const OUTLINE: [(f32, f32); 10] = [
-        (12.0, 2.0),
-        (15.0, 9.0),
-        (22.0, 9.0),
-        (16.5, 13.5),
-        (18.5, 21.0),
-        (12.0, 16.5),
-        (5.5, 21.0),
-        (7.5, 13.5),
-        (2.0, 9.0),
-        (9.0, 9.0),
+        (12.0, 1.5),
+        (15.2, 8.6),
+        (23.0, 9.4),
+        (17.2, 14.6),
+        (18.9, 22.3),
+        (12.0, 18.3),
+        (5.1, 22.3),
+        (6.8, 14.6),
+        (1.0, 9.4),
+        (8.8, 8.6),
     ];
-    let center = at(12.0, 12.0);
-    for i in 0..OUTLINE.len() {
-        let (a, b) = (OUTLINE[i], OUTLINE[(i + 1) % OUTLINE.len()]);
-        painter.add(Shape::convex_polygon(
-            vec![center, at(a.0, a.1), at(b.0, b.1)],
-            fill,
-            Stroke::NONE,
-        ));
+    // Mesh a ventaglio (nessuna cucitura fra i triangoli) + contorno chiuso per l'antialiasing dei bordi.
+    let center = at(12.0, 12.5);
+    let ring: Vec<Pos2> = OUTLINE.iter().map(|&(x, y)| at(x, y)).collect();
+    let mut mesh = Mesh::default();
+    mesh.colored_vertex(center, fill);
+    for &point in &ring {
+        mesh.colored_vertex(point, fill);
     }
+    let n = ring.len() as u32;
+    for i in 0..n {
+        mesh.add_triangle(0, 1 + i, 1 + (i + 1) % n);
+    }
+    painter.add(Shape::mesh(mesh));
+    painter.add(Shape::closed_line(ring, Stroke::new(1.0, fill)));
 }
 
 impl TestRunner for WcstRunner {
@@ -293,50 +464,29 @@ impl TestRunner for WcstRunner {
     }
 
     fn ui(&mut self, ui: &mut egui::Ui) -> RunnerStatus {
-        let now = Instant::now();
-        self.tick(now);
+        let stage = chrome::Stage::begin(ui);
+        if let Some(status) = self.pause_step(ui, &stage) {
+            return status;
+        }
+        self.tick(Instant::now());
         if let Some(result) = self.result.take() {
             return RunnerStatus::Finished(Box::new(result));
         }
-        let mut chosen: Option<Card> = None;
-        ui.vertical_centered(|ui| {
-            ui.label(
-                egui::RichText::new(format!(
-                    "Clicca la carta di riferimento a cui abbinare quella da smistare — Carta {}/{}",
-                    (self.deck_index + 1).min(self.deck.len()),
-                    self.deck.len()
-                ))
-                .color(theme::stimulus::MUTED),
-            );
-            ui.add_space(12.0);
-            if let Some(target) = self.deck.get(self.deck_index) {
-                ui.label(theme::eyebrow("Carta da smistare"));
-                card_face(ui, target, false);
-            }
-            self.feedback_row(ui);
-            ui.label(
-                egui::RichText::new("Abbinala a una di queste — per colore, forma o numero")
-                    .color(theme::stimulus::MUTED),
-            );
-            ui.add_space(6.0);
-            ui.horizontal(|ui| {
-                ui.add_space(((ui.available_width() - 4.0 * CARD_SIZE.x - 3.0 * 16.0) / 2.0).max(0.0));
-                ui.spacing_mut().item_spacing.x = 16.0;
-                for card in &WCST_STIMULUS_CARDS {
-                    if card_face(ui, card, true).clicked() {
-                        chosen = Some(*card);
-                    }
-                }
-            });
-        });
-        if let Some(card) = chosen {
-            self.choose(&card, Instant::now());
+        stage.esc_hint();
+        let total = self.deck.len();
+        let current = (self.deck_index + 1).min(total);
+        stage.status_bar_with(
+            &self.hint,
+            Some(false),
+            &format!("{current} / {total}"),
+            self.deck_index as f32 / total.max(1) as f32,
+        );
+        self.header_ui(&stage);
+        if let Some(i) = self.cards_ui(ui, &stage) {
+            self.last_chosen = Some(i);
+            self.choose(&WCST_STIMULUS_CARDS[i], Instant::now());
         }
         ui.ctx().request_repaint_after(Duration::from_millis(16));
-        ui.add_space(12.0);
-        if ui.small_button("Interrompi il test").clicked() {
-            return RunnerStatus::Aborted;
-        }
         RunnerStatus::Running
     }
 }

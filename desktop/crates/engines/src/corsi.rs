@@ -4,9 +4,9 @@
 //! Layout fisso di 9 blocchi. Ad ogni livello, 2 trial con sequenze diverse ma di pari complessità
 //! (stessi incroci, distanza entro tolleranza dal bersaglio del livello). Arresto: entrambi falliti.
 use serde::{Deserialize, Serialize};
-use sintropia_core::rng::shuffle;
 use sintropia_core::types::{Phase, SummaryMetric, TrialResult, ValidationFlag};
 use std::collections::HashSet;
+use std::hash::BuildHasherDefault;
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Point {
@@ -136,17 +136,51 @@ fn complexity_of(indices: Vec<usize>, blocks: &[Point]) -> Sequence {
     }
 }
 
-/// Forma canonica: una sequenza e il suo rovescio sono la stessa traiettoria.
-fn canonical_key(indices: &[usize]) -> String {
+/// Chiave di una traiettoria a meno del rovescio. Compatta (u64, 4 bit per indice) quando possibile;
+/// il testo è il ripiego per layout con più di 16 blocchi o sequenze più lunghe di 16.
+#[derive(PartialEq, Eq, Hash)]
+enum CanonicalKey {
+    Packed(u64),
+    Text(String),
+}
+
+fn canonical_key(indices: &[usize]) -> CanonicalKey {
+    if indices.len() <= 16 && indices.iter().all(|&i| i < 16) {
+        let pack =
+            |it: &mut dyn Iterator<Item = &usize>| it.fold(0u64, |acc, &i| (acc << 4) | i as u64);
+        let forward = pack(&mut indices.iter());
+        let backward = pack(&mut indices.iter().rev());
+        return CanonicalKey::Packed(forward.min(backward));
+    }
     let join = |it: &mut dyn Iterator<Item = &usize>| {
         it.map(usize::to_string).collect::<Vec<_>>().join("-")
     };
     let forward = join(&mut indices.iter());
     let backward = join(&mut indices.iter().rev());
-    if forward < backward {
+    CanonicalKey::Text(if forward < backward {
         forward
     } else {
         backward
+    })
+}
+
+/// Hasher moltiplicativo (stile Fx): le chiavi sono nostre, non serve la resistenza di SipHash.
+#[derive(Default)]
+struct FastHasher(u64);
+
+impl std::hash::Hasher for FastHasher {
+    fn write(&mut self, bytes: &[u8]) {
+        for &b in bytes {
+            self.write_u64(u64::from(b));
+        }
+    }
+
+    fn write_u64(&mut self, value: u64) {
+        self.0 = (self.0.rotate_left(5) ^ value).wrapping_mul(0x517c_c1b7_2722_0a95);
+    }
+
+    fn finish(&self) -> u64 {
+        self.0 ^ (self.0 >> 32)
     }
 }
 
@@ -175,39 +209,46 @@ pub fn target_path_length(length: usize, blocks: &[Point]) -> f64 {
 
 /// Estrae a sorte un gruppo di `count` sequenze a pari incroci con ampiezza di distanza <= `max_spread`.
 fn pick_uniform_group(
-    pool: &[Sequence],
+    pool: &[&Sequence],
     count: usize,
     max_spread: f64,
     rand: &mut dyn FnMut() -> f64,
 ) -> Option<Vec<Sequence>> {
     // Mappa a ordine di inserimento (come `Map` di JS): l'estrazione dipende dall'ordine dei gruppi.
     let mut by_crossings: Vec<(usize, Vec<&Sequence>)> = Vec::new();
-    for c in pool {
+    for &c in pool {
         match by_crossings.iter_mut().find(|(k, _)| *k == c.crossings) {
             Some((_, group)) => group.push(c),
             None => by_crossings.push((c.crossings, vec![c])),
         }
     }
 
-    let mut eligible: Vec<Vec<&Sequence>> = Vec::new();
-    for (_, group) in &by_crossings {
+    // Finestre idonee come (gruppo, inizio): niente copie finché non si è scelto.
+    let mut groups: Vec<Vec<&Sequence>> = Vec::new();
+    let mut eligible: Vec<(usize, usize)> = Vec::new();
+    for (_, mut group) in by_crossings {
         if group.len() < count {
             continue;
         }
-        let mut sorted = group.clone();
-        sorted.sort_by(|a, b| a.path_length.total_cmp(&b.path_length));
-        for i in 0..=(sorted.len() - count) {
-            let spread = sorted[i + count - 1].path_length - sorted[i].path_length;
+        group.sort_by(|a, b| a.path_length.total_cmp(&b.path_length));
+        for i in 0..=(group.len() - count) {
+            let spread = group[i + count - 1].path_length - group[i].path_length;
             if spread <= max_spread {
-                eligible.push(sorted[i..i + count].to_vec());
+                eligible.push((groups.len(), i));
             }
         }
+        groups.push(group);
     }
     if eligible.is_empty() {
         return None;
     }
-    let idx = (rand() * eligible.len() as f64).floor() as usize;
-    Some(eligible[idx].iter().map(|&s| s.clone()).collect())
+    let (group, start) = eligible[(rand() * eligible.len() as f64).floor() as usize];
+    Some(
+        groups[group][start..start + count]
+            .iter()
+            .map(|&s| s.clone())
+            .collect(),
+    )
 }
 
 /// Genera `count` sequenze DISTINTE della lunghezza data: entro `complexity_tolerance` dal bersaglio
@@ -221,24 +262,30 @@ pub fn generate_balanced_sequences(
     blocks: &[Point],
 ) -> Vec<Sequence> {
     const SAMPLES: usize = 2000; // tetto ai campionamenti (evita loop infiniti su lunghezze estreme)
-    let all_indices: Vec<usize> = (0..blocks.len()).collect();
     let target = target_path_length(length, blocks);
     let mut candidates: Vec<Sequence> = Vec::new();
-    let mut seen: HashSet<String> = HashSet::new();
+    let mut seen: HashSet<CanonicalKey, BuildHasherDefault<FastHasher>> = HashSet::default();
+    let mut perm: Vec<usize> = (0..blocks.len()).collect();
 
     for _ in 0..SAMPLES {
-        let mut perm = shuffle(&all_indices, rand);
-        perm.truncate(length);
-        if seen.insert(canonical_key(&perm)) {
-            candidates.push(complexity_of(perm, blocks));
+        // Stesso Fisher-Yates di `shuffle` (partenza dall'identità, stesso consumo del RNG), sul buffer riusato.
+        for (i, slot) in perm.iter_mut().enumerate() {
+            *slot = i;
+        }
+        for i in (1..perm.len()).rev() {
+            let j = (rand() * (i + 1) as f64).floor() as usize;
+            perm.swap(i, j);
+        }
+        let head = &perm[..length.min(perm.len())];
+        if seen.insert(canonical_key(head)) {
+            candidates.push(complexity_of(head.to_vec(), blocks));
         }
     }
 
     let tolerance = params.complexity_tolerance;
-    let band: Vec<Sequence> = candidates
+    let band: Vec<&Sequence> = candidates
         .iter()
         .filter(|c| (c.path_length - target).abs() <= tolerance)
-        .cloned()
         .collect();
 
     if let Some(ideal) = pick_uniform_group(&band, count, tolerance, rand) {
@@ -247,7 +294,7 @@ pub fn generate_balanced_sequences(
     if let Some(in_band) = pick_uniform_group(&band, count, f64::INFINITY, rand) {
         return in_band;
     }
-    let mut nearest = candidates;
+    let mut nearest: Vec<&Sequence> = candidates.iter().collect();
     nearest.sort_by(|a, b| {
         (a.path_length - target)
             .abs()
@@ -255,7 +302,7 @@ pub fn generate_balanced_sequences(
     });
     let relaxed_len = (count * 20).max(50).min(nearest.len());
     pick_uniform_group(&nearest[..relaxed_len], count, f64::INFINITY, rand)
-        .unwrap_or_else(|| nearest.into_iter().take(count).collect())
+        .unwrap_or_else(|| nearest.into_iter().take(count).cloned().collect())
 }
 
 /// Punteggio Corsi ponderato: baseline `start_length − 1` più 0.5 per ogni trial superato; 0 se nessuno.

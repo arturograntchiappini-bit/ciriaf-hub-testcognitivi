@@ -11,6 +11,9 @@ const COLOR_HEX: Record<WcstColor, string> = {
   blue: '#1565C0',
 };
 
+const COLOR_IT: Record<WcstColor, string> = { red: 'rosso', green: 'verde', yellow: 'giallo', blue: 'blu' };
+const SHAPE_IT: Record<WcstShape, string> = { triangle: 'triangoli', star: 'stelle', cross: 'croci', circle: 'cerchi' };
+
 function ShapeGlyph({ shape, color }: { shape: WcstShape; color: WcstColor }): JSX.Element {
   const fill = COLOR_HEX[color];
   const size = 22;
@@ -63,7 +66,8 @@ export function CardFace({ card, onClick, interactive = false }: CardFaceProps):
       className={`flex h-32 w-24 flex-col items-center justify-center gap-1 rounded-card border bg-white ${
         interactive ? 'border-line hover:border-accent cursor-pointer' : 'border-line'
       }`}
-      aria-label={`${card.number} ${card.shape} ${card.color}`}
+      role={interactive ? undefined : 'img'}
+      aria-label={`${card.number} ${SHAPE_IT[card.shape]} ${COLOR_IT[card.color]}`}
     >
       {symbols}
     </Comp>

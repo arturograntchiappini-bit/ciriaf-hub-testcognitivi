@@ -1,13 +1,11 @@
-//! Contratto di esecuzione dei test. Il runtime e le viste dei singoli test lo implementeranno;
-//! `create_runner` instrada ai runner dei test (vedi `views`); per ora gli altri restano segnaposto.
+//! Contratto di esecuzione dei test e costruzione dei runner.
 use std::collections::BTreeMap;
 
 use eframe::egui;
 use sintropia_core::{TestId, TestResult};
 
-use crate::theme;
+use crate::views_custom::{self, numbers_to_params, RunnerSpec};
 
-#[allow(dead_code)] // Finished lo userà il runtime dei test
 pub enum RunnerStatus {
     Running,
     Finished(Box<TestResult>),
@@ -20,48 +18,8 @@ pub trait TestRunner {
     fn ui(&mut self, ui: &mut egui::Ui) -> RunnerStatus;
 }
 
-/// Segnaposto «Esecuzione in arrivo».
-struct PlaceholderRunner {
-    test: TestId,
-    params: BTreeMap<String, f64>,
-}
-
-impl TestRunner for PlaceholderRunner {
-    fn test_id(&self) -> TestId {
-        self.test
-    }
-
-    fn ui(&mut self, ui: &mut egui::Ui) -> RunnerStatus {
-        let mut status = RunnerStatus::Running;
-        ui.vertical_centered(|ui| {
-            ui.add_space(60.0);
-            ui.label(
-                egui::RichText::new("ESECUZIONE IN ARRIVO")
-                    .font(egui::FontId::new(34.0, theme::display_family()))
-                    .color(theme::stimulus::INK),
-            );
-            ui.label(
-                egui::RichText::new(format!(
-                    "{} · {} parametri pronti",
-                    self.test,
-                    self.params.len()
-                ))
-                .monospace()
-                .color(theme::stimulus::MUTED),
-            );
-            ui.add_space(24.0);
-            if ui.button("Torna alla dashboard").clicked() {
-                status = RunnerStatus::Aborted;
-            }
-            ui.add_space(60.0);
-        });
-        status
-    }
-}
-
-/// Costruisce il runner di un test. I test a tempo di reazione (Stroop, Go/No-Go, Flanker, SART, PVT,
-/// N-Back, Visual Search, Mental Rotation) usano il runner condiviso di `views`; gli altri restano
-/// segnaposto finché non hanno la propria vista.
+/// Costruisce il runner di un test. I test a tempo di reazione usano il runner condiviso di `views`;
+/// Corsi, WCST e Trail Making le viste di `views_custom`.
 pub fn create_runner(
     test: TestId,
     params: BTreeMap<String, f64>,
@@ -88,10 +46,37 @@ pub fn create_runner(
         TestId::Nback => views::nback::runner(&params, run),
         TestId::VisualSearch => views::visual_search::runner(&params, run),
         TestId::MentalRotation => views::mental_rotation::runner(&params, run),
-        // TODO(altro agente): `TestId::Corsi => crate::views::corsi::CorsiRunner::new(..)` e
-        // `TestId::Wcst => crate::views::wcst::WcstRunner::new(..)`; Trail Making ha il motore ma non ancora la vista.
         TestId::Corsi | TestId::Wcst | TestId::TrailMaking => {
-            Ok(Box::new(PlaceholderRunner { test, params }))
+            let json = numbers_to_params(&params);
+            views_custom::create_custom_runner(&RunnerSpec {
+                test_id: test,
+                params: &json,
+                session_id: &run.session_id,
+                started_at: &run.started_at,
+                seed: run.seed,
+                practice: run.practice,
+                feedback: run.feedback_during_test,
+            })
+            .ok_or_else(|| format!("nessuna vista per {test}"))
         }
     }
+}
+
+/// Fabbrica per la modalità Sessione: stessi runner dell'esecuzione singola; `None` se i parametri sono invalidi.
+pub fn session_factory(spec: &RunnerSpec) -> Option<Box<dyn TestRunner>> {
+    let numbers: BTreeMap<String, f64> = spec
+        .params
+        .iter()
+        .filter_map(|(k, v)| v.as_f64().map(|n| (k.clone(), n)))
+        .collect();
+    create_runner(
+        spec.test_id,
+        numbers,
+        spec.session_id.to_string(),
+        spec.started_at.to_string(),
+        spec.seed,
+        spec.practice,
+        spec.feedback,
+    )
+    .ok()
 }

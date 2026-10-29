@@ -244,7 +244,45 @@ temporale**.
 
 ### Riuso dei test
 
-Le viste dei 6 test sono usate senza modifiche, tramite `TestHost`; l'unica
+Le viste dei test sono usate senza modifiche, tramite `TestHost`; l'unica
 aggiunta è la prop `practice?` per saltare la pratica in sessione. Ogni
 `TestResult` viene etichettato con il contesto (fase, t, indice) in un
 `SessionTestResult`.
+
+---
+
+## 10. Motori in Rust e app desktop
+
+Accanto alla web app c'è un workspace Rust in `desktop/` (dettagli operativi in `desktop/README.md`). L'obiettivo è **un solo
+motore dei test**, in Rust: usato nativamente dall'app desktop e, in seguito, dalla web app compilato in WebAssembly.
+
+```
+src/engine/  (TypeScript)  ── oracolo ──►  desktop/fixtures/  ◄── riprodotte da ──  desktop/crates/engines (Rust)
+                                              golden · fuzz · evidence
+```
+
+| Crate | Ruolo |
+|---|---|
+| `sintropia-core` | tipi (serde camelCase), RNG `mulberry32` identico al TS, validazione RT, SDT, sequencer con `Clock`/`Scheduler` iniettati, export, sessioni, `ENGINE_VERSION` |
+| `sintropia-engines` | un modulo **puro** per test, parametri di default, regressione; compila per `wasm32-unknown-unknown` |
+| `sintropia-content` | catalogo, istruzioni, sezioni dei parametri: dati di UI, separati perché i motori non dipendano dall'interfaccia |
+| `sintropia-desktop` | GUI eframe/egui (backend wgpu): dashboard, istruzioni, test a tutta finestra, risultati/export, impostazioni, sessione, paper |
+
+Regole che valgono per il Rust:
+
+- **Purezza.** I motori non fanno I/O, non leggono l'orologio, non usano thread. Il tempo entra solo dal sequencer
+  (`SystemClock` nell'app, `FakeEnv` nei test).
+- **Il TS è la specifica.** `src/engine/**` non si modifica per la migrazione. Le fixture golden
+  (`desktop/tools/golden/*.mjs` → `desktop/fixtures/<test>.json`) e il fuzz differenziale (`desktop/tools/fuzz`) lo eseguono e il Rust
+  deve riprodurle: sequenze, conteggi e ordini esattamente uguali, float entro `1e-9` (`FLOAT_TOLERANCE`, un solo punto).
+- **I bug del TS non si copiano.** Le divergenze sono classificate in `desktop/fixtures/DIVERGENZE.md` e nel paper
+  `docs/scientific/migrazione-rust.md`; le fixture le marcano `expectedDivergence`.
+- **Evidenze.** `desktop/fixtures/evidence/*.json` (scritte con `SINTROPIA_WRITE_EVIDENCE=1`) e `BENCHMARK.md` sono la fonte dei numeri del paper.
+
+I contenuti scientifici (paper) sono gli stessi file di `docs/scientific/`, incorporati nell'app desktop a tempo di compilazione.
+
+### Distribuzione dell'app
+
+`desktop/installer/` produce `Sintropia-Setup-x64.msi` (WiX 5, per utente, senza UAC), `Sintropia-Desktop-x64.zip` e `SHA256SUMS.txt`;
+`publish-to-site.ps1` li copia in `public/download/` (e `scripts/install.ps1` in `public/`), serviti da Netlify con le intestazioni di
+`public/_headers`. La home web linka `./download/Sintropia-Setup-x64.msi` (`src/ui/home/DesktopDownload.tsx`). L'eseguibile non è firmato.

@@ -1,0 +1,43 @@
+name: release-desktop
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Installa WiX
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          wix extension add -g WixToolset.UI.wixext/5.0.2
+      - name: Test
+        working-directory: desktop
+        run: |
+          cargo test --workspace
+          cargo check -p sintropia-engines --target wasm32-unknown-unknown
+      - name: Installer, zip e checksum
+        run: ./desktop/installer/build-installer.ps1
+      - name: Pubblica la Release
+        uses: softprops/action-gh-release@v2.0.8
+        with:
+          files: |
+            dist-desktop/Sintropia-Setup-x64.msi
+            dist-desktop/Sintropia-Desktop-x64.zip
+            dist-desktop/SHA256SUMS.txt
