@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "src/config/defaults.ts": {
-    "mtime": 1792751697.441797,
-    "seen": 1793296826.532328,
-    "ast_hash": "0da12099d93baf96d18f1690a34f3bea",
+    "mtime": 1793324125.0841584,
+    "seen": 1793324554.1891172,
+    "ast_hash": "c84712367ab7d419bc639010257b8768",
     "semantic_hash": ""
   },
   "src/engine/clock.test.ts": {
@@ -540,39 +540,39 @@
     "semantic_hash": ""
   },
   "docs/scientific/bibliography.md": {
-    "mtime": 1793321408.4958646,
-    "seen": 1793321957.2791774,
-    "ast_hash": "b3b99fe8a8093d00570aefb60c2863d0",
+    "mtime": 1793324061.5223646,
+    "seen": 1793324554.2435348,
+    "ast_hash": "bf28f90bf8b9718c7b5504d5da1b3678",
     "semantic_hash": ""
   },
   "docs/scientific/corsi.md": {
-    "mtime": 1793321532.868414,
-    "seen": 1793321957.2791774,
-    "ast_hash": "6522804d951385b435db738ac1663897",
+    "mtime": 1793323649.5173461,
+    "seen": 1793324554.2490726,
+    "ast_hash": "eea407769d74bceacfc2dc0a81941365",
     "semantic_hash": ""
   },
   "docs/scientific/gonogo.md": {
-    "mtime": 1793321227.9576359,
-    "seen": 1793321957.2791774,
-    "ast_hash": "3a64b01efa766313b44e721e7ee17fdc",
+    "mtime": 1793323821.5205321,
+    "seen": 1793324554.2435348,
+    "ast_hash": "3d63393830bd6f337c87ad1ec015c465",
     "semantic_hash": ""
   },
   "docs/scientific/nback.md": {
-    "mtime": 1793321550.559775,
-    "seen": 1793321957.2791774,
-    "ast_hash": "4ae4df261c141bb8c00dd332ab809045",
+    "mtime": 1793323784.6211917,
+    "seen": 1793324554.2435348,
+    "ast_hash": "ac147bed707721851eee1310a347122d",
     "semantic_hash": ""
   },
   "docs/scientific/stroop.md": {
-    "mtime": 1793321533.6744623,
-    "seen": 1793321957.2791774,
-    "ast_hash": "aa6b99243972d2fbbdc41e18fc249505",
+    "mtime": 1793323438.4558797,
+    "seen": 1793324554.2435348,
+    "ast_hash": "828ecee27c5f7aead02eae6414e5624d",
     "semantic_hash": ""
   },
   "docs/scientific/validazione-rt.md": {
-    "mtime": 1793321548.8957906,
-    "seen": 1793321957.2791774,
-    "ast_hash": "a6006aebc11c5897c57f50b47f126470",
+    "mtime": 1793323535.3919325,
+    "seen": 1793324554.2435348,
+    "ast_hash": "0cdadc7c2b567356ab00f1f9de5f354c",
     "semantic_hash": ""
   },
   "docs/superpowers/specs/2026-07-06-piattaforma-test-cognitivi-design.md": {
@@ -636,9 +636,9 @@
     "semantic_hash": ""
   },
   "docs/scientific/wcst.md": {
-    "mtime": 1793321394.2120278,
-    "seen": 1793321957.280322,
-    "ast_hash": "528998fa850065a3d78604ca190bfcfb",
+    "mtime": 1793323798.1851466,
+    "seen": 1793324554.2490726,
+    "ast_hash": "05ebcf854b7daff24abfde6cb62cd1f9",
     "semantic_hash": ""
   },
   "public/favicon.svg": {
@@ -654,9 +654,9 @@
     "semantic_hash": ""
   },
   "src/engine/tests/pvt.ts": {
-    "mtime": 1792715772.0397174,
-    "seen": 1793296826.532328,
-    "ast_hash": "da2339fd07274b55b70f17f2af4201cc",
+    "mtime": 1793324125.0866747,
+    "seen": 1793324554.1956375,
+    "ast_hash": "56746e98f935384e7d1181782684b5ff",
     "semantic_hash": ""
   },
   "src/ui/components/AuthorCard.tsx": {
@@ -672,9 +672,9 @@
     "semantic_hash": ""
   },
   "docs/scientific/pvt.md": {
-    "mtime": 1793321569.1123333,
-    "seen": 1793321957.2791774,
-    "ast_hash": "08deb8e1bbb74ac6318098252235a721",
+    "mtime": 1793323567.1043813,
+    "seen": 1793324554.2435348,
+    "ast_hash": "ffbfc7e133747607bfcb9df8be716d43",
     "semantic_hash": ""
   },
   "src/engine/tests/flanker.test.ts": {
@@ -822,9 +822,9 @@
     "semantic_hash": ""
   },
   "docs/scientific/flanker.md": {
-    "mtime": 1793321402.3194177,
-    "seen": 1793321957.2791774,
-    "ast_hash": "dd052e2c4c438253a539a5b6364708ac",
+    "mtime": 1793323485.0701063,
+    "seen": 1793324554.2435348,
+    "ast_hash": "c08916f5124f0006253a626d49818ef6",
     "semantic_hash": ""
   },
   "src/ui/home/SciencePanel.tsx": {
@@ -942,9 +942,9 @@
     "semantic_hash": ""
   },
   "revisione-motore/pvt.ts": {
-    "mtime": 1792751753.7899947,
-    "seen": 1793296826.532328,
-    "ast_hash": "b1a0c609eb806700441416c39a41364a",
+    "mtime": 1793324125.2962859,
+    "seen": 1793324554.187117,
+    "ast_hash": "fe0e22f146c6120a446df5e0bf1caad5",
     "semantic_hash": ""
   },
   "revisione-motore/sart.ts": {
@@ -996,9 +996,9 @@
     "semantic_hash": ""
   },
   "docs/scientific/sart.md": {
-    "mtime": 1793321309.178918,
-    "seen": 1793321957.2791774,
-    "ast_hash": "bf058663ac8bba8a25288c8baa00c5ce",
+    "mtime": 1793323761.2650197,
+    "seen": 1793324554.2435348,
+    "ast_hash": "a0114a22cacbe140e2e781a35b2d4156",
     "semantic_hash": ""
   },
   "desktop/Cargo.toml": {
@@ -1374,9 +1374,9 @@
     "semantic_hash": ""
   },
   "desktop/crates/engines/src/pvt.rs": {
-    "mtime": 1792751512.8013074,
-    "seen": 1793296826.532328,
-    "ast_hash": "88edde3444aa070f6c40a34dc68f6821",
+    "mtime": 1793324163.7384808,
+    "seen": 1793324554.1354477,
+    "ast_hash": "b53d664d4a8fdf935fd2a530f2fd39e4",
     "semantic_hash": ""
   },
   "desktop/crates/engines/src/regression.rs": {
@@ -2190,15 +2190,15 @@
     "semantic_hash": ""
   },
   "desktop/fixtures/BENCHMARK.md": {
-    "mtime": 1792773169.2228405,
-    "seen": 1793296826.532328,
-    "ast_hash": "c24d6745be80bcff12dab70ad02c71f0",
+    "mtime": 1793324125.0657778,
+    "seen": 1793324554.242861,
+    "ast_hash": "c347112a01495e92f70c7be3ec2c5c28",
     "semantic_hash": ""
   },
   "desktop/fixtures/DIVERGENZE.md": {
-    "mtime": 1793320181.463827,
-    "seen": 1793321957.2791774,
-    "ast_hash": "b858ef38858d362e4bfba6cfc7a74e89",
+    "mtime": 1793324125.0645518,
+    "seen": 1793324554.242861,
+    "ast_hash": "6c484ccffcd392421b1a0ea9c5ae3772",
     "semantic_hash": ""
   },
   "desktop/tools/bench/notes.md": {
@@ -2208,21 +2208,21 @@
     "semantic_hash": ""
   },
   "docs/scientific/mental-rotation.md": {
-    "mtime": 1792751055.349155,
-    "seen": 1793296826.532328,
-    "ast_hash": "a7a9559a8637392e96a8bf6155ad1263",
+    "mtime": 1793323849.9699051,
+    "seen": 1793324554.2435348,
+    "ast_hash": "a5415705ffb7f057fda6454fc933df7d",
     "semantic_hash": ""
   },
   "docs/scientific/migrazione-rust.md": {
-    "mtime": 1793321668.9914157,
-    "seen": 1793321957.2791774,
-    "ast_hash": "894187e7c1758d5db6ed09b6d70869e4",
+    "mtime": 1793323711.0963995,
+    "seen": 1793324554.2435348,
+    "ast_hash": "34944694f8ff5300f63502f69630381c",
     "semantic_hash": ""
   },
   "docs/scientific/trail-making.md": {
-    "mtime": 1793321344.3442743,
-    "seen": 1793321957.2791774,
-    "ast_hash": "fc84c0bd8fa32379673d1e41b4590fc9",
+    "mtime": 1793323848.29319,
+    "seen": 1793324554.2435348,
+    "ast_hash": "b1ba1d2cc6b7f2ce6d84d06ef9fb9092",
     "semantic_hash": ""
   },
   "docs/scientific/visual-search.md": {
@@ -2232,9 +2232,9 @@
     "semantic_hash": ""
   },
   "public/download/SHA256SUMS.txt": {
-    "mtime": 1793321743.620705,
-    "seen": 1793321957.2791774,
-    "ast_hash": "0eacb9061839d892fca5cb55fa8b53b9",
+    "mtime": 1793324534.3684447,
+    "seen": 1793324554.2450578,
+    "ast_hash": "684c98c504b40c9db63bcd4cdd355afb",
     "semantic_hash": ""
   },
   "src/engine/README.md": {
