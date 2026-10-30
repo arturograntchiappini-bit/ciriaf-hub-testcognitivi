@@ -4,16 +4,8 @@
  */
 import { RtTestRunner, type RtTestPlan } from '../runtime/RtTestRunner';
 import type { TrialSpec } from '../runtime/sequencer';
-import {
-  generateStroop,
-  correctKeyStroop,
-  stroopStimulusLabel,
-  scoreStroop,
-  type StroopParams,
-  type StroopStimulus,
-  type StroopVariant,
-} from '../../engine/tests/stroop';
-import { mulberry32 } from '../../engine/rng';
+import { correctKeyStroop, stroopStimulusLabel, type StroopParams, type StroopStimulus, type StroopVariant } from '../../engine/tests/stroop';
+import { generateStroopSeeded, scoreStroop } from '../../engine/backend';
 import { STIMULUS_COLORS } from '../theme';
 import type { TestResult } from '../../engine/types';
 
@@ -39,10 +31,10 @@ function toSpec(s: StroopStimulus): TrialSpec {
 
 export function StroopView(props: StroopViewProps): JSX.Element {
   const { variant, params, sessionId, startedAt, seed } = props;
-  const practice = generateStroop({ ...params, nTrials: params.practiceTrials }, mulberry32(seed + 1)).map(
+  const practice = generateStroopSeeded({ ...params, nTrials: params.practiceTrials }, seed + 1).map(
     toSpec,
   );
-  const test = generateStroop(params, mulberry32(seed)).map(toSpec);
+  const test = generateStroopSeeded(params, seed).map(toSpec);
 
   const plan: RtTestPlan = {
     testId: variant,

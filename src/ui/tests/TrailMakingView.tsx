@@ -6,14 +6,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { StimulusStage } from '../runtime/StimulusStage';
 import { Button } from '../components/Button';
 import {
-  generateTrail,
-  scoreTrailMaking,
   TrailRun,
   type TrailCircle,
   type TrailMakingParams,
   type TrailPart,
 } from '../../engine/tests/trailMaking';
-import { mulberry32 } from '../../engine/rng';
+import { RngStream, scoreTrailMaking } from '../../engine/backend';
 import { performanceClock } from '../../engine/clock';
 import type { TestResult, TrialResult } from '../../engine/types';
 
@@ -38,12 +36,12 @@ const CIRCLE_PX = 46;
 const ERROR_FLASH_MS = 350;
 
 function buildBlocks(params: TrailMakingParams, seed: number, practice: boolean): Block[] {
-  const rand = mulberry32(seed);
+  const stream = new RngStream(seed);
   const blocks: Block[] = [];
   if (practice && params.practiceTargets > 0) {
-    for (const part of ['A', 'B'] as const) blocks.push({ part, phase: 'practice', circles: generateTrail(part, params.practiceTargets, rand) });
+    for (const part of ['A', 'B'] as const) blocks.push({ part, phase: 'practice', circles: stream.trailCircles(part, params.practiceTargets) });
   }
-  for (const part of ['A', 'B'] as const) blocks.push({ part, phase: 'test', circles: generateTrail(part, params.nTargets, rand) });
+  for (const part of ['A', 'B'] as const) blocks.push({ part, phase: 'test', circles: stream.trailCircles(part, params.nTargets) });
   return blocks;
 }
 

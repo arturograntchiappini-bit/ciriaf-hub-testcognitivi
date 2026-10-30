@@ -39,7 +39,7 @@ jobs:
         working-directory: desktop
         run: |
           cargo test --workspace --release --locked
-          cargo check -p sintropia-engines --target wasm32-unknown-unknown --locked
+          cargo check -p sintropia-engines -p sintropia-wasm --target wasm32-unknown-unknown --locked
       - name: Installer, zip e checksum
         # Per firmare l'MSI e l'exe imposta il segreto SINTROPIA_SIGN_COMMAND (vedi docs/sicurezza.md).
         env:

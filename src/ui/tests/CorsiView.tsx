@@ -8,13 +8,11 @@ import { StimulusStage } from '../runtime/StimulusStage';
 import { Button } from '../components/Button';
 import {
   CORSI_BLOCKS,
-  generateBalancedSequences,
-  scoreCorsi,
   shouldStop,
   type CorsiParams,
   type CorsiSequence,
 } from '../../engine/tests/corsi';
-import { mulberry32 } from '../../engine/rng';
+import { RngStream, scoreCorsi } from '../../engine/backend';
 import { realScheduler, performanceClock, type Cancel } from '../../engine/clock';
 import { UI_COLORS } from '../theme';
 import type { TestResult, TrialResult } from '../../engine/types';
@@ -39,7 +37,7 @@ interface PlannedTrial {
 
 export function CorsiView(props: CorsiViewProps): JSX.Element {
   const { params, sessionId, startedAt, seed } = props;
-  const randRef = useRef<() => number>(mulberry32(seed));
+  const randRef = useRef(new RngStream(seed));
 
   const [phase, setPhase] = useState<Phase>('ready');
   const [litIndex, setLitIndex] = useState<number | null>(null);
@@ -62,7 +60,7 @@ export function CorsiView(props: CorsiViewProps): JSX.Element {
 
   // Prepara i trial di pratica (2 a lunghezza 2).
   useEffect(() => {
-    const seqs = generateBalancedSequences(2, 2, params, randRef.current);
+    const seqs = randRef.current.corsiSequences(2, 2, params);
     practiceQueueRef.current = seqs.map((seq) => ({ seq, isPractice: true, level: 2 }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -117,7 +115,7 @@ export function CorsiView(props: CorsiViewProps): JSX.Element {
     }
     levelResultsRef.current = [];
     trialInLevelRef.current = 0;
-    const seqs = generateBalancedSequences(level, params.trialsPerLevel, params, randRef.current);
+    const seqs = randRef.current.corsiSequences(level, params.trialsPerLevel, params);
     levelQueueRef.current = seqs.map((seq) => ({ seq, isPractice: false, level }));
     presentNextTestTrial();
     // eslint-disable-next-line react-hooks/exhaustive-deps

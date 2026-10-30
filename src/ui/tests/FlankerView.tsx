@@ -4,8 +4,8 @@
  */
 import { RtTestRunner, type RtTestPlan } from '../runtime/RtTestRunner';
 import type { TrialSpec } from '../runtime/sequencer';
-import { generateFlanker, scoreFlanker, type FlankerParams, type FlankerStimulus } from '../../engine/tests/flanker';
-import { mulberry32 } from '../../engine/rng';
+import { type FlankerParams, type FlankerStimulus } from '../../engine/tests/flanker';
+import { generateFlankerSeeded, scoreFlanker } from '../../engine/backend';
 import type { TestResult } from '../../engine/types';
 
 interface FlankerViewProps {
@@ -46,8 +46,8 @@ function Glyph({ symbol }: { symbol: string }): JSX.Element {
 
 export function FlankerView(props: FlankerViewProps): JSX.Element {
   const { params, sessionId, startedAt, seed } = props;
-  const practice = generateFlanker({ ...params, nTrials: params.practiceTrials }, mulberry32(seed + 1)).map(toSpec);
-  const test = generateFlanker(params, mulberry32(seed)).map(toSpec);
+  const practice = generateFlankerSeeded({ ...params, nTrials: params.practiceTrials }, seed + 1).map(toSpec);
+  const test = generateFlankerSeeded(params, seed).map(toSpec);
 
   const plan: RtTestPlan = {
     testId: 'flanker',

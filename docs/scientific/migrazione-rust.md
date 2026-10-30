@@ -27,11 +27,11 @@ stesso partecipante, con lo stesso seme, veda sequenze diverse nelle due applica
 La scelta di progetto è quindi **un solo motore, in Rust**:
 
 - nell'app desktop è usato **nativamente**;
-- nella web app sarà usato compilato in **WebAssembly** (WASM, target `wasm32-unknown-unknown`).
+- nella web app è usato compilato in **WebAssembly** (WASM, target `wasm32-unknown-unknown`, crate `desktop/crates/wasm`), con il TypeScript come ripiego.
 
 Il TS in `src/engine/` resta nel repository come **oracolo** (modificato solo per correggere i difetti del §4): il riferimento rispetto al quale si misura
-il Rust. Si ritirerà solo quando il Rust, compilato in WASM, sarà usato anche dalla web app (vedi
-`src/engine/README.md`). Finché ciò non accade, **il TS è la specifica**: dove TS e Rust differiscono, la differenza va
+il Rust. Dal 2026-10-30 la web app genera e valuta con il Rust in WASM e usa il TS solo come ripiego (vedi
+`src/engine/README.md`), ma **il TS resta la specifica**: dove TS e Rust differiscono, la differenza va
 spiegata e classificata (§4), non nascosta.
 
 ---
@@ -423,9 +423,9 @@ ulteriore calo è atteso ma **non misurato**.
 
 **Lavoro futuro.**
 
-1. **Rimpiazzare i motori TS con il WASM** nella web app, chiamando il modulo una volta per sessione; solo allora ritirare `src/engine/`.
+1. ~~Rimpiazzare i motori TS con il WASM nella web app~~ — fatto (2026-10-30, §8): una chiamata per generazione e una per punteggio, non una per tasto; il TS non si ritira, resta oracolo e ripiego.
 2. **Firma dell'installer.** L'eseguibile e l'MSI Windows non sono firmati (SmartScreen mostra un avviso): serve un certificato di firma del codice.
-3. Misurare la latenza dei tasti su hardware, eseguire il WASM in browser e applicare `wasm-opt`.
+3. Misurare la latenza dei tasti su hardware e applicare `wasm-opt`. Il WASM è già stato istanziato in Chrome sulla build di produzione (con la CSP del sito) e provato sulle fixture golden in Node; non è stato misurato il costo per chiamata nel browser né provato in Firefox e Safari.
 
 ---
 
@@ -459,10 +459,28 @@ byte identiche** a quelle del repository (confronto MD5); la CI lo verifica a og
 comando 4 esegue in sequenza il TS, il Rust nativo (`cargo bench`), le tre build WASM e l'unione dei risultati in `fixtures/BENCHMARK.md`. I dati grezzi
 sono in `desktop/fixtures/evidence/bench*.json`. Una guida di sintesi è in `desktop/README.md`; la storia dei difetti in `desktop/fixtures/DIVERGENZE.md`.
 
+## 8. Il motore Rust nella web app
+
+`desktop/crates/wasm` espone una sola porta JSON → JSON (`engine_call`) sopra `sintropia-engines`: richiesta nel buffer di input, risposta nel buffer di
+output, nessun binding generato né dipendenza oltre a `serde`. Il modulo compilato (≈ 420 KB, ≈ 150 KB compressi) è `public/engine/sintropia-engine.wasm`,
+caricato a interfaccia già disegnata; la CSP del sito ammette `'wasm-unsafe-eval'` e nient'altro di nuovo.
+
+- **Confine.** Passano dal WASM le generazioni di sequenze (un'unica chiamata per generazione) e i punteggi di tutti gli 11 test. Il sequencer, i tasti e i
+  tempi di reazione restano in TypeScript: la precisione temporale non dipende dal confine JSON, che il benchmark (§5.3) ha misurato come più costoso del calcolo.
+- **Flussi casuali.** Corsi e Trail Making generano a più riprese dallo stesso flusso. `mulberry32` avanza lo stato di una costante a ogni estrazione, per cui
+  il modulo restituisce il numero di estrazioni (`calls`) e la web app tiene lo stato come intero (`RngStream`): il flusso è identico con Rust e con TS, anche se il backend cambia a metà.
+- **Parità.** `src/engine/backend/parity.test.ts` esegue il modulo in Node su tutte le generazioni e i punteggi delle fixture golden degli 11 test (749 test),
+  confrontando con il TS (e con le fixture) entro 1e-9; la CI ricompila il modulo e ripete la prova.
+- **Ripiego.** Se il modulo non si carica, o rifiuta una richiesta, vale il TS. Provato in Chrome: con la CSP completa il backend è `wasm`; senza `'wasm-unsafe-eval'` il backend è `ts` e il test parte.
+- **Provenienza.** Gli export web non riportano `engineVersion` (invariati: i risultati sono identici con i due backend); il backend attivo è esposto in `document.documentElement.dataset.engine`.
+
+---
+
 ## Cronologia delle revisioni
 
 - **2026-10.** Prima versione. Numeri letti da `desktop/fixtures/evidence/` e `BENCHMARK.md`; rigenerati fixture, fuzz, esito dei test, ripartizione del
   Go/No-Go per `goRatio` e controllo di sensibilità. Nessuna fonte bibliografica esterna citata.
+- **2026-10-30, web app sul WASM.** Aggiunto il §6 e aggiornati §1 e «Lavoro futuro»: il motore Rust è usato dalla web app, con il TS come ripiego e oracolo.
 - **Revisione 2026-10-30.** Compilata la tabella dei risultati del §5 (era rimasto un segnaposto) da `BENCHMARK.md`; aggiornati
   i valori del confine JSON del §5.3; precisato che il limite dei 30 ms vale per il Rust; chiarite le divergenze registrate nel fuzz;
   limitata la spiegazione «1-2 ulp» alle due deviazioni analizzate; aggiunto il §4.8 (CSV).

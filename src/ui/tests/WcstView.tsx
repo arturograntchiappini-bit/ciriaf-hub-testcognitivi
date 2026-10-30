@@ -8,15 +8,13 @@ import { StimulusStage } from '../runtime/StimulusStage';
 import { CardFace } from './WcstCard';
 import {
   WCST_STIMULUS_CARDS,
-  buildDeck,
   matchingDims,
   ruleForCategory,
-  scoreWcst,
   type WcstCard,
   type WcstParams,
   type WcstTrialMeta,
 } from '../../engine/tests/wcst';
-import { mulberry32 } from '../../engine/rng';
+import { buildWcstDeckSeeded, scoreWcst } from '../../engine/backend';
 import { realScheduler, performanceClock } from '../../engine/clock';
 import type { TestResult, TrialResult } from '../../engine/types';
 
@@ -33,7 +31,7 @@ interface WcstViewProps {
 
 export function WcstView(props: WcstViewProps): JSX.Element {
   const { params, sessionId, startedAt, seed } = props;
-  const deck = useMemo(() => buildDeck(params.deckSize, mulberry32(seed)), [params.deckSize, seed]);
+  const deck = useMemo(() => buildWcstDeckSeeded(params.deckSize, seed), [params.deckSize, seed]);
 
   const [deckIndex, setDeckIndex] = useState(0);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);

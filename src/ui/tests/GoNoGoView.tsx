@@ -4,13 +4,8 @@
  */
 import { RtTestRunner, type RtTestPlan } from '../runtime/RtTestRunner';
 import type { TrialSpec } from '../runtime/sequencer';
-import {
-  generateGoNoGo,
-  scoreGoNoGo,
-  type GoNoGoParams,
-  type GoNoGoStimulus,
-} from '../../engine/tests/gonogo';
-import { mulberry32 } from '../../engine/rng';
+import { type GoNoGoParams, type GoNoGoStimulus } from '../../engine/tests/gonogo';
+import { generateGoNoGoSeeded, scoreGoNoGo } from '../../engine/backend';
 import { STIMULUS_COLORS } from '../theme';
 import type { TestResult } from '../../engine/types';
 
@@ -31,10 +26,10 @@ function toSpec(s: GoNoGoStimulus): TrialSpec {
 
 export function GoNoGoView(props: GoNoGoViewProps): JSX.Element {
   const { params, sessionId, startedAt, seed } = props;
-  const practice = generateGoNoGo({ ...params, nTrials: params.practiceTrials }, mulberry32(seed + 1)).map(
+  const practice = generateGoNoGoSeeded({ ...params, nTrials: params.practiceTrials }, seed + 1).map(
     toSpec,
   );
-  const test = generateGoNoGo(params, mulberry32(seed)).map(toSpec);
+  const test = generateGoNoGoSeeded(params, seed).map(toSpec);
 
   const plan: RtTestPlan = {
     testId: 'gonogo',

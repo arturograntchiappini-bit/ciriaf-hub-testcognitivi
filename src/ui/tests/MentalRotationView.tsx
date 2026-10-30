@@ -4,16 +4,8 @@
  */
 import { RtTestRunner, type RtTestPlan } from '../runtime/RtTestRunner';
 import type { TrialSpec } from '../runtime/sequencer';
-import {
-  conditionLabel,
-  generateMentalRotation,
-  projectFaces,
-  scoreMentalRotation,
-  type Cube,
-  type MentalRotationParams,
-  type MentalRotationStimulus,
-} from '../../engine/tests/mentalRotation';
-import { mulberry32 } from '../../engine/rng';
+import { conditionLabel, projectFaces, type Cube, type MentalRotationParams, type MentalRotationStimulus } from '../../engine/tests/mentalRotation';
+import { generateMentalRotationSeeded, scoreMentalRotation } from '../../engine/backend';
 import type { TestResult } from '../../engine/types';
 
 interface MentalRotationViewProps {
@@ -55,8 +47,8 @@ function Figure({ cubes, angle, label }: { cubes: readonly Cube[]; angle: number
 
 export function MentalRotationView(props: MentalRotationViewProps): JSX.Element {
   const { params, sessionId, startedAt, seed } = props;
-  const practice = generateMentalRotation({ ...params, nTrials: params.practiceTrials }, mulberry32(seed + 1)).map(toSpec);
-  const test = generateMentalRotation(params, mulberry32(seed)).map(toSpec);
+  const practice = generateMentalRotationSeeded({ ...params, nTrials: params.practiceTrials }, seed + 1).map(toSpec);
+  const test = generateMentalRotationSeeded(params, seed).map(toSpec);
 
   const plan: RtTestPlan = {
     testId: 'mentalRotation',

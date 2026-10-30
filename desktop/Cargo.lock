@@ -2081,6 +2081,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "sintropia-wasm"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sintropia-core",
+ "sintropia-engines",
+]
+
+[[package]]
 name = "skrifa"
 version = "0.44.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

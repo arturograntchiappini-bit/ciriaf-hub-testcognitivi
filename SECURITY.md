@@ -19,7 +19,7 @@ dell'utente (app desktop). Le superfici da proteggere sono quindi:
 
 | Superficie | Rischio | Difesa |
 |---|---|---|
-| Sito web | XSS, clickjacking, contenuti di terze parti | Nessun `innerHTML`; paper resi con nodi DOM; KaTeX con `trust: false`; CSP stretta (`default-src 'none'`, solo risorse proprie), HSTS, COOP/CORP, `frame-ancestors 'none'` |
+| Sito web | XSS, clickjacking, contenuti di terze parti | Nessun `innerHTML`; paper resi con nodi DOM; KaTeX con `trust: false`; CSP stretta (`default-src 'none'`, solo risorse proprie; `'wasm-unsafe-eval'` solo per il motore WebAssembly, senza `eval`), HSTS, COOP/CORP, `frame-ancestors 'none'` |
 | Dati salvati e file importati | Valori manomessi che bloccano il browser o l'app | Ogni parametro è validato e riportato nei limiti dichiarati; protocolli importati con struttura, dimensione e numero di elementi limitati |
 | File esportati | Iniezione di formule nei fogli di calcolo (CSV injection), XSS nel report HTML | Neutralizzazione delle celle che iniziano come una formula; report HTML con tutto escapato e CSP `default-src 'none'`; nomi file ripuliti |
 | Installer e `install.ps1` | Download alterato, downgrade a HTTP, archivi malevoli | Solo HTTPS; verifica SHA-256; controllo anti zip-slip; verifica della firma digitale se presente; installazione per-utente senza elevazione |

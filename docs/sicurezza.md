@@ -35,7 +35,9 @@ e `isSafeHref`; KaTeX con `trust: false`; report HTML con escape di tutti i camp
   Lo script di build firma automaticamente se imposti `SINTROPIA_SIGN_COMMAND` (segreto della CI o variabile locale): vedi sotto.
 - **Checksum e binari sullo stesso sito.** `SHA256SUMS.txt` garantisce l'integrità del download ma non l'autenticità se il sito fosse compromesso: per questo
   gli artefatti della Release hanno l'attestazione di provenienza e, con la firma, la firma Authenticode.
-- **`style-src-attr 'unsafe-inline'`.** React imposta stili inline come attributi; non esiste un'alternativa senza riscrivere l'interfaccia. Gli elementi `<style>` restano limitati a risorse proprie.
+- **`'wasm-unsafe-eval'` nella CSP.** Il motore Rust gira come modulo WebAssembly e il browser lo istanzia solo con questa direttiva in `script-src`. Non consente `eval` né `new Function` (quelli restano vietati); consente la compilazione di WebAssembly dalla stessa origine. Il modulo è un file statico committato (`public/engine/`), verificato dalla CI contro il TypeScript; se la direttiva mancasse, la web app ripiega sul TypeScript.
+- **`unsafe` nel crate `wasm`.** L'esposizione `extern "C"` richiede `#[no_mangle]`, che il compilatore conta come `unsafe_code`: il crate usa `deny(unsafe_code)` con un `allow` limitato al modulo `ffi`, senza blocchi `unsafe` veri e senza dipendenze oltre a `serde`.
+- **`style-src-attr 'unsafe-inline'`. React imposta stili inline come attributi; non esiste un'alternativa senza riscrivere l'interfaccia. Gli elementi `<style>` restano limitati a risorse proprie.
 - **`localStorage`.** I dati sono nel profilo del browser, in chiaro: non c'è un segreto da proteggere, ma chi ha accesso al dispositivo può leggerli.
 
 ## Firmare l'installer

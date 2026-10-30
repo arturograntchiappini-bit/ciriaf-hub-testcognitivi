@@ -1,2 +1,2 @@
-f5ce18671348941c5be6684839cb043225bc3eb3c109dc18ab67b6a3c7adb69b  Sintropia-Desktop-x64.zip
-29d0ccef287667fda54e8a2639ff674879ceeafcc9f44cf44b0825332b7f1edc  Sintropia-Setup-x64.msi
+0b34186b84e7522bab5c35809152d5594d899f3bf221db8b22f5fec0b5f70739  Sintropia-Desktop-x64.zip
+29efb337b9c5ff86cc8967471769dbc0d34d863146cbf3e5ad5f84b7bd28ad3a  Sintropia-Setup-x64.msi

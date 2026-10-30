@@ -242,19 +242,22 @@ flowchart LR
         CONT["content<br/>catalogo · istruzioni · parametri"]
     end
     RS --> APP["app desktop<br/>eframe/egui"]
-    RS -. "in futuro, WebAssembly" .-> WEB["web app<br/>React"]
-    TS --> WEB
+    RS -- "WebAssembly<br/>(crates/wasm)" --> WEB["web app<br/>React"]
+    TS -. "ripiego se il WASM<br/>non si carica" .-> WEB
     P["docs/scientific/*.md"] -. "letti in app" .-> APP
     P -. "letti in app" .-> WEB
 ```
 
 - **`src/engine`** — motori dei test in TypeScript puro (nessuna dipendenza da React o dal DOM). Restano nel repository
-  **invariati, come oracolo della migrazione**: [vedi `src/engine/README.md`](src/engine/README.md). Oggi alimentano la web app.
+  come **oracolo** della migrazione e come **ripiego** della web app: [vedi `src/engine/README.md`](src/engine/README.md).
 - **`src/ui`** — schermate, runner dei test a tempo di reazione, scena 3D della home (WebGL diretto, senza librerie 3D),
   lettore dei paper. **`src/config`** — parametri di default, ciascuno con la sua fonte.
 - **`desktop/crates/core`** — tipi, RNG `mulberry32` identico al TS, validazione RT, SDT, sequencer con orologio iniettato, export, sessioni.
 - **`desktop/crates/engines`** — un motore **puro** per test (nessun I/O, tempo o thread): compila anche per
-  `wasm32-unknown-unknown`, così lo stesso codice potrà girare nel browser.
+  `wasm32-unknown-unknown`, così lo stesso codice gira nel browser.
+- **`desktop/crates/wasm`** — porta JSON → JSON sopra i motori, compilata in `public/engine/sintropia-engine.wasm` (≈ 420 KB, 150 KB compressi).
+  La web app lo carica a interfaccia già disegnata e genera sequenze e punteggi con il Rust; se non si carica, usa il TypeScript.
+  La sua parità con il TS è provata da `src/engine/backend/parity.test.ts` (sulle fixture golden).
 - **`desktop/crates/content`** — dati di interfaccia separati dai motori. **`desktop/crates/app`** — GUI eframe/egui.
 - **`revisione-motore/`** — copie autonome (generate dai motori vivi) per la revisione scientifica; `scripts/sync-revisione-motore.mjs` le rigenera.
 - **`docs/`** — [architettura](docs/architettura.md), paper scientifici, specifiche e piani di progetto.
@@ -298,7 +301,8 @@ npm run dev        # web su http://localhost:5173
 | `npm run dev` / `npm run build` / `npm run preview` | sviluppo, build statica in `dist/`, anteprima |
 | `npm test` / `npm run typecheck` | test (Vitest) e controllo dei tipi |
 | `cd desktop && cargo test --workspace --release` | tutti i test Rust (golden, fuzz, proprietà) |
-| `cd desktop && cargo check -p sintropia-engines --target wasm32-unknown-unknown` | verifica la compilazione WASM dei motori |
+| `npm run build:wasm` | ricompila il motore Rust in `public/engine/sintropia-engine.wasm` (richiede Rust e il target wasm32) |
+| `cd desktop && cargo check -p sintropia-engines -p sintropia-wasm --target wasm32-unknown-unknown` | verifica la compilazione WASM |
 | `node desktop/tools/golden/generate.mjs` | rigenera le fixture golden dal TS |
 | `.\desktop\installer\build-installer.ps1` | costruisce MSI, zip e checksum (richiede .NET SDK e WiX) |
 | `.\desktop\installer\publish-to-site.ps1` | copia i file in `public/download/` per il sito |
@@ -323,7 +327,7 @@ in `public/download/` e vengono serviti dallo stesso sito.
   dedicato senza calibrazione. Vedi [`validazione-rt.md`](docs/scientific/validazione-rt.md).
 - L'angolo visivo degli stimoli dipende da distanza e schermo del partecipante.
 - Per confrontare gruppi servono stesso hardware, stessa versione del motore e stessi parametri.
-- L'app per Windows non è ancora firmata digitalmente (vedi [`docs/sicurezza.md`](docs/sicurezza.md)); la web app non usa ancora il motore Rust (la migrazione verso WebAssembly è il passo successivo).
+- L'app per Windows non è ancora firmata digitalmente (vedi [`docs/sicurezza.md`](docs/sicurezza.md)); la web app genera e valuta con il motore Rust in WebAssembly (ripiego sul TypeScript se il modulo non si carica); gli export web non riportano ancora `engineVersion`.
 
 ## Roadmap
 
@@ -331,7 +335,7 @@ in `public/download/` e vengono serviti dallo stesso sito.
 - [x] Revisione scientifica dei motori e dei paper dei test esistenti
 - [x] Motori in Rust verificati contro il riferimento TypeScript, app desktop, installer per Windows
 - [x] Più formati di export (CSV internazionale, riepilogo metriche, eventi TSV, report HTML)
-- [ ] Web app sul motore Rust compilato in WebAssembly, poi ritiro del TypeScript
+- [x] Web app sul motore Rust compilato in WebAssembly, con il TypeScript come oracolo e ripiego
 - [ ] Firma del codice dell'installer e rilascio su GitHub Releases
 
 ## Contribuire

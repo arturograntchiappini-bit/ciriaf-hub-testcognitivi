@@ -6,8 +6,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { RtTestRunner, type RtTestPlan } from '../runtime/RtTestRunner';
 import type { TrialSpec } from '../runtime/sequencer';
-import { generatePvt, scorePvt, type PvtParams } from '../../engine/tests/pvt';
-import { mulberry32 } from '../../engine/rng';
+import { type PvtParams } from '../../engine/tests/pvt';
+import { generatePvtSeeded, scorePvt } from '../../engine/backend';
 import type { TestResult } from '../../engine/types';
 
 interface PvtViewProps {
@@ -64,11 +64,11 @@ function PvtCounter({ running }: { running: boolean }): JSX.Element {
 
 export function PvtView(props: PvtViewProps): JSX.Element {
   const { params, sessionId, startedAt, seed } = props;
-  const practiceStims = generatePvt(
+  const practiceStims = generatePvtSeeded(
     { ...params, nTrials: params.practiceTrials },
-    mulberry32(seed + 1),
+    seed + 1,
   );
-  const testStims = generatePvt(params, mulberry32(seed));
+  const testStims = generatePvtSeeded(params, seed);
 
   const practice = practiceStims.map(toSpec);
   const test = testStims.map(toSpec);

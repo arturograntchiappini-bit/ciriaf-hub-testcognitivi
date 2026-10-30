@@ -4,15 +4,8 @@
  */
 import { RtTestRunner, type RtTestPlan } from '../runtime/RtTestRunner';
 import type { TrialSpec } from '../runtime/sequencer';
-import {
-  conditionLabel,
-  generateVisualSearch,
-  scoreVisualSearch,
-  type SearchColor,
-  type VisualSearchParams,
-  type VisualSearchStimulus,
-} from '../../engine/tests/visualSearch';
-import { mulberry32 } from '../../engine/rng';
+import { conditionLabel, type SearchColor, type VisualSearchParams, type VisualSearchStimulus } from '../../engine/tests/visualSearch';
+import { generateVisualSearchSeeded, scoreVisualSearch } from '../../engine/backend';
 import type { TestResult } from '../../engine/types';
 
 interface VisualSearchViewProps {
@@ -55,8 +48,8 @@ function Field({ stimulus }: { stimulus: VisualSearchStimulus }): JSX.Element {
 
 export function VisualSearchView(props: VisualSearchViewProps): JSX.Element {
   const { params, sessionId, startedAt, seed } = props;
-  const practice = generateVisualSearch({ ...params, nTrials: params.practiceTrials }, mulberry32(seed + 1)).map(toSpec);
-  const test = generateVisualSearch(params, mulberry32(seed)).map(toSpec);
+  const practice = generateVisualSearchSeeded({ ...params, nTrials: params.practiceTrials }, seed + 1).map(toSpec);
+  const test = generateVisualSearchSeeded(params, seed).map(toSpec);
 
   const plan: RtTestPlan = {
     testId: 'visualSearch',

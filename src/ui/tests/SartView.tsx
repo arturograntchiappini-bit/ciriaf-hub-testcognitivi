@@ -5,8 +5,8 @@
  */
 import { RtTestRunner, type RtTestPlan } from '../runtime/RtTestRunner';
 import type { TrialSpec } from '../runtime/sequencer';
-import { generateSart, scoreSart, SART_FONT_SIZES_PX, type SartParams, type SartStimulus } from '../../engine/tests/sart';
-import { mulberry32 } from '../../engine/rng';
+import { SART_FONT_SIZES_PX, type SartParams, type SartStimulus } from '../../engine/tests/sart';
+import { generateSartSeeded, scoreSart } from '../../engine/backend';
 import type { TestResult } from '../../engine/types';
 
 interface SartViewProps {
@@ -39,8 +39,8 @@ function Mask(): JSX.Element {
 export function SartView(props: SartViewProps): JSX.Element {
   const { params, sessionId, startedAt, seed } = props;
   const spec = toSpec(params.targetDigit);
-  const practice = generateSart({ ...params, nTrials: params.practiceTrials }, mulberry32(seed + 1)).map(spec);
-  const test = generateSart(params, mulberry32(seed)).map(spec);
+  const practice = generateSartSeeded({ ...params, nTrials: params.practiceTrials }, seed + 1).map(spec);
+  const test = generateSartSeeded(params, seed).map(spec);
 
   const plan: RtTestPlan = {
     testId: 'sart',

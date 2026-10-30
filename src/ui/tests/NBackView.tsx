@@ -6,8 +6,8 @@
  */
 import { RtTestRunner, type RtTestPlan } from '../runtime/RtTestRunner';
 import type { TrialSpec } from '../runtime/sequencer';
-import { generateNBack, scoreNBack, type NBackParams, type NBackStimulus } from '../../engine/tests/nback';
-import { mulberry32 } from '../../engine/rng';
+import { type NBackParams, type NBackStimulus } from '../../engine/tests/nback';
+import { generateNBackSeeded, scoreNBack } from '../../engine/backend';
 import { nBackInstruction } from '../content/instructions';
 import type { TestResult } from '../../engine/types';
 
@@ -29,10 +29,10 @@ function toSpec(s: NBackStimulus): TrialSpec {
 
 export function NBackView(props: NBackViewProps): JSX.Element {
   const { params, sessionId, startedAt, seed } = props;
-  const practice = generateNBack({ ...params, nTrials: params.practiceTrials }, mulberry32(seed + 1)).map(
+  const practice = generateNBackSeeded({ ...params, nTrials: params.practiceTrials }, seed + 1).map(
     toSpec,
   );
-  const test = generateNBack(params, mulberry32(seed)).map(toSpec);
+  const test = generateNBackSeeded(params, seed).map(toSpec);
 
   const trialMs = params.letterMs + params.blankMs;
 
