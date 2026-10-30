@@ -17,9 +17,14 @@ risposta (**congruenti**). Questa differenza è l'**effetto flanker**.
 > Eriksen, B. A., & Eriksen, C. W. (1974). *Effects of noise letters upon the identification of a target letter in a
 > nonsearch task.* **Perception & Psychophysics, 16**(1), 143–149. https://doi.org/10.3758/BF03203267
 
-Nel lavoro originale i partecipanti davano una risposta sinistra/destra a una lettera bersaglio in un breve display; i
-tempi erano più lunghi quando le lettere laterali richiedevano la risposta opposta e miglioravano all'aumentare della
-distanza dal bersaglio.
+Dall'abstract (verificato sulla pagina dell'editore): con un'esposizione tachistoscopica di 1 s, i partecipanti
+premevano una leva a destra o a sinistra in risposta a una lettera bersaglio (H e K contro S e C), sempre presentata
+subito sopra il punto di fissazione. Si variavano il tipo di lettere laterali (compatibili o incompatibili con la
+risposta) e la spaziatura. In tutte le condizioni di rumore il tempo di reazione **diminuiva all'aumentare della
+spaziatura**; le lettere dell'insieme di risposta opposto rallentavano la risposta molto più di quelle dello stesso
+insieme, e lettere estranee ma con tratti simili davano un rallentamento intermedio. Gli autori concludono che le lettere
+entro circa 1° dal bersaglio vengono elaborate comunque e che la risposta va trattenuta finché il bersaglio non è
+discriminato.
 
 **Riferimenti di supporto**
 
@@ -39,14 +44,22 @@ distanza dal bersaglio.
 ## 2. Meccanismo cognitivo misurato
 
 - **Competizione di risposta.** I flanker incongruenti attivano la risposta sbagliata in parallelo a quella del
-  bersaglio; il sistema deve risolvere il conflitto prima di rispondere (C. W. Eriksen, 1995). Il costo si manifesta come
-  RT più lunghi e più errori.
+  bersaglio; il sistema deve risolvere il conflitto prima di rispondere. È la lettura proposta da Eriksen ed Eriksen
+  (1974, abstract) e richiamata dal titolo di C. W. Eriksen (1995), il cui testo non è stato consultato. Il costo si
+  manifesta come RT più lunghi e più errori.
 - **Interferenza e facilitazione.** Aggiungendo una condizione **neutra** (nessun distrattore informativo) il costo si
   separa in *interferenza* (incongruente − neutro) e *facilitazione* (neutro − congruente): la prima misura quanto
   disturba il distrattore in conflitto, la seconda quanto aiuta il distrattore concorde.
-- **Adattamento al conflitto.** Gratton, Coles e Donchin (1992) mostrano che l'effetto flanker è **minore dopo un trial
-  incongruente** che dopo uno congruente: il sistema regola dinamicamente il controllo attentivo.
-- **Rete esecutiva.** Il compito con frecce è la componente "esecutiva" dell'Attention Network Test (Fan et al., 2002).
+- **Adattamento al conflitto.** Dall'abstract (verificato su Europe PMC, PMID 1431740): Gratton, Coles e Donchin (1992),
+  con il paradigma di compatibilità del rumore (lettere), manipolano in 4 esperimenti le **aspettative** di rumore
+  compatibile o incompatibile e modulano così l'effetto di interferenza; le aspettative sull'utilità
+  dell'informazione determinano quale fase di elaborazione attiva la risposta. L'effetto sequenziale che la letteratura
+  successiva chiama «effetto Gratton» (effetto flanker minore dopo un trial incongruente) non è nell'abstract e **non è
+  stato verificato sul testo**: la metrica di §4 ne adotta la definizione corrente.
+- **Rete esecutiva.** Il compito con frecce è la componente legata al conflitto ("esecutiva") dell'Attention Network
+  Test (Fan et al., 2002). Dall'abstract (verificato su Crossref): l'ANT valuta allerta, orientamento e attenzione
+  esecutiva in una sessione di circa 30 minuti; in 40 adulti dà stime individuali affidabili, le efficienze delle tre
+  reti risultano non correlate, e allerta e orientamento possono modulare l'interferenza dei flanker.
 
 Differenza rispetto allo Stroop (già presente): nello Stroop il conflitto è tra due **dimensioni dello stesso stimolo**
 (parola/colore); nel Flanker è tra **bersaglio e oggetti spazialmente separati**. I due compiti non sono intercambiabili:
@@ -58,13 +71,13 @@ misurano forme diverse di conflitto.
 
 | Parametro | Default | Origine |
 |---|---|---|
-| Stimolo | 5 elementi: freccia centrale + 2 + 2 flanker | Convenzione del compito con frecce (Fan et al., 2002) |
-| Condizioni | congruente, incongruente, neutra (trattini) | Eriksen & Eriksen (1974); neutro per separare interferenza/facilitazione |
+| Stimolo | 5 elementi: freccia centrale + 2 + 2 flanker | Convenzione del compito con frecce. Il formato a 5 frecce è quello delle implementazioni dell'ANT che si dichiarano basate su Fan et al. (2002) (PsyToolkit: «5 arrows»; Inquisit: quattro flanker e un bersaglio, con le dimensioni riferite alle pp. 345–346 dell'articolo); **non verificato sul testo** di Fan et al. |
+| Condizioni | congruente, incongruente, neutra (trattini) | Congruente/incongruente come in Eriksen & Eriksen (1974), che però usavano lettere e, come controlli, rumore misto e bersaglio da solo. La condizione **neutra con trattini** è una **scelta di progetto**, per separare interferenza e facilitazione |
 | Trial | 96 (39 congruenti, 38 incongruenti, 19 neutri) | **Scelta di progetto**: numero sufficiente per stimare effetto e adattamento |
-| Proporzioni | 40% incongruenti, 20% neutri | **Scelta di progetto** |
+| Proporzioni | 40% incongruenti, 20% neutri (parametri); con 96 trial gli arrotondamenti danno 39,6% e 19,8% | **Scelta di progetto** |
 | Bilanciamento | direzione sinistra/destra bilanciata in ogni condizione | Prassi per evitare bias di risposta |
 | Run massimi | ≤ 3 trial consecutivi con stessa condizione o stessa risposta | **Scelta di progetto** (evita attesa ritmica). Costruzione passo per passo con fino a 300 tentativi; se falliscono tutti si usa un rimescolamento senza vincolo, quindi il limite non è garantito in assoluto |
-| Fissazione | 500 ms | Convenzione jsPsych/PsyToolkit |
+| Fissazione | 500 ms | Prassi dei software di riferimento (jsPsych, PsyToolkit; **non riverificata** nelle versioni correnti) |
 | Finestra di risposta | 1500 ms (stimolo fino a risposta) | **Scelta di progetto**; oltre = omissione |
 | ISI | 700–1100 ms uniforme | **Scelta di progetto** (jitter anti-anticipazione) |
 | Pratica | 12 trial con feedback, esclusi dalle metriche | Prassi |
@@ -114,3 +127,16 @@ con soglia di anticipazione a 150 ms. I trial invalidi restano nei dati grezzi c
 - Differenze individuali e pratica influenzano l'effetto; confrontare gruppi richiede stesso hardware e parametri.
 - L'uso del test in studi su ambiente fisico (comfort termico, acustico, qualità dell'aria) è una scelta del
   ricercatore: la sensibilità del paradigma a quelle manipolazioni va giustificata con fonti specifiche dello studio.
+- **Fonti lette solo in parte.** Di Eriksen & Eriksen (1974), Gratton et al. (1992) e Fan et al. (2002) sono stati letti
+  gli abstract, non i testi completi; di C. W. Eriksen (1995) solo i dati bibliografici. L'effetto sequenziale di Gratton
+  e il formato a 5 frecce dell'ANT sono quindi riportati da fonti secondarie.
+
+## Cronologia delle revisioni
+
+- **Prima versione.** DOI verificati su Crossref il 2026-10-23.
+- **2026-10-30.** Letti gli abstract di Eriksen & Eriksen (1974, pagina dell'editore: effetto della spaziatura confermato
+  su fonte primaria), Gratton et al. (1992, Europe PMC) e Fan et al. (2002, Crossref). Attenuata l'attribuzione a Gratton
+  et al. dell'effetto sequenziale (non presente nell'abstract) e quella a C. W. Eriksen (1995) della competizione di
+  risposta (testo non letto). Il formato a 5 frecce è attribuito ai porting dell'ANT (PsyToolkit, Inquisit), non
+  all'articolo; la condizione neutra con trattini è dichiarata scelta di progetto (Eriksen & Eriksen usavano altri
+  controlli). Aggiunta la sezione dei limiti sulle fonti.

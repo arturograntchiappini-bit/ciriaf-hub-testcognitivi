@@ -26,29 +26,41 @@ di parole-colore incongruenti:
 > reactions.* Journal of Experimental Psychology, 18(6), 643–662.
 > https://doi.org/10.1037/h0054651
 
-La sintesi integrativa di riferimento — che organizza mezzo secolo di ricerca e isola
-18 risultati empirici robusti che ogni teoria dell'effetto Stroop deve
-spiegare — è:
+La sintesi integrativa di riferimento — che organizza oltre 50 anni e circa 400 studi
+e isola 18 risultati empirici affidabili che ogni teoria dell'effetto Stroop deve
+spiegare (abstract e Appendice B, verificati sul testo dell'articolo) — è:
 
 > **MacLeod, C. M. (1991).** *Half a century of research on the Stroop
 > effect: An integrative review.* Psychological Bulletin, 109(2), 163–203.
 > https://doi.org/10.1037/0033-2909.109.2.163
 
+Nell'abstract MacLeod giudica insufficienti («found to be wanting») le due principali
+teorie candidate, la *velocità relativa di elaborazione* e l'*automaticità della lettura*,
+e indica come più promettenti le teorie che pongono l'elaborazione **in parallelo** della
+dimensione rilevante e di quella irrilevante (la rassegna discute in particolare un
+modello connessionista a elaborazione distribuita in parallelo, che non è stato
+consultato per questo documento).
+
 Il presente documento adotta la **variante manuale a scelta forzata** (button
-press) anziché la denominazione verbale: questa versione, oggi standard nelle
+press) anziché la denominazione verbale: questa versione, diffusa nelle
 implementazioni computerizzate (jsPsych, PsyToolkit), consente la misura
 precisa dei tempi di reazione ed è coerente con l'infrastruttura della
-piattaforma. Vengono somministrate due varianti complementari del compito:
+piattaforma. Secondo MacLeod (1991, risultato 13 dell'Appendice B) passare dalla risposta orale a quella manuale
+**riduce** l'interferenza, che però resta significativa; la compatibilità stimolo-risposta conta. Gli effetti misurati
+qui vanno quindi confrontati solo con altri dati a risposta manuale. Vengono somministrate due varianti complementari
+del compito:
 
 - **Focus colore** (compito canonico): rispondere al **colore dell'inchiostro**,
   ignorando la parola. È la condizione in cui l'effetto di interferenza è
   massimo e più affidabile.
 - **Focus parola**: rispondere al **significato della parola**, ignorando il
   colore dell'inchiostro. In questa direzione l'interferenza del colore sulla
-  lettura della parola è marcatamente ridotta o assente — **asimmetria**
-  documentata da MacLeod (1991) e riconducibile alla maggiore automaticità
-  della lettura rispetto alla denominazione dei colori. Il confronto tra le due
-  varianti rende esplicita tale asimmetria.
+  lettura della parola è di norma molto minore — **asimmetria** documentata da
+  MacLeod (1991). Un effetto Stroop inverso è comunque possibile (risultato 11
+  dell'Appendice B) e, secondo MacLeod, non si spiega semplicemente con la velocità
+  relativa delle due dimensioni. La spiegazione classica dell'asimmetria con la
+  maggiore automaticità della lettura è una delle teorie che la rassegna giudica
+  insufficienti. Il confronto tra le due varianti rende esplicita l'asimmetria.
 
 ---
 
@@ -61,10 +73,13 @@ Il test di Stroop misura due processi distinti ma correlati:
    di base di lettura/denominazione e di selezione della risposta manuale.
 
 2. **Risoluzione del conflitto / controllo inibitorio (interference control).**
-   Il nucleo teorico del paradigma. Secondo il modello dell'*automaticità
-   relativa* (MacLeod, 1991), la lettura della parola è un processo altamente
-   automatico e difficilmente sopprimibile, mentre la denominazione del colore
-   è più controllata. Nelle prove incongruenti le due dimensioni attivano
+   Il nucleo teorico del paradigma. Secondo la spiegazione classica dell'*automaticità*
+   (LaBerge e Samuels, Posner e Snyder, Shiffrin e Schneider, Logan, come riassunti da
+   MacLeod, 1991), la lettura della parola è un processo altamente automatico e
+   difficilmente sopprimibile, mentre la denominazione del colore richiede più
+   attenzione. MacLeod (1991) giudica questa spiegazione, da sola, insufficiente e
+   preferisce i modelli a elaborazione parallela; la descrizione che segue in termini di
+   risposte in competizione è compatibile con entrambe le letture. Nelle prove incongruenti le due dimensioni attivano
    risposte in competizione: il sistema di controllo esecutivo deve **inibire
    la risposta prepotente** (leggere la parola) a favore della risposta
    rilevante per il compito (nominare il colore). Il costo di questa
@@ -75,8 +90,8 @@ L'indice comportamentale di questo meccanismo è l'**effetto di interferenza**
 (RT medio incongruenti − RT medio congruenti): un valore positivo elevato
 riflette una risoluzione del conflitto più costosa (minore efficienza del
 controllo inibitorio). L'asimmetria tra la variante *focus colore* (interferenza
-ampia) e *focus parola* (interferenza minima) fornisce una verifica interna
-della natura del meccanismo misurato.
+ampia) e *focus parola* (interferenza attesa molto minore) fornisce un controllo interno
+della procedura.
 
 ---
 
@@ -89,12 +104,12 @@ riverificata** nelle loro versioni correnti) e ciò che è una **scelta di proge
 | Parametro | Valore | Origine e razionale |
 |---|---|---|
 | **N. trial per variante** | **48** (24 congruenti + 24 incongruenti) | **Scelta di progetto**: stima di screening dell'effetto Stroop in tempi contenuti. L'affidabilità di una differenza tra condizioni cresce col numero di prove: per misure individuali stabili (confronti clinici, test-retest) conviene aumentare i trial per condizione dal pannello Impostazioni. |
-| **Proporzione congruenti / incongruenti** | **50% / 50%** | **Scelta di progetto**, neutra: la proporzione di prove incongruenti modula l'ampiezza dell'interferenza (*proportion-congruent effect*), quindi un rapporto 50/50 evita di gonfiarla o comprimerla artificialmente. Il fenomeno è discusso nella rassegna di MacLeod (1991). |
+| **Proporzione congruenti / incongruenti** | **50% / 50%** | **Scelta di progetto**, tenuta **costante** fra somministrazioni e partecipanti. La proporzione conta: secondo MacLeod (1991, risultato 7) la presenza di prove congruenti induce a dividere l'attenzione fra le due dimensioni e **aumenta** l'interferenza sulle incongruenti; la rassegna riporta, per Lowe e Mitterer, un'interferenza (rispetto al controllo neutro) da 35 ms con 0% di congruenti a 66 ms con 75%. Un disegno 50/50 non è quindi «neutro»: ci si attende un'interferenza maggiore che in un disegno senza prove congruenti, e i valori sono confrontabili solo con studi alla stessa proporzione. |
 | **Fissazione** | **500 ms** | **Prassi** dei software di riferimento: orienta l'attenzione al centro prima dello stimolo. |
 | **Timeout di risposta** | **3000 ms** | **Scelta di progetto**: finestra ampia, che include le risposte lente sotto interferenza. Oltre = omissione. |
-| **ISI** | **500 ms, costante** | **Scelta di progetto con vincolo di fonte.** Galer et al. (2014) hanno variato l'intervallo risposta-stimolo da 1000 a 5000 ms in bambini (8–10 anni) e adulti: l'intervallo più breve (1000 ms, nell'esperimento a intervalli fissi) ha prodotto l'interferenza maggiore in entrambi i gruppi. In Sintropia l'intervallo risposta-stimolo è ISI (500 ms) + fissazione (500 ms) = **1000 ms** nel test (si aggiunge la durata del feedback in pratica, e nel test se l'opzione «feedback durante il test», disattivata per default, è attiva): coincide con il livello più breve di Galer et al., quello con l'interferenza maggiore, ed è più breve dei protocolli con intervalli lunghi. Va tenuto **costante** tra trial e partecipanti, così l'effetto è comparabile. |
+| **ISI** | **500 ms, costante** | **Scelta di progetto con vincolo di fonte.** Galer et al. (2014) hanno variato l'intervallo risposta-stimolo da 1000 a 5000 ms in bambini (8–10 anni) e adulti: l'intervallo più breve (1000 ms, nell'esperimento a intervalli fissi 1000/1500/3000 ms) ha prodotto l'interferenza maggiore in entrambi i gruppi; nell'esperimento a intervalli variabili (2000–5000 ms) l'effetto dell'intervallo non è risultato significativo. In Sintropia l'intervallo risposta-stimolo è ISI (500 ms) + fissazione (500 ms) = **1000 ms** nel test (si aggiunge la durata del feedback in pratica, e nel test se l'opzione «feedback durante il test», disattivata per default, è attiva): coincide con il livello più breve di Galer et al., quello con l'interferenza maggiore, ed è più breve dei protocolli con intervalli lunghi. Va tenuto **costante** tra trial e partecipanti, così l'effetto è comparabile. |
 | **Pratica** | **8 trial con feedback** | **Prassi**. Serve a imparare la mappatura tasto-colore; i trial di pratica sono esclusi dalle metriche. |
-| **Colori e parole** | **ROSSO, VERDE, BLU, GIALLO** | Set a 4 colori molto diffuso nella letteratura. Nelle prove incongruenti la parola è uno degli altri 3 colori. |
+| **Colori e parole** | **ROSSO, VERDE, BLU, GIALLO** | **Scelta di progetto**: set a 4 colori comune nelle versioni computerizzate (la diffusione non è stata quantificata su una fonte). Nelle prove incongruenti la parola è uno degli altri 3 colori, quindi le parole irrilevanti appartengono all'insieme delle risposte possibili: secondo MacLeod (1991, risultato 14) questo produce più interferenza che con insiemi non sovrapposti. |
 | **Tasti** | **R, V, B, G** (iniziali italiane) | **Scelta di progetto**: le quattro iniziali sono univoche. Una legenda tasto-colore resta visibile e si impara in pratica. |
 | **Anti-ripetizione** | **≤ 3 ripetizioni consecutive** dello stesso colore o della stessa parola | **Scelta di progetto**: evita sequenze prevedibili. |
 
@@ -157,7 +172,8 @@ La SD è campionaria (denominatore $N-1$); il CV normalizza la variabilità sull
 $$\text{Interferenza} = \overline{RT}_{\text{incongruenti}} - \overline{RT}_{\text{congruenti}}$$
 
 Un valore **positivo** indica il costo del conflitto: più è alto, più costosa è la risoluzione del conflitto
-(MacLeod, 1991). Nella variante *focus parola* ci si attende un valore vicino a zero, per l'asimmetria dell'effetto.
+(MacLeod, 1991). Nella variante *focus parola* ci si attende un valore molto minore, per l'asimmetria dell'effetto; un
+valore positivo non è però un'anomalia, perché un effetto Stroop inverso è possibile (MacLeod, 1991, risultato 11).
 
 ### 5.5 Conteggi di qualità dei dati
 
@@ -200,3 +216,10 @@ stretta. Il dettaglio per condizione è nei dati grezzi (CSV/JSON, una riga per 
 - **2026-10-30.** Corretto il confronto con Galer et al. (2014): si confrontava l'ISI (500 ms) con l'intervallo
   risposta-stimolo dello studio, mentre in Sintropia quest'ultimo è ISI + fissazione = 1000 ms. Rimossa la cifra
   «oltre 400 studi» attribuita a MacLeod (1991), non verificata sul testo.
+- **2026-10-30 (verifica sul testo di MacLeod, 1991).** Letto il testo completo della rassegna (copia del laboratorio
+  dell'autore, estratta in testo): confermati i «circa 400 studi» in oltre 50 anni e i 18 risultati (Appendice B).
+  Corretta un'attribuzione errata: MacLeod non sostiene il modello dell'automaticità, lo giudica insufficiente insieme a
+  quello della velocità relativa. Corretta la riga sulla proporzione di congruenti: secondo il risultato 7 le prove
+  congruenti **aumentano** l'interferenza (Lowe e Mitterer: da 35 a 66 ms passando da 0% a 75% di congruenti), quindi il
+  50/50 non è neutro. Aggiunti i risultati 11 (Stroop inverso possibile), 13 (risposta manuale: interferenza ridotta ma
+  significativa) e 14 (sovrapposizione fra parole e risposte). Galer et al. (2014) riverificati sulla pagina dell'editore.

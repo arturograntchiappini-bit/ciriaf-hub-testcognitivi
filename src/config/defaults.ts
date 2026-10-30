@@ -36,7 +36,7 @@ export interface AllParams {
  * Fonte: Stroop (1935); MacLeod (1991); convenzioni jsPsych/PsyToolkit. Vedi docs/scientific/stroop.md
  */
 const STROOP_BASE: StroopParams = {
-  nTrials: 48, // 24 congruenti + 24 incongruenti (MacLeod, 1991)
+  nTrials: 48, // 24 congruenti + 24 incongruenti (scelta di progetto)
   fixationMs: 500, // croce di fissazione (convenzione jsPsych/PsyToolkit)
   timeoutMs: 3000, // oltre = omissione (RT tipici 600–1000 ms)
   isiMs: 500, // ISI costante: la durata modula l'interferenza (Galer et al., 2014)
@@ -99,7 +99,7 @@ export const DEFAULTS: AllParams = {
    */
   wcst: {
     deckSize: 64, // WCST-64 (Kongs et al., 2000)
-    runToShift: 10, // 10 corrette consecutive per il cambio (Grant & Berg, 1948)
+    runToShift: 10, // 10 corrette consecutive per il cambio (convenzione delle implementazioni, es. Inquisit)
     maxCategories: 6,
   },
 

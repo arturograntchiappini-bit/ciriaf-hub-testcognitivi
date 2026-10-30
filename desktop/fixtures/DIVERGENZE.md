@@ -14,7 +14,7 @@ Metodo e dati completi: `docs/scientific/migrazione-rust.md` (§3-§4); evidenze
 |---|---|---|---|
 | 1 | Go/No-Go | `tryArrange` accodava No-Go oltre il limite di 2 consecutivi quando i Go erano finiti (107 sequenze su 500 nel fuzz) | ritenta; stesso algoritmo in TS e Rust |
 | 2 | Go/No-Go | `deterministicArrange` irraggiungibile nel TS e, nel Rust, accodava tutti i No-Go rimasti anche quando il vincolo era realizzabile | quota uniforme di al massimo 2 No-Go dopo ogni Go; solo l'eccesso (nNoGo > 2·nGo) si accoda |
-| 3 | Trail Making | il ripiego a griglia ignorava la distanza minima 0.11 (86.6% di violazioni a n = 51) | celle a caso di una griglia con centri a distanza ≥ 0.11 fino a 64 cerchi |
+| 3 | Trail Making | il ripiego a griglia ignorava la distanza minima 0.11 (88.4% di violazioni a n = 51) | celle a caso di una griglia con centri a distanza ≥ 0.11 fino a 64 cerchi |
 | 4 | Trail Making | parte B oltre 53 cerchi: etichetta mancante (`undefined` nel TS, `?` nel Rust) | la parte B si ferma a 53 cerchi (1, A, 2, …, Z, 27) |
 | 5 | N-Back | `splitIntoChunks` con `ceil(n/k)` lasciava l'ultimo quartile vuoto (n = 5, k = 4 → 2, 2, 1, 0) | i primi `n mod k` blocchi hanno un elemento in più (2, 1, 1, 1) |
 | 6 | WCST | `scoreWcst` allineava le meta ai trial già filtrati: un trial interrotto sfalsava le meta successive | liste parallele allineate per indice originale; altrimenti meta già filtrate |

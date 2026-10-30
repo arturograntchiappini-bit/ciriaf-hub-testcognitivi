@@ -19,7 +19,7 @@ export interface PvtParams {
 }
 
 export interface PvtStimulus {
-  /** ISI che precede QUESTO stimolo (ms). */
+  /** Pausa (ISI) dopo questo trial, prima dello stimolo successivo (ms). */
   isiMs: number;
 }
 

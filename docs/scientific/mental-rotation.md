@@ -20,8 +20,8 @@ oppure la sua immagine speculare ruotata (figura diversa: nessuna rotazione la s
 
 Dall'abstract (verificato su Europe PMC): i tempi per decidere se due disegni in prospettiva mostrano oggetti della stessa
 forma tridimensionale crescono **in modo lineare** con la differenza angolare fra gli orientamenti rappresentati. La
-rotazione nel piano del disegno non richiede meno tempo di quella in profondità: le due rotazioni costano circa lo stesso
-sforzo mentale. **I valori numerici dell'articolo (per esempio i gradi al secondo) non sono riportati qui perché non
+rotazione nel piano del disegno non richiede meno tempo di quella in profondità (l'abstract non dice di più sul
+confronto fra le due). **I valori numerici dell'articolo (per esempio i gradi al secondo) non sono riportati qui perché non
 sono stati letti.**
 
 ---
@@ -95,3 +95,7 @@ uguali e diverse.
 ## Cronologia delle revisioni
 
 - **2026-10.** Prima versione: motore, vista, paper. Fonte verificata su Crossref ed Europe PMC.
+- **2026-10-30.** Riletto l'abstract di Shepard & Metzler (1971) su Europe PMC (PMID 5540314): rimossa l'interpretazione
+  «le due rotazioni costano circa lo stesso sforzo mentale», che va oltre la frase dell'abstract (la rotazione nel piano
+  non è più rapida di quella in profondità). Il numero di 10 cubetti è descritto come forma generale delle figure a
+  blocchi, senza attribuirlo all'articolo; controllato sul codice (bracci 2, 2, 2, 3 più il cubetto iniziale).

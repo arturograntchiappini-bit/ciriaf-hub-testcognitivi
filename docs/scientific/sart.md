@@ -70,21 +70,32 @@ considerati quando si interpretano i punteggi.
 
 ## 3. Parametri adottati
 
-I valori seguono quelli descritti dalle implementazioni pubbliche del compito (PsyToolkit, Inquisit).
-**Il testo originale di Robertson et al. (1997) non è stato consultato** (il PDF non è accessibile in modo
-automatico): i numeri sotto non sono quindi attribuiti all'articolo, ma alla convenzione dei porting.
+I valori seguono quelli descritti dalle implementazioni pubbliche del compito (PsyToolkit, Inquisit), le cui pagine
+sono state consultate il 2026-10-30. **Il testo originale di Robertson et al. (1997) non è stato consultato** (il PDF
+non è accessibile in modo automatico): i numeri sotto non sono quindi attribuiti all'articolo, ma alla convenzione dei
+porting. Che cosa dicono i porting:
+
+- **PsyToolkit** (pagina della libreria SART): cifra per 250 ms e maschera per 900 ms, maschera a cerchio con croce,
+  cinque corpi (48, 72, 94, 100 e 120 **punti**); la pagina afferma che tempi e dimensioni degli stimoli seguono lo
+  studio originale di Robertson. Riporta inoltre 18 trial di addestramento (ogni cifra due volte), 225 trial di test
+  (ogni cifra 25 volte), bersaglio 3 e cifre che non si ripetono mai consecutivamente, senza attribuire questi valori a
+  Robertson.
+- **Inquisit** (manuale del SART): cifra 250 ms e maschera 900 ms come valori predefiniti, 9 cifre × 25 = 225 trial,
+  bersaglio 3, cinque corpi (in percentuale dello schermo) estratti 45 volte ciascuno; ordine delle cifre
+  **prestabilito** (semi-casuale) per impostazione predefinita; la procedura è dichiarata basata su Robertson et al.
+  (1997) e su Cheyne et al. (2009).
 
 | Parametro | Valore adottato | Origine |
 |---|---|---|
-| **Cifre** | 1–9 | Convenzione del compito (porting pubblici) |
-| **Bersaglio (cifra da non rispondere)** | **3** (modificabile) | Convenzione dei porting; in Sintropia è un parametro |
-| **Numero di trial** | **225** (25 per cifra) | Convenzione dei porting; 25 presentazioni del bersaglio sono l'unica base della stima delle commissioni |
-| **Durata della cifra** | **250 ms** | Convenzione dei porting |
-| **Durata della maschera** | **900 ms** (cerchio con croce) | Convenzione dei porting; la finestra di risposta è 250 + 900 = 1150 ms dall'onset |
+| **Cifre** | 1–9 | Convenzione del compito (PsyToolkit, Inquisit); l'abstract di Robertson et al. (1997) conferma bersagli rari, uno su nove |
+| **Bersaglio (cifra da non rispondere)** | **3** (modificabile) | Convenzione dei porting (PsyToolkit, Inquisit); in Sintropia è un parametro |
+| **Numero di trial** | **225** (25 per cifra) | Convenzione dei porting (PsyToolkit, Inquisit); 25 presentazioni del bersaglio sono l'unica base della stima delle commissioni |
+| **Durata della cifra** | **250 ms** | PsyToolkit e Inquisit; PsyToolkit la dichiara conforme allo studio originale (non verificato sul testo) |
+| **Durata della maschera** | **900 ms** (cerchio con croce) | PsyToolkit e Inquisit; PsyToolkit dichiara la maschera conforme allo studio originale (non verificato sul testo). La finestra di risposta è 250 + 900 = 1150 ms dall'onset |
 | **Pausa fra i trial** | **nessuna** | La maschera ne fa le veci: il ritmo è costante, il che è parte del compito |
-| **Corpo del carattere** | **5 corpi** (48, 72, 94, 100, 120 px) | Dai porting; scoraggia il confronto con una sagoma. In Sintropia i corpi sono in pixel CSS, non in punti |
-| **Ripetizione immediata** | **vietata** | **Scelta di progetto**: nessuna cifra uguale alla precedente, per evitare che la ripetizione fornisca un indizio |
-| **Trial di pratica** | **18** (con feedback) | Convenzione dei porting; esclusi dalle metriche |
+| **Corpo del carattere** | **5 corpi** (48, 72, 94, 100, 120 px) | Valori di PsyToolkit, che li indica in **punti** e li dichiara conformi allo studio originale; Inquisit usa percentuali dello schermo. In Sintropia sono pixel CSS: la dimensione fisica non coincide con nessuno dei due porting |
+| **Ripetizione immediata** | **vietata** | Come in PsyToolkit (le cifre non si ripetono mai l'una dopo l'altra; nessuna attribuzione a Robertson); in Sintropia la sequenza è casuale con seme, mentre Inquisit usa per impostazione predefinita un ordine prestabilito |
+| **Trial di pratica** | **18** (con feedback) | Come in PsyToolkit (18 trial di addestramento, ogni cifra due volte); Inquisit non li menziona. Esclusi dalle metriche |
 | **Tasto di risposta** | Barra spaziatrice | Risposta unimanuale a tasto singolo |
 
 La durata complessiva è di circa 4,3 minuti (225 × 1,15 s).
@@ -177,8 +188,9 @@ contate come risposte in $d'$.
 
 ## 6. Limiti
 
-- **Parametri non verificati sull'originale.** I valori di §3 sono quelli dei porting pubblici; vanno confrontati
-  con Robertson et al. (1997) prima di un uso clinico o di un confronto con norme.
+- **Parametri non verificati sull'originale.** I valori di §3 sono quelli dei porting pubblici (PsyToolkit, Inquisit);
+  vanno confrontati con Robertson et al. (1997) prima di un uso clinico o di un confronto con norme. Cheyne et al.
+  (2009), citato da Inquisit, non è stato consultato.
 - **Nessuna norma.** La piattaforma non fornisce punteggi normativi né cut-off diagnostici: le metriche
   descrivono la prestazione del singolo partecipante.
 - **Compromesso velocità-accuratezza.** Commissioni e RT dipendono dalla strategia di risposta (Dang et al.,
@@ -197,3 +209,10 @@ contate come risposte in $d'$.
 - **2026-10-30.** Allineate al riassunto le descrizioni di Robertson et al. (1997) («accorciamento significativo» dei
   tempi prima degli errori) e di Dang et al. (2018) (quattro SART, non quattro sessioni); descritto il ripiego reale
   della sequenza (non deterministico e senza garanzia del vincolo).
+- **2026-10-30 (convenzione dei porting).** Consultate la pagina SART di PsyToolkit e il manuale SART di Inquisit: ogni
+  parametro del §3 è ora attribuito al porting che lo riporta. PsyToolkit dichiara tempi, maschera e corpi conformi allo
+  studio originale (attribuzione riportata, non verificata sull'articolo); 225 trial, 18 di pratica, bersaglio 3 e divieto
+  di ripetizione sono convenzioni di PsyToolkit senza attribuzione. Il divieto di ripetizione non è più presentato come
+  scelta originale di Sintropia. Notate le differenze: corpi in punti (PsyToolkit) o in percentuale dello schermo (Inquisit)
+  contro pixel CSS, e ordine prestabilito in Inquisit contro sequenza casuale con seme. Riverificati gli abstract di
+  Robertson et al. (1997), Manly et al. (1999), Dang et al. (2018) e Wilson et al. (2016) su Europe PMC.

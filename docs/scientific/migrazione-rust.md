@@ -9,6 +9,11 @@
 > (`evidence/*.json`, `BENCHMARK.md`, `DIVERGENZE.md`) o è stata rigenerata eseguendo i comandi del §7 il 2026-10-23 (le tabelle del §3.4 il 2026-10-30)
 > (esito dei test, determinismo della rigenerazione, esperimento di sensibilità del §3.5, ripartizione per `goRatio`
 > del §4.1). Il documento non cita articoli: non ci sono fonti bibliografiche nuove da verificare.
+> **Riverifica del 2026-10-30** (senza rieseguire benchmark né test): le tabelle del §3.4 sono ricalcolate da
+> `evidence/*.json` e coincidono; le tabelle del §5 e del §5.1 coincidono cella per cella con `BENCHMARK.md` (confronto con
+> uno script); 225 e 392 coincidono con il conteggio statico dei `#[test]` meno i 2 `#[ignore]`; 107 e la ripartizione per
+> `goRatio` sono ricalcolati dal file di fuzz precedente alla correzione (commit `23de699`); le percentuali del §4.3 sono
+> state rimisurate sul codice di quel commit. Ciò che non è stato possibile riprodurre è marcato nel testo.
 
 ---
 
@@ -127,7 +132,8 @@ seme, distanza minima fra i cerchi di Trail Making. In tutto 63 proprietà, per 
 
 La colonna «Casi fixture» somma generazione, scoring e parti ausiliarie di ciascun file. La riga «0» di deviazione
 significa che tutti i float sono identici bit a bit. Il nucleo (`core.json`: RNG, validazione, SDT, export, sessioni)
-ha un proprio golden con 11 test.
+ha un proprio golden con 11 test (le 11 funzioni `#[test]` di `crates/core/tests/golden_core.rs`; `evidence/core.json`
+registra 10 aree: rng, validazione, sdt, export, sessione e 5 proprietà).
 
 **Fuzz** (`evidence/fuzz.json`; `tsHang` e `tsErrors` sono 0 per tutti gli 11 motori).
 
@@ -154,7 +160,10 @@ Fixture e fuzz sono state rigenerate dall'oracolo corretto il 2026-10-30; i file
 
 **Esito dei test.** Il 2026-10-30, `cargo test -p sintropia-engines --release` ha dato 225 test superati e 0 falliti
 (unitari nei moduli, golden, fuzz, proptest; i 2 test di budget di prestazione sono `#[ignore]`);
-`cargo test --workspace --release`: 392 test superati e 0 falliti.
+`cargo test --workspace --release`: 392 test superati e 0 falliti. L'esito non è conservato in un file di evidenza; i
+due totali sono però coerenti con il conteggio statico dei sorgenti (2026-10-30): 227 attributi `#[test]` in
+`crates/engines` meno 2 `#[ignore]` = 225; nel workspace 227 + 65 (`core`) + 92 (`app`) + 10 (`content`) = 394, meno 2 =
+392. Il conteggio statico conferma il numero dei test, non che siano passati.
 
 ### 3.5 Analisi della deviazione massima e controllo di sensibilità
 
@@ -180,7 +189,8 @@ sia sensibile, il 2026-10-23 si è modificata una copia della fixture `stroop.js
 all'originale). Il test **fallisce**, con il messaggio
 `sim-stroop1-perfect@42.metrics[2:RT medio congruenti].value: 422.5 != 422.500001 (tolleranza 0.000000001)`;
 senza la modifica il test passa. Un errore tre ordini di grandezza sopra $\varepsilon$ è dunque rilevato. L'esperimento
-è stato eseguito su un solo test (Stroop); gli altri usano lo stesso codice di confronto (`evidence.rs`).
+è stato eseguito su un solo test (Stroop); gli altri usano lo stesso codice di confronto (`evidence.rs`). L'esperimento
+non lascia traccia nei file di evidenza e **non è stato rieseguito** nella riverifica del 2026-10-30.
 
 ---
 
@@ -203,7 +213,9 @@ ha un test di regressione (`src/engine/tests/regressioni.test.ts`); l'insieme de
 
 Il paper ([gonogo.md](gonogo.md)) dichiara «mai più di 2 No-Go consecutivi». In `tryArrange` (`gonogo.ts`), quando i Go erano finiti il TS accodava
 No-Go **ignorando** il limite, e accettava sempre la sequenza. Nelle 500 sequenze casuali del fuzz (numerosità 0-397, `goRatio` da 0.05 a 1) il TS violava il vincolo in
-**107 casi**. Ripartizione per `goRatio`, misurata prima della correzione:
+**107 casi**. Ripartizione per `goRatio`, misurata prima della correzione (riverificata il 2026-10-30 dal file di fuzz
+`fuzz/gonogo.json.gz` del commit `23de699`, che conserva le sequenze del TS non corretto: 107 sequenze con
+`expectedDivergence` e le stesse cifre per fascia, compresa la serie più lunga per fascia citata sotto):
 
 | `goRatio` | Sequenze | Con serie di No-Go > 2 (TS) |
 |---|--:|--:|
@@ -227,17 +239,24 @@ stato riscritto in modo che termini sempre (§4.2). Si riporta l'errore dell'ipo
 
 ### 4.2 Go/No-Go: ripiego deterministico (bug Rust, corretto)
 
-Lo stesso fuzz ha trovato un bug **nel Rust**: in 7 sequenze con `goRatio` 0.36-0.46 (dove il campionamento casuale quasi mai rispetta il
-vincolo e si arriva al ripiego) `deterministic_arrange` alternava Go e No-Go e accodava **tutti** i No-Go rimasti, con serie fino a 17,
-pur essendo il vincolo realizzabile. Correzione: dopo ogni Go si inserisce una quota uniforme di No-Go (al massimo 2); si
+Lo stesso fuzz ha trovato un bug **nel Rust**: in 7 sequenze (numero registrato in `evidence/fuzz.json`, `divergencesFound`)
+con `goRatio` 0.36-0.46 (dove il campionamento casuale quasi mai rispetta il vincolo e si arriva al ripiego) `deterministic_arrange`
+alternava Go e No-Go e accodava **tutti** i No-Go rimasti, con serie fino a 17, pur essendo il vincolo realizzabile. L'intervallo di
+`goRatio` e la serie massima di 17 vengono dal registro `DIVERGENZE.md` del commit `23de699`: le uscite del Rust difettoso non sono
+conservate, quindi queste due cifre **non sono state ricalcolate** (la serie di 17 del Rust non va confusa con quella del TS del §4.1). Correzione: dopo ogni Go si inserisce una quota uniforme di No-Go (al massimo 2); si
 accodano solo quelli che non trovano posto (nNoGo > 2·nGo, caso in cui il vincolo non è realizzabile). Ora il TS usa lo stesso ripiego.
 
 ### 4.3 Trail Making: il ripiego violava la distanza minima (limite TS, corretto)
 
 `placePoints` mette i cerchi in posizioni casuali con distanza minima 0.11; esaurite le 4000 prove i cerchi mancanti erano messi su una griglia
-**senza controllare** la distanza dai punti già piazzati. Misurato sul TS con 3000 semi per numerosità: distanza violata nello 0% dei casi fino a
-n = 40, 1.5% a n = 45, 86.6% a n = 51. Con il default (n = 25) non succedeva. **Correzione:** se l'estrazione casuale non arriva al numero richiesto, si scarta
+**senza controllare** la distanza dai punti già piazzati. Misura originale sul TS, 3000 semi per numerosità: distanza violata nello 0% dei casi
+fino a n = 40, 1.5% a n = 45, 86.6% a n = 51 (cifre del registro `DIVERGENZE.md`; l'insieme di semi usato non è documentato). Rimisurato il
+2026-10-30 sul codice del commit `23de699` con i semi 0–2999 (e 1–3000, stesso esito): 0% a n = 25 e 40, **1.9%** a n = 45, 52.9% a n = 49,
+73.1% a n = 50, **88.4%** a n = 51. L'andamento è confermato; le due percentuali originali non sono riprodotte esattamente. Con il default
+(n = 25) non succedeva. **Correzione:** se l'estrazione casuale non arriva al numero richiesto, si scarta
 e si scelgono `n` celle a caso di una griglia, i cui centri distano almeno 0.11 fino a 64 cerchi (il limite del parametro è 51); vale per TS e Rust.
+Per 50–64 cerchi il passo della griglia è esattamente 0.11, quindi alcune distanze calcolate risultano inferiori a 0.11 di una quantità
+dell'ordine dell'arrotondamento in virgola mobile (con tolleranza 10⁻¹² le violazioni rimisurate sul codice attuale sono 0% fino a n = 51).
 Anche la parte B oltre 53 cerchi (etichetta mancante nel TS, `?` nel Rust) è ora limitata a 53 (1, A, 2, B, …, Z, 27). Vedi [trail-making.md](trail-making.md).
 
 ### 4.4 N-Back: quartile vuoto (limite TS, corretto)
@@ -254,7 +273,7 @@ l'indice è quello del trial originale; altrimenti i metadati si considerano gi�
 ### 4.6 Quirk del linguaggio
 
 - **`Math.hypot` (Corsi).** `distance()` usa `Math.hypot`; `f64::hypot` di Rust differisce di 1 ulp da V8 (distanza fra i blocchi 0 e 4:
-  `403ea5adf8a76f92` contro `403ea5adf8a76f91`). Conta perché le sequenze sono ordinate per lunghezza di percorso e un ulp può invertire due
+  `403ea5adf8a76f92` contro `403ea5adf8a76f91`; valori esadecimali non riverificati il 2026-10-30). Conta perché le sequenze sono ordinate per lunghezza di percorso e un ulp può invertire due
   sequenze quasi pari, cambiando la coppia estratta a parità di seme. Il Rust (`js_hypot`) riproduce l'algoritmo di V8 (scala per il massimo
   più somma di Kahan) e il golden confronta **bit a bit** tutte le 81 distanze fra i blocchi: poiché ogni percorso è una somma di queste distanze,
   ordinamenti ed estrazioni coincidono per ogni seme. Nota: `Math.hypot` non è garantito al bit dal linguaggio (altri motori JS possono dare risultati
@@ -350,8 +369,14 @@ riferimenti invece di copie in `score_sart` e `score_flanker`, chiavi `u64` e un
 | `corsi.gen.default` | 8.64 ms | 13.38 ms | 2.21 ms | 6.04x | 9.44 ms | 2.17 ms |
 | `corsi.gen.x10` | 85.60 ms | 181.35 ms | 23.29 ms | 7.79x | 93.17 ms | 22.84 ms |
 
-Sono riportate solo le righe toccate dagli interventi. Nelle altre (rotazione mentale, Trail Making, WCST...) il codice non è cambiato e i rapporti
-«prima/dopo» inferiori a 1 che compaiono nel file `BENCHMARK.md` sono rumore di misura, non regressioni.
+Le righe coincidono cella per cella con la tabella «Ottimizzazioni» di `BENCHMARK.md` (confronto con uno script, 2026-10-30). Sono riportate le
+righe di calcolo puro delle operazioni toccate dagli interventi, **tranne** `nback.score.400` (anche `score_nback` è stato modificato): TS
+10.7 µs, Rust 3.8 → 2.8 µs (1.37x), WASM (Os) 7.5 → 3.8 µs. Nelle altre righe (rotazione mentale, Trail Making, WCST...) il codice non è
+cambiato e i rapporti «prima/dopo» inferiori a 1 che compaiono nel file `BENCHMARK.md` sono rumore di misura, non regressioni. Lo stesso vale
+in senso opposto: anche righe non toccate migliorano fra le due esecuzioni (per esempio `gonogo.gen.default` 1.35x, `sart.gen.default` 1.29x,
+`visual_search.gen.default` 1.50x, `pvt.gen.default` 1.73x), quindi una parte dei guadagni della tabella, dell'ordine di 1.3–1.7x, può dipendere
+dal carico della macchina e non dagli interventi. I guadagni grandi (da 4.67x in su) restano molto oltre questo rumore; quelli di Stroop
+(2.04x e 2.20x) solo in parte.
 
 ### 5.2 Dimensioni del modulo WASM
 
@@ -441,3 +466,12 @@ sono in `desktop/fixtures/evidence/bench*.json`. Una guida di sintesi è in `des
 - **Revisione 2026-10-30.** Compilata la tabella dei risultati del §5 (era rimasto un segnaposto) da `BENCHMARK.md`; aggiornati
   i valori del confine JSON del §5.3; precisato che il limite dei 30 ms vale per il Rust; chiarite le divergenze registrate nel fuzz;
   limitata la spiegazione «1-2 ulp» alle due deviazioni analizzate; aggiunto il §4.8 (CSV).
+- **Riverifica 2026-10-30 delle cifre interne.** Senza rieseguire benchmark né test Rust: ricalcolate da `evidence/*.json`
+  tutte le celle delle tabelle golden e fuzz (§3.4) e le posizioni delle deviazioni massime (§3.5): coincidono. Confrontate
+  con uno script le tabelle del §5 (35 righe) e del §5.1 (10 righe) con `BENCHMARK.md`: nessuna differenza. Aggiunta la riga
+  omessa `nback.score.400` e la cautela sui guadagni dovuti al carico (righe non toccate che migliorano di 1.3–1.7x).
+  225 e 392 coerenti con il conteggio statico dei test. 107 e la ripartizione per `goRatio` ricalcolati dal fuzz del commit
+  `23de699`. L'intervallo di `goRatio` (0.36-0.46) e la serie di 17 del bug Rust del §4.2 non sono ricalcolabili e sono
+  marcati come tali. Le percentuali di Trail Making del §4.3 rimisurate sul codice di `23de699` (1.9% e 88.4% invece di
+  1.5% e 86.6%, andamento confermato) e aggiunta la nota sull'arrotondamento a passo di griglia 0.11. Marcati come non
+  rieseguiti il controllo di sensibilità del §3.5 e i valori esadecimali di `Math.hypot` del §4.6.

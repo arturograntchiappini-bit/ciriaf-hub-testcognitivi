@@ -83,18 +83,19 @@ e **capacità di controllo top-down** che la sopprime sul No-Go.
 
 ## 3. Parametri adottati
 
-Valori adottati nell'implementazione Sintropia. «Confermato» indica un valore coerente con le fonti citate nella
-riga; dove nessuna fonte è citata il valore è una **scelta di progetto** con il suo razionale.
+Valori adottati nell'implementazione Sintropia. «Coerente con le fonti» indica un valore compatibile con le fonti
+citate nella riga, non prescritto da esse; dove nessuna fonte è citata il valore è una **scelta di progetto** con il suo
+razionale.
 
 | Parametro | Valore adottato | Fonte / razionale |
 |---|---|---|
-| **Numero totale di trial** | **80** | Compromesso per una batteria breve. Confermato con caveat: i 20 trial No-Go sono il **minimo** ragionevole per una stima stabile degli errori di commissione; per protocolli dedicati alla sola inibizione conviene aumentarne il numero (scelta del ricercatore: la letteratura citata non fissa un minimo universale). Per screening rapido multi-test, 80 è accettabile. **Scelta di progetto.** |
-| **Proporzione Go / No-Go** | **75% Go (60) / 25% No-Go (20)** | **Confermato.** Rapporto che crea prepotenza mantenendo abbastanza No-Go per stime stabili. Sostenuto da Wessel (2018) (No-Go rari necessari per attività motoria prepotente) e Wilson et al. (2016) (prepotenza cresce con la proporzione di Go). |
+| **Numero totale di trial** | **80** | **Scelta di progetto**, compromesso per una batteria breve. Con 20 No-Go il tasso di commissione ha una risoluzione di 5 punti percentuali (1/20) e una stima individuale rumorosa; la letteratura citata non fissa un minimo. Per protocolli dedicati alla sola inibizione conviene aumentare i trial (parametro modificabile). |
+| **Proporzione Go / No-Go** | **75% Go (60) / 25% No-Go (20)** | **Coerente con le fonti**, ma il valore preciso è una scelta di progetto. Wessel (2018, abstract) trova attività motoria prepotente affidabile solo con No-Go rari e ritmo veloce; Wilson et al. (2016, abstract) osservano RT più brevi e più commissioni passando da .50 a .95 di Go (proporzioni testate: .50, .65, .80, .95). La probabilità di No-Go usata nelle condizioni «rare» di Wessel non è stata verificata sul testo. |
 | **Durata stimolo / finestra di risposta** | **800 ms fissi** | **Scelta di progetto**, come *response deadline* (deadline di risposta). Il ritmo rapido favorisce la prepotenza (Wessel, 2018). 800 ms è moderato-veloce: impone velocità senza tagliare troppe risposte lente valide. Nota: è la finestra entro cui la risposta è conteggiata come Go corretto. |
 | **ISI (inter-stimulus interval) variabile** | **Uniforme 500–1000 ms (jitter)** | **Scelta di progetto.** La *variabilità* dell'ISI serve a ostacolare l'entrainment temporale e le risposte anticipatorie ritmiche. L'ISI è uno schermo vuoto fra lo stimolo e il successivo (nessuna croce di fissazione). Hasegawa et al. (2021) hanno confrontato ISI di 400, 600, 800 e 1000 ms con stimolo di 250 ms: gli ISI brevi producono più errori di commissione e, a 400 ms, anche più omissioni sui Go, il che rende l'errore di commissione meno valido come indice di inibizione. L'intervallo 500–1000 ms evita la zona più critica (400 ms); lo stimolo di Sintropia (800 ms) è però più lungo di quello dello studio (250 ms), quindi il confronto è qualitativo. |
 | **Vincolo anti-cluster No-Go** | **Mai più di 2 No-Go consecutivi** | **Scelta di progetto** (pseudo-randomizzazione). Garantito quando i No-Go non superano il doppio dei Go (sempre vero con i default); oltre, il vincolo non è realizzabile e i No-Go in eccesso si accodano (§4). Sequenze lunghe di No-Go indebolirebbero la prepotenza Go e consentirebbero un rallentamento strategico proattivo, alterando la misura dell'inibizione. Il vincolo mantiene la risposta Go dominante trial-per-trial. |
 | **Numero trial di pratica** | **10 (con entrambi i tipi Go e No-Go)** | **Scelta di progetto.** La pratica deve includere almeno alcuni No-Go affinché il partecipante comprenda la regola di inibizione prima della fase sperimentale. Esclusi dall'analisi. |
-| **Stimoli** | **Cerchio verde = Go; cerchio rosso = No-Go** | **Scelta di progetto**: mappatura comune e intuitiva (semaforo: verde→vai, rosso→ferma). Cerchi colorati sono una scelta diffusa nei go/no-go computerizzati. Caveat: la coppia verde/rosso **può non essere distinguibile** da chi ha una deficienza nella visione dei colori rosso-verde: per quei partecipanti il test va adattato (cambiando forma o luminanza). Altro caveat minore: la congruenza semantica verde/rosso può fornire un piccolo vantaggio di codifica; è accettabile e anzi rafforza la prepotenza del Go. Mantenere costanti dimensione, luminanza e posizione centrale. |
+| **Stimoli** | **Cerchio verde = Go; cerchio rosso = No-Go** | **Scelta di progetto**: mappatura intuitiva (semaforo: verde→vai, rosso→ferma); la diffusione dei cerchi colorati nei go/no-go computerizzati non è stata quantificata su una fonte. Caveat: la coppia verde/rosso **può non essere distinguibile** da chi ha una deficienza nella visione dei colori rosso-verde: per quei partecipanti il test va adattato (cambiando forma o luminanza). Altro caveat minore: la congruenza semantica verde/rosso può fornire un piccolo vantaggio di codifica; è accettabile e anzi rafforza la prepotenza del Go. Mantenere costanti dimensione, luminanza e posizione centrale. |
 | **Tasto di risposta** | **Barra spaziatrice** | **Scelta di progetto.** Risposta a tasto singolo ("go response" unimanuale): il partecipante preme sul Go e trattiene sul No-Go. Standard per il go/no-go a risposta singola. |
 
 ---
@@ -190,6 +191,13 @@ risposta; le metriche §5.1–5.4 restano quelle di riferimento. Il calcolo è c
 
 ## Cronologia delle revisioni
 
+- **2026-10-30 (riverifica riga per riga).** Riletti su Europe PMC gli abstract di Verbruggen & Logan (2008), Wessel
+  (2018: ~40% di studi equiprobabili, ~20% con intervalli > 4 s, riduzione del 75%), Wilson et al. (2016: 30 partecipanti,
+  proporzioni .50–.95) e Hasegawa et al. (2021: N = 213, ISI 400–1000 ms, stimolo 250 ms): le affermazioni del paper
+  coincidono. Rimossi il «Confermato con caveat» e il «minimo ragionevole» di 20 No-Go (senza fonte) dalla riga del numero
+  di trial; la proporzione 75/25 è ora «coerente con le fonti» e non «confermata»; attenuata la diffusione dei cerchi
+  colorati. Aggiunto alla riga della proporzione che la probabilità di No-Go delle condizioni rare di Wessel non è
+  verificata sul testo.
 - **2026-10-30 (revisione delle fonti).** Il contributo di Verbruggen e Logan (2008) è ora descritto come nel loro riassunto
   (inibizione automatica da associazioni stimolo-stop; non equivalenza fra go/no-go e stop-signal), senza attribuire loro la
   crescita della prepotenza con la frequenza dei Go. Le righe di §3 senza fonte sono marcate come scelte di progetto;

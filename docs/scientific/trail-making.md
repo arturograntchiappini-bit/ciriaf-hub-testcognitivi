@@ -52,7 +52,7 @@ riportato** perché non sono stati letti.
 
 | Parametro | Valore adottato | Origine |
 |---|---|---|
-| **Cerchi per parte** | **25** (parte B: 13 numeri e 12 lettere) | Numero classico del TMT; modificabile (8–51). Il motore limita comunque la parte B a 53 cerchi (1, A, 2, B, …, Z, 27), finite le lettere |
+| **Cerchi per parte** | **25** (parte B: 13 numeri e 12 lettere) | Numero classico del TMT (non riverificato sul testo di Reitan, 1958, di cui non è stato letto nemmeno l'abstract); modificabile (8–51). Il motore limita comunque la parte B a 53 cerchi (1, A, 2, B, …, Z, 27), finite le lettere |
 | **Disposizione** | posizioni casuali con distanza minima fra i centri di **0,11** (frazione del lato del campo) | **Scelta di progetto**: non è il layout cartaceo originale |
 | **Risposta** | clic del mouse o tocco sul cerchio | **Scelta di progetto** (il test originale è carta e matita con tracciamento) |
 | **Errore** | il cerchio lampeggia, non si avanza, il tempo scorre | **Scelta di progetto** (nel test cartaceo lo sperimentatore corregge l'errore a tempo in corso) |
@@ -67,7 +67,7 @@ Codice: `src/engine/tests/trailMaking.ts`, `src/config/defaults.ts`, `src/ui/tes
 | Elemento | Dove | Comportamento |
 |---|---|---|
 | Etichette | `trailLabels` | A: 1…n. B: 1, A, 2, B…, al massimo 53 etichette (fino a Z, 27) |
-| Layout | `generateTrail` | Posizioni casuali (RNG a seme) a distanza minima 0,11, con margine 0,06, fino a 4000 estrazioni. Se il campo è troppo affollato si scarta tutto e si scelgono celle a caso di una griglia `⌈√n⌉ × ⌈√n⌉`, i cui centri distano almeno 0,11 fino a 64 cerchi (il parametro arriva a 51) |
+| Layout | `generateTrail` | Posizioni casuali (RNG a seme) a distanza minima 0,11, con margine 0,06, fino a 4000 estrazioni. Se il campo è troppo affollato si scarta tutto e si scelgono celle a caso di una griglia `⌈√n⌉ × ⌈√n⌉`, i cui centri distano almeno 0,11 fino a 64 cerchi (il parametro arriva a 51). Da 50 a 64 cerchi il passo della griglia è esattamente 0,11, quindi alcune distanze calcolate sono inferiori a 0,11 solo per l'arrotondamento in virgola mobile (scarto inferiore a 10⁻¹²) |
 | Registrazione | `TrailRun` | Ogni clic è un trial: `rtMs` = tempo dal clic precedente (o dall'inizio); un clic errato non fa avanzare |
 | Metriche | `scoreTrailMaking` | Solo `phase = 'test'`; il tempo di una parte conta solo se completata |
 
@@ -95,3 +95,8 @@ sbagliato) e il tempo medio per clic di ciascuna parte.
   Europe PMC.
 - **2026-10-30.** Documentati la distanza minima (0,11), il ripiego a griglia che la rispetta (prima i cerchi mancanti
   venivano messi su una griglia senza controllare la distanza) e il limite di 53 cerchi della parte B.
+- **2026-10-30 (rimisura del ripiego).** Rimisurata su 3000 semi per numerosità la distanza minima dei cerchi: nel codice
+  precedente alla correzione (commit `23de699`) era violata nell'1,9% dei casi a n = 45 e nell'88,4% a n = 51 (le cifre
+  1,5% e 86,6% del registro dei difetti non sono riprodotte esattamente; vedi [migrazione-rust.md](migrazione-rust.md),
+  §4.3); nel codice attuale 0% fino a n = 51, a meno dell'arrotondamento in virgola mobile quando il passo della griglia
+  è esattamente 0,11 (50–64 cerchi). Il «numero classico» di 25 cerchi è marcato come non verificato su Reitan (1958).

@@ -6,6 +6,34 @@ la data dell'ultima verifica è 2026-10-30. Per gli articoli pubblicati prima on
 2017, Wessel, Hasegawa) Crossref registra l'anno della versione online; qui si usa l'anno del fascicolo, come da APA. I testi
 senza DOI (tesi, manuali, monografie) sono indicati come tali e **non sono stati consultati direttamente**.
 
+## Stato della verifica dei contenuti (2026-10-30)
+
+La verifica su Crossref riguarda i dati bibliografici. Per il **contenuto** attribuito a ciascuna fonte nei paper vale
+quanto segue.
+
+- **Testo completo letto.** MacLeod (1991), copia del laboratorio dell'autore (numero di studi, 18 risultati, effetto
+  della proporzione di congruenti, giudizio sulle teorie dell'automaticità e della velocità relativa); Basner & Dinges
+  (2011), Metodi su PubMed Central (ISI 2–10 s, lapse ≥ 500 ms, false starts < 100 ms, timeout 30 s).
+- **Solo abstract letto** (riepilogo di quanto dichiarato nella cronologia di ciascun paper; per le fonti indicate lì come
+  rilette il 2026-10-30 la lettura è di questa revisione, per le altre di quelle precedenti). Eriksen & Eriksen (1974), Hautus (1995), Whelan (2008) (pagina dell'editore); Gratton et al.
+  (1992), Ulrich & Miller (1994), Ratcliff (1993), Robertson et al. (1997), Manly et al. (1999), Dang et al. (2018),
+  Wilson et al. (2016), Wessel (2018), Hasegawa et al. (2021), Verbruggen & Logan (2008), Kessels et al. (2000), Berch et
+  al. (1998), Orsini et al. (2004), Jaeggi et al. (2010), Kane et al. (2007), Owen et al. (2005), Nyhus & Barceló (2009),
+  Miles et al. (2021), Howlett & Moseley (2024), Kofler et al. (2013), Shepard & Metzler (1971), Lan et al. (2011),
+  Mueller & Piper (2014) (Europe PMC o PubMed); Galer et al. (2014) (pagina dell'editore: intervalli e risultati dei
+  due esperimenti); Fan et al. (2002) (Crossref); Sánchez-Cubillo et al. (2009) (Europe PMC,
+  revisione precedente); Treisman & Gelade (1980) (abstract letto solo attraverso una ricerca web, non su fonte primaria).
+- **Solo dati bibliografici.** Stroop (1935), C. W. Eriksen (1995), Reitan (1958), Tombaugh (2004), Kirchner (1958),
+  Berg (1948), Grant & Berg (1948), Dinges & Powell (1985), Donders (1969), de Leeuw (2015), Stoet (2010, 2017).
+- **Non consultati.** Corsi (1972, tesi), Heaton et al. (1993) e Kongs et al. (2000) (manuali PAR), Luce (1986,
+  monografia). In particolare il criterio delle 10 risposte corrette consecutive non è verificato per Grant & Berg (1948).
+- **Fonti secondarie usate come riscontro** (software, non letteratura scientifica): sorgente PEBL del Corsi (commit
+  `aaf55c9`: coordinate, `isi`, `iti`, lunghezze, regola di arresto), pagine e manuali PsyToolkit e Inquisit per i
+  parametri del SART, il formato a 5 frecce dell'ANT, il total score del Corsi e i parametri del WCST. Ciò che i paper
+  attribuiscono a un articolo tramite queste fonti è dichiarato «non verificato sul testo».
+- **Citazioni testuali.** Le citazioni con numero di pagina di Whelan (2008) sono state trasformate in parafrasi perché il
+  testo non è accessibile; in tutti i paper si citano tra virgolette solo frasi lette su testo grezzo (PDF estratto, API).
+
 ## Stroop Task
 
 - Stroop, J. R. (1935). Studies of interference in serial verbal reactions.
@@ -202,3 +230,8 @@ senza DOI (tesi, manuali, monografie) sono indicati come tali e **non sono stati
   795–811. https://doi.org/10.1016/j.cpr.2013.06.001
 - Luce, R. D. (1986). *Response times: Their role in inferring elementary mental
   organization.* Oxford University Press. (monografia, senza DOI)
+
+## Cronologia delle revisioni
+
+- **2026-10-30.** Aggiunta la sezione «Stato della verifica dei contenuti»: per ogni fonte si distingue fra testo letto,
+  solo abstract, solo dati bibliografici e non consultata. Nessun DOI modificato.

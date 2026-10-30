@@ -78,13 +78,13 @@ La colonna *Origine* distingue ciò che è **riportato dalle fonti** (con la cau
 
 | Parametro | Valore | Origine |
 |---|---|---|
-| Carte-stimolo | 4 carte fisse: **① un triangolo rosso**, **② due stelle verdi**, **③ tre croci gialle**, **④ quattro cerchi blu** | Configurazione classica del test (Heaton et al., 1993): ogni valore di ogni dimensione compare su una sola carta-stimolo |
-| Dimensioni | **Colore** (rosso, verde, giallo, blu) · **Forma** (triangolo, stella, croce, cerchio) · **Numero** (1, 2, 3, 4) | Grant & Berg (1948); Heaton et al. (1993) |
-| Mazzo-risposta | Le **64 combinazioni** 4 × 4 × 4, ciascuna una volta, in **ordine casuale** (con seme); se `deckSize` > 64 il mazzo si ripete in permutazioni successive | Il WCST-64 usa 64 carte (Kongs et al., 2000). **Differenza:** nel test ufficiale l'ordine delle carte è prestabilito; qui è casuale, quindi i punteggi non sono strettamente confrontabili con i dati normativi |
-| Dimensione mazzo | **64** (default); la versione completa usa 128 | Heaton et al. (1993) = 128; Kongs et al. (2000) = 64 |
-| Ordine dei criteri | **Colore → Forma → Numero**, ciclico | Heaton et al. (1993) |
-| Corrette consecutive per il cambio | **10** (`runToShift`) | Valore classico della versione standardizzata (Heaton et al., 1993, non consultato direttamente); il criterio usato da Grant & Berg (1948) non è stato riverificato sul testo |
-| Categorie per terminare | **6** (`maxCategories`), oppure esaurimento del mazzo | Heaton et al. (1993). Con 64 carte e 10 corrette per categoria, sei categorie richiedono almeno 60 risposte corrette: il test finisce di norma per esaurimento del mazzo |
+| Carte-stimolo | 4 carte fisse: **① un triangolo rosso**, **② due stelle verdi**, **③ tre croci gialle**, **④ quattro cerchi blu** | Configurazione classica del test, attribuita a Heaton et al. (1993; manuale non consultato). Coincide con le carte dell'implementazione Inquisit (manuale consultato il 2026-10-30): ogni valore di ogni dimensione compare su una sola carta-stimolo |
+| Dimensioni | **Colore** (rosso, verde, giallo, blu) · **Forma** (triangolo, stella, croce, cerchio) · **Numero** (1, 2, 3, 4) | Attribuite a Grant & Berg (1948) e Heaton et al. (1993); testi non consultati, coincidono con Inquisit |
+| Mazzo-risposta | Le **64 combinazioni** 4 × 4 × 4, ciascuna una volta, in **ordine casuale** (con seme); se `deckSize` > 64 il mazzo si ripete in permutazioni successive | Il WCST-64 usa 64 carte (dal titolo del manuale di Kongs et al., 2000). **Differenza:** nel test ufficiale l'ordine delle carte è prestabilito (non verificato: manuali non consultati); qui è casuale, quindi i punteggi non sono strettamente confrontabili con i dati normativi |
+| Dimensione mazzo | **64** (default); la versione completa usa 128 | 128 = due mazzi da 64, come in Inquisit (versione completa attribuita a Heaton et al., 1993); 64 = Kongs et al. (2000) |
+| Ordine dei criteri | **Colore → Forma → Numero**, ciclico | Attribuito a Heaton et al. (1993; non consultato); è anche l'ordine di Inquisit, che non lo attribuisce a una fonte |
+| Corrette consecutive per il cambio | **10** (`runToShift`) | Valore classico della versione standardizzata (Heaton et al., 1993, non consultato direttamente) e predefinito in Inquisit; il criterio usato da Grant & Berg (1948) **non è verificato** sul testo (il commento in `src/config/defaults.ts` che lo attribuisce a loro è quindi da leggere con questa cautela) |
+| Categorie per terminare | **6** (`maxCategories`), oppure esaurimento del mazzo | Attribuito a Heaton et al. (1993; non consultato); anche Inquisit si ferma a 6 categorie (due cicli colore→forma→numero). Con 64 carte e 10 corrette per categoria, sei categorie richiedono almeno 60 risposte corrette: il test finisce di norma per esaurimento del mazzo |
 | Feedback | Binario («Corretto» / «Errato») dopo ogni risposta, **900 ms** | Il feedback binario è del test originale; la durata è una **scelta di progetto**, fissa nel codice (non è un parametro modificabile) |
 
 Il valore predefinito del mazzo è 64 carte: la somministrazione è più breve, ma **non esiste equivalenza dimostrata** con
@@ -227,6 +227,13 @@ errori non perseverativi.
 - **2026-10-30.** Documentato l'allineamento dei metadati per indice originale (correzione del difetto per cui un trial
   interrotto sfalsava i metadati successivi); attenuate l'attribuzione del criterio di 10 corrette a Grant & Berg (1948)
   e la descrizione dello scopo di Howlett & Moseley (2024), allineata al riassunto.
+- **2026-10-30 (manuali e criterio delle 10 corrette).** I manuali PAR (Heaton et al., 1993; Kongs et al., 2000) e il
+  testo di Grant & Berg (1948) restano **non accessibili**: nessun valore è attribuito a essi come verificato. Come
+  riscontro secondario si è consultato il manuale dell'implementazione Inquisit, che si dichiara basata in parte su Grant
+  & Berg (1948) e Heaton et al. (1993): carte-stimolo, cambio dopo 10 corrette, ordine colore→forma→numero, 6 categorie e
+  due mazzi da 64 coincidono con i parametri di Sintropia. Il criterio delle 10 corrette **non** è confermato per lo
+  studio originale di Grant & Berg (le fonti trovate lo descrivono per il WCST standard). Riverificati gli abstract di
+  Nyhus & Barceló (2009), Miles et al. (2021) e Howlett & Moseley (2024) su Europe PMC.
 
 ## Aggiornamento metriche (revisione)
 

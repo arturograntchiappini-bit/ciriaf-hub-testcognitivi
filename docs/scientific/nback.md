@@ -99,7 +99,7 @@ La colonna *Origine* distingue fonti primarie, prassi e **scelte di progetto**.
 | **N. trial** | **360** (≈ 12 min) | **Scelta di progetto**: blocco lungo per osservare la stabilità nel tempo (quartili, §5.5). 360 × 2 s = 720 s. Un blocco così lungo mescola memoria di lavoro e cali di vigilanza: va tenuto presente nell'interpretazione. |
 | **Target rate** | **30%** dei trial idonei (≥ n) | **Scelta di progetto**. Su 360 trial: 107 target (30% di 358 trial idonei) e 253 non-target. Numero **fisso**, per ridurre la varianza tra blocchi. |
 | **Posizione dei target** | Casuale, **mai due target adiacenti** (vincolo rilassato solo se necessario), mai nelle prime n posizioni | **Scelta di progetto**: evita artefatti da sequenze di target consecutivi. |
-| **Lure** | **20%** dei non-target (`lureRate`), a **lag n−1 o n+1** (per il 2-back: lag 1 o 3), scelti a caso fra i lag possibili | Kane et al. (2007) usano come esche gli item che ricorrono **una posizione prima** (lag n−1). L'aggiunta di n+1 e la quota del 20% sono **scelte di progetto**. Gli altri non-target **evitano** ripetizioni a quei lag, così i lure sono esattamente quelli pianificati. |
+| **Lure** | **20%** dei non-target (`lureRate`), a **lag n−1 o n+1** (per il 2-back: lag 1 o 3), scelti a caso fra i lag possibili | L'abstract di Kane et al. (2007) parla di esche «n − 1» (in PubMed il segno è reso come «n = 1»; la lettura n − 1, cioè item che ricorrono una posizione prima, è quella corrente ma **non è verificata sul testo**). L'aggiunta di n+1 e la quota del 20% sono **scelte di progetto**. Gli altri non-target **evitano** ripetizioni a quei lag, così i lure sono esattamente quelli pianificati. |
 | **Pratica** | **20 trial** con feedback | **Scelta di progetto**; esclusi dalle metriche. |
 | **Lettere** | **16 consonanti**: B C D F G H L M N P Q R S T V Z | **Scelta di progetto**: vocali escluse per evitare sillabe e parole pronunciabili; escluse anche J K W X Y per ridurre confusioni visive e fonetiche. |
 | **Tasto** | **Barra spaziatrice** solo sui target | Paradigma di tipo go/no-go: i non-target richiedono di trattenere la risposta. |
@@ -175,6 +175,12 @@ d′   = z(H_ll) − z(F_ll)
 > Hautus, M. J. (1995). *Corrections for extreme proportions and their biasing effects
 > on estimated values of d′.* **Behavior Research Methods, Instruments, & Computers,
 > 27**(1), 46–51. DOI: [10.3758/BF03203619](https://doi.org/10.3758/BF03203619)
+
+Dall'abstract (verificato sulla pagina dell'editore): Hautus confronta con simulazioni Monte Carlo la regola 1/(2N), che
+corregge solo le proporzioni estreme, e la regola log-linear, che aggiunge 0,5 a ogni cella della tabella di contingenza
+qualunque sia il contenuto. La log-linear dà stime di $d'$ **meno distorte**, che però **sottostimano sempre** il $d'$
+della popolazione; la 1/(2N) è più distorta e può sovrastimarlo o sottostimarlo. Applicarla sempre, come fa Sintropia,
+segue la definizione della regola; la lieve sottostima sistematica va tenuta presente confrontando valori assoluti.
 
 *(Complementare — criterio di risposta / bias, opzionale):*
 
@@ -253,3 +259,7 @@ non-target indica una strategia basata sulla familiarità. I lure contano anche 
 - **2026-10-30.** Quartili bilanciati documentati (corretto in `splitIntoChunks` l'ultimo quartile che poteva restare
   vuoto); corretti i conteggi per quartile (circa 27 target e 63 non-target); attenuate le sintesi di Jaeggi et al. (2010)
   («in parte» per affidabilità insufficiente) e di Owen et al. (2005), come nei riassunti.
+- **2026-10-30 (Hautus e Kane).** Letto l'abstract di Hautus (1995) sulla pagina dell'editore: aggiunto che la correzione
+  log-linear è la meno distorta ma sottostima sempre il $d'$ della popolazione. Riletto l'abstract di Kane et al. (2007)
+  su PubMed: l'attribuzione delle esche a lag n−1 è ora marcata come lettura non verificata sul testo (il segno è
+  ambiguo nel record). Riverificati su Europe PMC gli abstract di Jaeggi et al. (2010) e Owen et al. (2005).

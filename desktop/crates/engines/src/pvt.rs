@@ -19,7 +19,7 @@ pub struct Params {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Stimulus {
-    /// ISI che precede questo stimolo (ms).
+    /// Pausa (ISI) dopo questo trial, prima dello stimolo successivo (ms).
     pub isi_ms: i64,
 }
 

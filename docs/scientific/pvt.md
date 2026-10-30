@@ -39,6 +39,11 @@ Raccomandano lapse e velocità di risposta come esiti primari del PVT a 10 minut
 RT** come misure primarie di allerta. Versioni più brevi possono talvolta essere sufficientemente sensibili, ma i lapse
 beneficiano di test più lunghi nella privazione totale di sonno.
 
+Dai **Metodi** dello stesso articolo (testo completo su PubMed Central, PMC3079937, letto il 2026-10-30): l'ISI, definito
+come tempo fra l'ultima risposta e lo stimolo successivo, variava a caso fra **2 e 10 s**; i lapse erano gli RT
+**≥ 500 ms**; le risposte senza stimolo o con RT **< 100 ms** erano contate come false starts; il contatore in
+millisecondi andava in timeout dopo **30 s** senza risposta.
+
 ---
 
 ## 2. Meccanismo cognitivo misurato
@@ -59,11 +64,11 @@ complessa o inibizione, solo rilevare uno stimolo semplice e rispondere.
 | Parametro | Valore | Origine |
 |---|---|---|
 | **Numero di trial** | **100** | Con ISI medio di 6 s dà circa 10 minuti di attesa (+ i tempi di risposta), la durata del PVT standard analizzato da Basner e Dinges (2011) |
-| **ISI** | **2000–10 000 ms**, uniforme | Intervallo tipico del PVT a 10 minuti; non verificato sul testo di Dinges e Powell (1985) |
-| **Tempo massimo di risposta** | **10 000 ms**, poi omissione | **Scelta di progetto**. Le omissioni contano come lapse |
+| **ISI** | **2000–10 000 ms**, uniforme | Come nei Metodi di Basner e Dinges (2011): 2–10 s dall'ultima risposta allo stimolo successivo (in Sintropia l'ISI parte alla fine del trial; si aggiunge il feedback quando è attivo). La distribuzione uniforme non è specificata nella frase letta. Non verificato sul testo di Dinges e Powell (1985) |
+| **Tempo massimo di risposta** | **10 000 ms**, poi omissione | **Scelta di progetto**: Basner e Dinges (2011) usavano un timeout di 30 s. Le omissioni contano come lapse |
 | **Pratica** | **5 trial** con feedback | **Scelta di progetto**; esclusi dalle metriche |
-| **Soglia di lapse** | **RT ≥ 500 ms** | Soglia convenzionale del PVT a 10 minuti (il manuale del PVT di Inquisit, consultato il 2026-10-30, classifica come lapse le risposte **> 500 ms**: il confine esatto differisce di 1 ms da quello di Sintropia; il riassunto di Basner & Dinges, 2011, parla di lapse senza indicare la soglia, e il testo completo non è stato riletto). Il PVT breve di 3 minuti usa una soglia più bassa, non verificata qui |
-| **Soglia di anticipazione** | **RT < 150 ms** | Soglia comune a tutta la piattaforma ([validazione RT](validazione-rt.md)); altre fonti usano 100 ms per le *false starts* |
+| **Soglia di lapse** | **RT ≥ 500 ms** | **Verificato** sui Metodi di Basner e Dinges (2011): lapse = RT ≥ 500 ms, lo stesso confine di Sintropia. Il PVT breve di 3 minuti usa una soglia più bassa, non verificata qui |
+| **Soglia di anticipazione** | **RT < 150 ms** | Soglia comune a tutta la piattaforma ([validazione RT](validazione-rt.md)), **scelta di progetto**: Basner e Dinges (2011) contano come false starts gli RT < 100 ms, quindi le risposte fra 100 e 149 ms sono valide là e anticipazioni qui |
 
 Nota: l'ISI massimo di 10 s è anche il tempo massimo di risposta, quindi un trial con stimolo visibile per 10 s senza
 risposta è un lapse molto lungo, non un errore tecnico.
@@ -175,3 +180,7 @@ Limiti da considerare:
   del trial precedente.
 - **2026-10-30.** Attenuata l'attribuzione della soglia di 500 ms (non presente nel riassunto di Basner e Dinges) e
   rimossa la soglia di 355 ms del PVT breve, priva di fonte verificata.
+- **2026-10-30 (testo completo di Basner e Dinges, 2011).** Letti i Metodi su PubMed Central: verificati l'ISI di 2–10 s
+  (dall'ultima risposta), la soglia di lapse ≥ 500 ms (ora attribuita alla fonte, non più al manuale Inquisit), le false
+  starts < 100 ms e il timeout di 30 s. Dichiarate come scelte di progetto le due differenze: timeout di 10 s e soglia di
+  anticipazione di 150 ms.

@@ -7,8 +7,10 @@
 > originale (inglese); il testo esplicativo è in italiano.
 
 > **Cautela sulle fonti.** I riferimenti (autori, titolo, rivista, anno, volume, pagine) sono stati verificati su
-> Crossref il 2026-10-23. Le **citazioni testuali** di Whelan (2008) e il loro numero di pagina sono riportate dal
-> documento originale di lavoro e **non sono state riverificate** nel testo dell'articolo.
+> Crossref il 2026-10-23. Di Whelan (2008) è stato letto **solo l'abstract** (pagina dell'editore): il testo completo non
+> è accessibile. Per questo le affermazioni attribuite a Whelan oltre l'abstract sono **parafrasi non verificate sul
+> testo**, senza virgolette né numeri di pagina. Di Ratcliff (1993) e Ulrich & Miller (1994) sono stati letti gli
+> abstract (Europe PMC).
 
 ---
 
@@ -20,19 +22,16 @@ valori estremi (outlier) ed è eterogenea in varianza; applicare test di ipotesi
 (es. ANOVA) su dati con queste caratteristiche riduce la potenza statistica e
 può portare a non rilevare un effetto reale.
 
-> *"using hypothesis tests on data that are skewed, contain outliers, are
-> heteroscedastic, or have a combination of these characteristics (raw RT data
-> typically have at least the first two) reduces the power of these tests and
-> can result in a failure to detect a real difference between conditions"*
-> — Whelan (2008), *Effective Analysis of Reaction Time Data*, p. 477.
+Dall'abstract di Whelan (2008), verificato: le analisi più comuni (per esempio l'analisi della varianza sulla media
+campionaria) sono di solito inadatte ai dati di RT perché hanno **poca potenza** nel rilevare differenze reali fra
+condizioni, e alcuni approcci possono produrre risultati che sono artefatti del metodo; analizzare l'intera
+distribuzione degli RT è più efficace. Il legame con asimmetria, outlier ed eteroschedasticità è, secondo Whelan
+(parafrasi non verificata sul testo), il motivo di questa perdita di potenza.
 
 Il punto cruciale è che **non tutti gli RT osservati riflettono il processo
-cognitivo di interesse**. Alcuni sono troppo veloci per essere guidati dallo
-stimolo (risposte anticipatorie / *fast guesses*), altri sono anomali perché il
-soggetto era disattento o distratto:
-
-> *"Typically, some observed RTs are not a result of the process of interest."*
-> — Whelan (2008), p. 476.
+cognitivo di interesse** (lo afferma anche Whelan, 2008; parafrasi non verificata sul testo). Alcuni sono troppo veloci
+per essere guidati dallo stimolo (risposte anticipatorie / *fast guesses*), altri sono anomali perché il
+soggetto era disattento o distratto.
 
 Di conseguenza, prima di calcolare qualunque indicatore (media, mediana,
 deviazione standard, tassi di errore) è necessaria una fase di **validazione e
@@ -62,12 +61,10 @@ trasduzione sensoriale → trasmissione neurale → elaborazione centrale
 Questa catena ha un **limite inferiore fisiologico**: nessuna risposta *guidata
 dallo stimolo* può completarsi al di sotto di ~100 ms.
 
-> *"Luce (1986) demonstrated that genuine RTs have a minimum value of at least
-> 100 ms: time needed for physiological processes such as stimulus perception
-> and for motor responses. Reaction times below this value could be the result
-> of fast guesses, for example. It is easy to identify these very fast RTs, and
-> they are normally eliminated by using a cutoff of between 100 ms and 200 ms."*
-> — Whelan (2008), p. 476 (che cita Luce, 1986).
+Secondo Whelan (2008), che cita Luce (1986), gli RT genuini hanno un valore minimo di almeno 100 ms, il tempo dei
+processi fisiologici di percezione dello stimolo e di risposta motoria; tempi più brevi possono essere, per esempio,
+tiri a indovinare, e di norma si eliminano con un cutoff fra 100 e 200 ms. (Parafrasi da una citazione riportata nel
+documento di lavoro originale, **non verificata sul testo** di Whelan né su Luce, 1986.)
 
 Il punto concettuale è netto: **una risposta più rapida di questa soglia non è
 cognitivamente guidata**. Non c'è stato tempo materiale perché lo stimolo venga
@@ -79,8 +76,9 @@ appartengono al processo misurato.
 
 ### Perché 150 ms
 
-La letteratura non fissa una soglia unica ma un **intervallo di consenso tra 100
-e 200 ms** (Whelan, 2008; Luce, 1986). Il valore di **150 ms** adottato dalla
+La letteratura non fissa una soglia unica: Whelan (2008, che cita Luce, 1986; non verificato sul testo) indica un
+**intervallo tra 100 e 200 ms**, e per esempio il PVT di Basner e Dinges (2011, verificato) conta come false starts le
+risposte sotto 100 ms. Il valore di **150 ms** adottato dalla
 piattaforma si colloca al centro di questa finestra (è una **scelta di
 progetto**, non un valore prescritto da una fonte):
 
@@ -91,7 +89,7 @@ progetto**, non un valore prescritto da una fonte):
 
 In sintesi: `RT < 150 ms` non identifica una risposta "molto brava", bensì una
 risposta che **con ogni probabilità non è guidata dallo stimolo** (sotto ~100 ms
-non lo è, secondo Luce, 1986, come riportato da Whelan, 2008; tra 100 e 150 ms la
+non lo è, secondo Luce, 1986, come riportato da Whelan, 2008, non verificato sul testo; tra 100 e 150 ms la
 soglia è una scelta prudenziale), e viene
 quindi trattata come errore di anticipazione.
 
@@ -196,10 +194,8 @@ stima della varianza **non distorta** (unbiased). Con `n < 2` trial validi la SD
 non è definita. **Limite attuale:** il motore restituisce `0` in quel caso, e i riepiloghi mostrano 0: va letto come
 «non calcolabile», non come variabilità nulla. Nei dati grezzi il numero di trial validi è sempre ricostruibile.
 
-> La deviazione standard è il classico "dispersion parameter" riportato accanto
-> alla tendenza centrale: *"report a central tendency parameter (e.g., the mean)
-> and a dispersion parameter (e.g., the standard deviation)"* — Whelan (2008),
-> p. 477.
+La deviazione standard è il parametro di dispersione abituale da riportare accanto alla tendenza centrale (la
+raccomandazione è attribuita a Whelan, 2008, nel documento di lavoro originale: **non verificata sul testo**).
 
 **Riferimenti:** Whelan (2008), DOI: [10.1007/BF03395630](https://doi.org/10.1007/BF03395630);
 Kofler, M. J., et al. (2013). *Reaction time variability in ADHD: A meta-analytic
@@ -230,15 +226,14 @@ Marcare-anziché-eliminare non è una preferenza stilistica, ma una **necessità
 metodologica**:
 
 1. **La soglia è una scelta, non una legge di natura.** La letteratura mostra che
-   *il risultato dipende dal cutoff scelto*: cutoff diversi possono aumentare o
-   ridurre la potenza, e possono introdurre bias asimmetrici nelle statistiche.
-   > *"no reliable rule can be used to establish absolute cutoffs because they
-   > are highly dependent on the particular data that were observed"*
-   > — Whelan (2008), p. 477.
-   > *"cutoffs can introduce asymmetric biases into statistics such as the sample
-   > mean, median, and standard deviation and warn against using cutoffs without
-   > allowing for these effects"*
-   > — Whelan (2008), p. 477 (su Ulrich & Miller, 1994).
+   *il risultato dipende dal cutoff scelto*. Ratcliff (1993, abstract) confronta la potenza dei metodi per limitare
+   gli outlier nell'ANOVA, fra cui trasformazioni e cutoff, e mostra che misure basate sui momenti risentono di outlier
+   e cutoff molto più delle misure robuste. Ulrich e Miller (1994, abstract) mostrano che il troncamento (escludere
+   gli RT fuori da un intervallo prefissato) può **distorcere** media, mediana, deviazione standard e asimmetria, con
+   bias anche maggiori di alcuni effetti sperimentali studiati spesso, e alterare relazioni lineari, pattern additivi e
+   funzioni di rischio, pur avendo **poco effetto sulla potenza statistica**; propongono procedure per controllare
+   questi bias. Secondo Whelan (2008; parafrasi non verificata sul testo) non esiste una regola affidabile per fissare
+   cutoff assoluti, perché dipendono dai dati osservati.
 
    Se i trial esclusi venissero distrutti, sarebbe **impossibile ricalcolare** i
    risultati con una soglia diversa o eseguire **analisi di sensibilità**. Con i
@@ -309,7 +304,11 @@ misurabili; valori assoluti brevi **non** sono confrontabili con laboratori a ha
   DOI: [10.1016/j.cpr.2013.06.001](https://doi.org/10.1016/j.cpr.2013.06.001)
 - **Luce, R. D. (1986).** *Response Times: Their Role in Inferring Elementary
   Mental Organization.* New York: Oxford University Press. (Fonte primaria del
-  limite fisiologico di ~100 ms; monografia, senza DOI.)
+  limite fisiologico di ~100 ms secondo Whelan, 2008; monografia, senza DOI, non consultata.)
+- **Basner, M., & Dinges, D. F. (2011).** Maximizing sensitivity of the psychomotor
+  vigilance test (PVT) to sleep loss. *Sleep*, 34(5), 581–591.
+  DOI: [10.1093/sleep/34.5.581](https://doi.org/10.1093/sleep/34.5.581) (citato in §2 per la soglia delle false starts;
+  vedi [pvt.md](pvt.md))
 
 ## Cronologia delle revisioni
 
@@ -321,3 +320,9 @@ misurabili; valori assoluti brevi **non** sono confrontabili con laboratori a ha
   (rimossi «Monte Carlo», «errore di Tipo I» e l'«indicatore classico» SDRT, non verificabili); la soglia di 150 ms è
   dichiarata come scelta di progetto; risolta la contraddizione sull'RT delle omissioni (`null`); documentati
   l'arrotondamento al millisecondo e la neutralizzazione delle formule nel CSV.
+- **2026-10-30 (fonti di Whelan, Ratcliff, Ulrich e Miller).** Il testo completo di Whelan (2008) non è accessibile: letto
+  l'abstract sulla pagina dell'editore, le quattro citazioni testuali con pagina sono state trasformate in **parafrasi
+  marcate come non verificate**. Corretta un'affermazione in contrasto con la fonte: secondo l'abstract di Ulrich e
+  Miller (1994) il troncamento distorce media, mediana, SD e asimmetria ma ha **poco effetto sulla potenza**; il confronto
+  di potenza fra cutoff e trasformazioni è ora attribuito a Ratcliff (1993). Aggiunta, come esempio verificato di soglia,
+  quella delle false starts del PVT (< 100 ms, Basner e Dinges, 2011).

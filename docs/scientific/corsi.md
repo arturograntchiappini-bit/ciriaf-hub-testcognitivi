@@ -7,7 +7,7 @@
 
 ## 1. Paradigma e citazione primaria
 
-Il **Corsi Block-Tapping Task** è la prova di riferimento per la misura dello *span* di memoria a breve termine **visuo-spaziale**. L'apparato consiste in **9 cubetti identici** (3 cm di lato nella versione di Kessels, secondo PEBL; le dimensioni dell'apparato variano fra gli studi, Berch et al., 1998) fissati in disposizione **irregolare e asimmetrica** su una tavoletta. L'esaminatore tocca una sequenza di blocchi al ritmo di circa un blocco al secondo e il partecipante deve riprodurre la stessa sequenza; la lunghezza della sequenza cresce progressivamente fino al fallimento.
+Il **Corsi Block-Tapping Task** è la prova di riferimento per la misura dello *span* di memoria a breve termine **visuo-spaziale**. L'apparato consiste in **9 cubetti identici** (30 mm di lato nella versione di Kessels, secondo i commenti del sorgente PEBL; l'abstract di Berch et al., 1998, verificato, segnala una notevole incoerenza fra gli studi nella somministrazione, nel punteggio e nelle proprietà fisiche dell'apparato) fissati in disposizione **irregolare e asimmetrica** su una tavoletta. L'esaminatore tocca una sequenza di blocchi al ritmo di circa un blocco al secondo e il partecipante deve riprodurre la stessa sequenza; la lunghezza della sequenza cresce progressivamente fino al fallimento.
 
 Citazione primaria (tesi originale):
 
@@ -21,7 +21,7 @@ Rassegna metodologica di riferimento (parametri, varianti, criticità di standar
 
 > Berch, D. B., Krikorian, R., & Huha, E. M. (1998). "The Corsi block-tapping task: Methodological and theoretical considerations." *Brain and Cognition, 38*(3), 317–338. DOI: 10.1006/brcg.1998.1039
 
-**Nota metodologica importante.** Come documentato dalla letteratura di rassegna (Berch et al., 1998; rassegne successive sulla digitalizzazione del test), **nessuno degli autori originari — Corsi compreso — ha pubblicato le distanze inter-blocco in forma numerica esatta** (Berch et al., 1998, documentano in generale l'eterogeneità dell'apparato; l'affermazione puntuale non è stata riverificata sul testo); secondo l'intestazione di PEBL, Kessels et al. (2000) hanno fornito lo schema della tavoletta con le coordinate dei blocchi (in mm, con cubetti da 30 mm). L'articolo di Kessels non è stato consultato direttamente. Le coordinate numeriche adottate in questo documento (§3bis) sono la trascrizione di quella configurazione standard, così come digitalizzata e resa riproducibile nelle implementazioni open-source più diffuse (PEBL, che dichiara esplicitamente di seguire le raccomandazioni di Kessels et al., 2000).
+**Nota metodologica importante.** Si legge spesso che **nessuno degli autori originari — Corsi compreso — ha pubblicato le distanze inter-blocco in forma numerica esatta**: l'affermazione puntuale **non è verificata** (Berch et al., 1998, documentano nell'abstract solo l'eterogeneità generale dell'apparato; la tesi di Corsi, 1972, non è stata consultata). Secondo i commenti del sorgente PEBL (`battery/corsi/corsi.pbl`, commit `aaf55c9` del 2026-04-01, letto il 2026-10-30: «Points reported in: Kessels, R. P. C., van Zandvoort, M. J. E., …»), Kessels et al. (2000) hanno pubblicato le coordinate dei blocchi (in mm, con cubetti da 30 mm). L'articolo di Kessels non è stato consultato direttamente: del lavoro è verificato solo l'abstract (Europe PMC: procedura standardizzata, 70 controlli e 70 pazienti con lesioni cerebrali, percentili e cut-off). Le coordinate numeriche adottate in questo documento (§3bis) sono la trascrizione di quella configurazione standard, così come digitalizzata e resa riproducibile nelle implementazioni open-source più diffuse (PEBL, che dichiara esplicitamente di seguire le raccomandazioni di Kessels et al., 2000).
 
 ---
 
@@ -45,15 +45,15 @@ Rispetto allo span verbale (Digit Span), il CBT è impiegato come misura di memo
 | Parametro | Valore adottato | Fonte / razionale |
 |---|---|---|
 | Coordinate dei 9 blocchi | Configurazione asimmetrica fissa di Kessels — vedi tabella §3bis | Kessels et al. (2000); trascrizione numerica da PEBL (`CorsiPoints`, mm, cubetti 30 mm), che dichiara di seguire Kessels |
-| Numero di blocchi | 9 | Corsi (1972); Kessels et al. (2000) |
-| Lunghezza iniziale della sequenza | **3** (valore di piattaforma) | Default di piattaforma. La versione classica Kessels/PEBL parte da 2 (`startlength = 2`); si adotta 3 per evitare l'effetto pavimento negli adulti sani |
-| Lunghezza massima | 9 | Kessels et al. (2000); corrisponde al numero di blocchi (in PEBL `endlength` non è tra i parametri di default della versione a sequenze fisse) |
-| Ritmo di presentazione (`presentMsPerBlock`) | **1000 ms** onset-to-onset | Ritmo classico ≈ 1 blocco/secondo; PEBL usa 1000 ms (`isi`, valore non riverificato sul sorgente) |
+| Numero di blocchi | 9 | Numero classico; i 9 punti di PEBL sono attribuiti a Kessels et al. (2000). Tesi di Corsi (1972) e articolo di Kessels non consultati |
+| Lunghezza iniziale della sequenza | **3** (valore di piattaforma) | **Scelta di progetto**. PEBL parte da 2 (`startlength = 2`; il commento del sorgente lo presenta come raccomandazione di Kessels); si adotta 3 per evitare l'effetto pavimento negli adulti sani |
+| Lunghezza massima | 9 | Corrisponde al numero di blocchi. In PEBL le sequenze fisse «di Kessels» arrivano a 9 (il commento del sorgente avverte che la sequenza di lunghezza 9 all'indietro non è stata fornita da Kessels); il parametro `endlength = 9` vale solo per le sequenze casuali (`useKessels = 0`) |
+| Ritmo di presentazione (`presentMsPerBlock`) | **1000 ms** onset-to-onset | Ritmo ≈ 1 blocco/secondo. **Verificato su PEBL** (sorgente e schema dei parametri, commit `aaf55c9`): `isi = 1000` ms e `iti = 1000` ms. In PEBL però il blocco evidenziato resta acceso per tutto l'`isi` e poi salta al successivo: il ritmo onset-onset coincide, la durata di accensione no (1000 ms contro 700 ms) |
 | Durata illuminazione per blocco | **700 ms** (70% di `presentMsPerBlock`), poi 300 ms spento | **Scelta di progetto** del codice (`CorsiView`): la fase di risposta inizia `n · 1000 + 200` ms dopo l'avvio della sequenza, cioè 1200 ms dopo l'accensione dell'ultimo blocco (500 ms dopo il suo spegnimento) |
-| N. trial per livello | **2** | Kessels et al. (2000); PEBL (`timesperlength = 2`) |
-| Regola di arresto | Interruzione quando **entrambi** i trial di uno stesso livello sono falliti | Kessels et al. (2000), come riportato dai manuali Inquisit (il test si ferma quando non si riescono due sequenze di pari lunghezza); si avanza se **almeno un** trial del livello è corretto |
-| Punteggio ponderato | **`startLength − 1` + 0,5 per ogni trial superato** (0 se nessuno) | Scelta di progetto: con 2 trial per livello, superarli entrambi porta il punteggio esattamente alla lunghezza del livello (§5.1) |
-| Punteggio classico (riferimento) | Corsi span = lunghezza massima riprodotta; **Total score = span × n. sequenze corrette** | Kessels et al. (2000), come riportato dai manuali Inquisit: prodotto span × sequenze corrette |
+| N. trial per livello | **2** | PEBL (`timesperlength = 2`); secondo il commento del sorgente PEBL è la raccomandazione di Kessels et al. (2000), non verificata sull'articolo |
+| Regola di arresto | Interruzione quando **entrambi** i trial di uno stesso livello sono falliti | Come in PEBL (il sorgente interrompe se una lunghezza si chiude senza risposte corrette) e nei manuali Inquisit (il test termina quando si falliscono due sequenze di pari lunghezza), che la attribuiscono a Kessels et al. (2000); non verificata sull'articolo. Si avanza se **almeno un** trial del livello è corretto |
+| Punteggio ponderato | **`startLength − 1` + 0,5 per ogni trial superato** (0 se nessuno) | Scelta di progetto: con 2 trial per livello, superarli entrambi porta il punteggio esattamente alla lunghezza del livello (§5.1). Con `startLength = 2` coincide con lo span che PEBL mostra a fine prova, `(startlength + corrette) / timesperlength` (verificato sul sorgente); con `startLength = 3` i due valori differiscono di 0,5 |
+| Punteggio classico (riferimento) | Corsi span = lunghezza massima riprodotta; **Total score = span × n. sequenze corrette** | Come nei manuali Inquisit (`blockspan × ncorrecttotal`), che lo attribuiscono a Kessels et al. (2000) e ne riportano le norme (Kessels et al., 2000, tabella 2); non verificato sull'articolo. Inquisit definisce lo span come lunghezza dell'**ultima** sequenza riprodotta correttamente, Sintropia come la **massima**: di norma coincidono |
 | Indice di complessità del percorso | Distanza euclidea totale **L(S)** + numero di incroci geometrici **X(S)** | Le due variabili sono quelle studiate da Orsini et al. (2004); la loro combinazione in un indice per il bilanciamento è una scelta di progetto (§5) |
 | Bilanciamento intra-livello | **L(S)** entro `complexityTolerance` dal bersaglio del livello e stesso **X(S)** tra i trial dello stesso livello (§4, ultima sezione) | Controllo della difficoltà geometrica a parità di lunghezza |
 
@@ -76,7 +76,7 @@ Le coordinate seguenti riproducono la **configurazione asimmetrica standard** di
 | 9 | 64.0 | 23.2 | 135 | 30 |
 
 **Note sulla fonte e sull'asimmetria.**
-- **Fonte.** Configurazione standard di **Kessels et al. (2000)**; valori numerici nativi presi dalla trascrizione open-source PEBL (`CorsiPoints`, controllata sul sorgente `battery/corsi/corsi.pbl` il 2026-10-23: i nove punti coincidono con la tabella), la cui intestazione cita Kessels et al. (2000) per standardizzazione e coordinate. L'estensione dei punti di riferimento è x∈[15,195] mm, y∈[20,155] mm (≈180×135 mm tra i blocchi estremi; ≈210×165 mm includendo l'ingombro dei cubetti), coerente con le board fisiche classiche da ~20–28 cm.
+- **Fonte.** Configurazione standard di **Kessels et al. (2000)**; valori numerici nativi presi dalla trascrizione open-source PEBL (`CorsiPoints`, controllata sul sorgente `battery/corsi/corsi.pbl` il 2026-10-23 e di nuovo il 2026-10-30 sul commit `aaf55c9` del repository GitHub di PEBL: i nove punti coincidono con la tabella), la cui intestazione cita Kessels et al. (2000) per standardizzazione e coordinate. Che le coordinate PEBL siano identiche a quelle stampate nell'articolo di Kessels **non è verificato** (articolo non consultato). L'estensione dei punti di riferimento è x∈[15,195] mm, y∈[20,155] mm (≈180×135 mm tra i blocchi estremi; ≈210×165 mm includendo l'ingombro dei cubetti), coerente con le board fisiche classiche da ~20–28 cm.
 - **Asimmetria.** I 9 blocchi sono volutamente **sparsi e non allineati** (nessuna riga/colonna regolare, distanze inter-blocco disuguali) per impedire strategie basate su pattern geometrici prevedibili. La normalizzazione applica lo **stesso** coefficiente ai due assi, quindi non introduce distorsioni: la geometria relativa (angoli, rapporti tra distanze) è identica all'originale.
 - **Orientamento dell'asse y.** Le coordinate normalizzate sono espresse in convenzione **cartesiana** (origine in basso a sinistra, y crescente verso l'alto). Le implementazioni con origine schermo in alto a sinistra (y verso il basso, come PEBL) devono applicare `y' = 100 − y`: la configurazione resta identica a meno di una riflessione verticale.
 
@@ -179,6 +179,16 @@ In questo modo la variazione di prestazione tra trial dello stesso livello è at
 - **2026-10-30.** Corretta la temporizzazione: il blocco resta acceso 700 ms (70% di `presentMsPerBlock`) con
   ritmo onset-onset di 1000 ms, non 1000 ms di accensione più 1000 ms di intervallo. Le affermazioni sull'apparato e
   sulle coordinate di Kessels et al. (2000) sono attribuite a PEBL, perché l'articolo non è stato consultato.
+- **2026-10-30 (verifica su PEBL, Inquisit e riproduzione delle cifre).** Letto il sorgente PEBL (`battery/corsi/corsi.pbl`
+  e `params/corsi.pbl.schema.json`, commit `aaf55c9`): verificati `isi = 1000`, `iti = 1000`, `startlength = 2`,
+  `timesperlength = 2`, cubetti da 30 mm, le nove coordinate e la regola di arresto; corretta la frase su `endlength`
+  (esiste, ma vale solo per le sequenze casuali); notato che in PEBL il blocco resta acceso per tutto l'`isi`. Regola di
+  arresto e total score confermati sui manuali Inquisit (fonte secondaria). Rieseguita con Node la generazione su 200
+  semi (1–200) per la versione attuale e per quella a finestra mobile (commit `5a59816`), senza modificare il codice: le
+  cifre del «Dopo» e il livello 5 del «Prima» sono riprodotte; corretta l'ampiezza massima del «Prima» (0,4, non 0,3) e
+  precisato che 17,0–28,5 e 94–134 valgono per le lunghezze 4–9. Sostituito il «requisito di sequenze indipendenti»
+  attribuito a Kessels e PEBL (non verificato) con il controllo sulle sequenze fisse di PEBL. Restano non verificati sul
+  testo: la tesi di Corsi (1972) e l'articolo di Kessels et al. (2000), di cui è letto solo l'abstract.
 
 ## Aggiornamento metriche e generazione (revisione)
 
@@ -201,9 +211,11 @@ In questo modo la variazione di prestazione tra trial dello stesso livello è at
 Il bilanciamento descritto sopra garantisce l'equivalenza **fra i due trial dello
 stesso livello**, ma non fra somministrazioni diverse: la finestra mobile vincola
 l'ampiezza *interna* alla coppia, non la sua *posizione assoluta*. Misurato su 200
-seed, la difficoltà media del livello 5 variava fra 121,7 e 255,3 unità di
-percorso (sd 28,5): due partecipanti potevano ricevere livelli nominalmente
-uguali ma di difficoltà geometrica doppia l'uno rispetto all'altro.
+seed (semi 1–200, `mulberry32`; difficoltà del livello = media dei `L(S)` dei due trial), la difficoltà media del
+livello 5 variava fra 121,7 e 255,3 unità di percorso (sd 28,5): due partecipanti potevano ricevere livelli
+nominalmente uguali ma di difficoltà geometrica doppia l'uno rispetto all'altro. (Cifre riprodotte il 2026-10-30
+rieseguendo `generateBalancedSequences` della versione a finestra mobile, commit `5a59816`, con lo script descritto nella
+cronologia.)
 
 ### Bersaglio di difficoltà del livello
 
@@ -237,19 +249,26 @@ Una sequenza e il suo **rovescio** hanno L(S) e X(S) identici per costruzione:
 qualunque criterio di massima somiglianza li seleziona sistematicamente. Nella
 versione precedente, a lunghezza 3 la coppia di trial era un rovescio esatto in
 194 run su 200. Formalmente equivalenti, ma il secondo trial ripercorre la stessa
-traiettoria all'indietro sugli stessi blocchi, contro il requisito di sequenze
-indipendenti della somministrazione standard (Kessels et al., 2000; PEBL). I
+traiettoria all'indietro sugli stessi blocchi, quindi non è una prova indipendente. Nelle sequenze fisse di PEBL
+(`KesselsTrials`, che il sorgente attribuisce a Kessels et al., 2000) nessuna coppia di pari lunghezza è il rovescio
+dell'altra (controllato sul sorgente); un «requisito» esplicito di indipendenza nell'articolo non è stato verificato. I
 candidati sono ora deduplicati per traiettoria, non per ordine.
 
 ### Effetto misurato (200 seed, tolleranza 8)
 
+Semi 1–200 (`mulberry32`), lunghezze 3–9; «Prima» = versione a finestra mobile (commit `5a59816`), «Dopo» = codice
+attuale. Intervalli = minimo e massimo fra le lunghezze.
+
 | Indicatore | Prima | Dopo |
 |---|---|---|
-| sd della difficoltà del livello fra le run | 17,0 – 28,5 | **4,4 – 4,8** |
-| escursione min→max fra le run | 94 – 134 | **15,1 – 15,9** |
-| ampiezza dentro il livello (max) | 0,0 – 0,3 | 0,9 – 5,4 (≤ tolleranza) |
+| sd della difficoltà del livello fra le run | 17,0 – 28,5 (lunghezze 4–9; 3,4 a lunghezza 3) | **4,4 – 4,8** |
+| escursione min→max fra le run | 94 – 134 (lunghezze 4–9; 21,6 a lunghezza 3) | **15,1 – 15,9** |
+| ampiezza dentro il livello (max) | 0,0 – 0,4 | 0,9 – 5,4 (≤ tolleranza) |
 | coppie che sono un rovescio esatto | fino a 194/200 | **0/200** |
 | sequenze distinte su 400 (lunghezza 3) | 42 | **107** |
+
+A lunghezza 3 la vecchia versione aveva poca variabilità fra le run proprio perché sceglieva quasi sempre una sequenza e
+il suo rovescio (solo 42 sequenze distinte). Il valore 107 dipende dall'insieme di semi: con i semi 0–199 si ottiene 106.
 
 Il parametro `complexityTolerance` cambia quindi significato: da *ampiezza
 ammessa fra i due trial* a **scostamento massimo dal bersaglio del livello**,
