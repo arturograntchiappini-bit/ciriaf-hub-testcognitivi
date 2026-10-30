@@ -425,7 +425,7 @@ ulteriore calo è atteso ma **non misurato**.
 
 1. ~~Rimpiazzare i motori TS con il WASM nella web app~~ — fatto (2026-10-30, §8): una chiamata per generazione e una per punteggio, non una per tasto; il TS non si ritira, resta oracolo e ripiego.
 2. **Firma dell'installer.** L'eseguibile e l'MSI Windows non sono firmati (SmartScreen mostra un avviso): serve un certificato di firma del codice.
-3. Misurare la latenza dei tasti su hardware e applicare `wasm-opt`. Il WASM è già stato istanziato in Chrome sulla build di produzione (con la CSP del sito) e provato sulle fixture golden in Node; non è stato misurato il costo per chiamata nel browser né provato in Firefox e Safari.
+3. Misurare la latenza dei tasti su hardware e applicare `wasm-opt`. Il costo per chiamata e la parità sono stati misurati in Chrome, Firefox e WebKit (§8.1); restano da provare Safari su macOS/iOS e i browser mobili, e il costo su hardware lento.
 
 ---
 
@@ -474,13 +474,34 @@ caricato a interfaccia già disegnata; la CSP del sito ammette `'wasm-unsafe-eva
 - **Ripiego.** Se il modulo non si carica, o rifiuta una richiesta, vale il TS. Provato in Chrome: con la CSP completa il backend è `wasm`; senza `'wasm-unsafe-eval'` il backend è `ts` e il test parte.
 - **Provenienza.** Gli export web non riportano `engineVersion` (invariati: i risultati sono identici con i due backend); il backend attivo è esposto in `document.documentElement.dataset.engine`.
 
+### 8.1 Verifica in browser (2026-10-30)
+
+Misure e prove eseguite su build di produzione servita con le intestazioni del sito (CSP completa), con Chrome 156, Firefox 157 e WebKit 27.2 (il motore di Safari, in versione Playwright; non Safari su macOS/iOS).
+
+- **Sessioni complete a confronto.** Per ognuno dei 12 test (Stroop 1 e 2, Go/No-Go, Flanker, SART, Visual Search, PVT, N-Back, Mental Rotation, Corsi, WCST, Trail Making) un partecipante simulato, con orologio del browser finto e `Math.random` fisso, ha svolto l'intera somministrazione due volte: con il WASM e con il TS (modulo bloccato). Risultato in tutti e tre i browser: tabella delle metriche e sei file di export (CSV, JSON, CSV internazionale, riepilogo, eventi TSV, report HTML) **identici byte per byte** fra i due backend, nessun errore in console. Le sessioni sono brevi (16 trial, mazzo WCST da 32 carte, 8 cerchi) e il partecipante risponde in modo deterministico, non realistico: provano l'identità dei dati, non la qualità delle risposte. Gli export non sono identici *fra* browser dove contano i tempi di tasto (le temporizzazioni degli eventi differiscono), ma lo sono fra backend dentro lo stesso browser.
+- **Estetica.** 42 schermate (home in cima e in fondo, quattro sezioni, istruzioni e due istanti di ciascun test a tempo fisso) catturate a 1440×900 con movimento ridotto: **pixel-identiche** fra la versione precedente al WASM, la nuova con WASM e la nuova con TS.
+- **Latenza per chiamata** (media su 40–200 ripetizioni, build di sviluppo; Firefox e WebKit riducono la risoluzione dei timer, per cui le celle sotto 10 µs sono rumore). Con i parametri di default il WASM è **più lento del TS per quasi tutte le operazioni piccole** (il confine JSON costa da 0,05 a 0,4 ms) e più veloce per le pesanti:
+
+| Operazione (Chrome) | TS | WASM |
+|---|---|---|
+| generazione Stroop 48 trial | 0,013 ms | 0,10 ms |
+| generazione Visual Search 96 trial | 0,53 ms | 1,45 ms |
+| generazione N-Back 360 trial | 0,18 ms | 0,31 ms |
+| punteggio SART 243 trial | 0,02 ms | 0,27 ms |
+| punteggio PVT 300 trial | 0,16 ms | 0,38 ms |
+| generazione Mental Rotation 84 trial | 4,8 ms | 0,98 ms |
+| generazione Corsi, livelli 2–9 | 13,9 ms | 3,0 ms |
+
+  La più lenta in assoluto è la generazione di Visual Search (1,0–1,5 ms nei tre browser). Tutte le chiamate avvengono all'avvio del test o fra un livello e l'altro, mai durante un tasto. In Firefox e WebKit i rapporti sono simili. Il vantaggio del WASM non è la velocità: è avere un solo motore.
+- **Simulazione della CI** su clone pulito del commit (nuovo percorso, Windows): `npm ci`, tipi, 1148 test web, build e `npm audit`; ricompilazione del WASM, che risulta **identica byte per byte** al modulo committato, e 749 test di parità; rigenerazione delle fixture golden senza differenze; fmt, clippy `-D warnings`, 396 test Rust e controllo wasm32. Non è la CI di GitHub: manca Linux e Node 22 (si è usato Node 24).
+
 ---
 
 ## Cronologia delle revisioni
 
 - **2026-10.** Prima versione. Numeri letti da `desktop/fixtures/evidence/` e `BENCHMARK.md`; rigenerati fixture, fuzz, esito dei test, ripartizione del
   Go/No-Go per `goRatio` e controllo di sensibilità. Nessuna fonte bibliografica esterna citata.
-- **2026-10-30, web app sul WASM.** Aggiunto il §6 e aggiornati §1 e «Lavoro futuro»: il motore Rust è usato dalla web app, con il TS come ripiego e oracolo.
+- **2026-10-30, web app sul WASM.** Aggiunto il §8 (con la verifica in browser del §8.1) e aggiornati §1 e «Lavoro futuro»: il motore Rust è usato dalla web app, con il TS come ripiego e oracolo.
 - **Revisione 2026-10-30.** Compilata la tabella dei risultati del §5 (era rimasto un segnaposto) da `BENCHMARK.md`; aggiornati
   i valori del confine JSON del §5.3; precisato che il limite dei 30 ms vale per il Rust; chiarite le divergenze registrate nel fuzz;
   limitata la spiegazione «1-2 ulp» alle due deviazioni analizzate; aggiunto il §4.8 (CSV).
