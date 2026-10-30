@@ -22,6 +22,17 @@ Per studiare come l'ambiente fisico influisce sulla mente. Nessun account, nessu
 
 ---
 
+> [!WARNING]
+> **Progetto in sviluppo e sperimentale.** Sintropia è ancora in fase di sviluppo: molte parti devono ancora essere
+> testate (in particolare su Safari/iOS, dispositivi mobili, hardware lento e con partecipanti reali) e possono cambiare
+> senza preavviso. I test e le metriche sono strumenti di **ricerca**, non dispositivi diagnostici né clinici, e i
+> risultati non vanno usati per decisioni sulla salute. Il confine tra ciò che è verificato e ciò che non lo è è
+> dichiarato nei [paper](docs/scientific/) e in [`docs/scientific/migrazione-rust.md`](docs/scientific/migrazione-rust.md).
+> Segnala problemi tramite le [issue](https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/issues).
+>
+> **L'installer per Windows non è ancora firmato digitalmente**; la firma arriverà a breve. Fino ad allora Windows
+> SmartScreen mostrerà un avviso: verifica lo SHA-256 (lo script da terminale lo fa da solo) prima di eseguirlo.
+
 ## Cos'è
 
 **Sintropia — Cognitive tests Hub** è una piattaforma **open source** per somministrare in laboratorio una batteria di
@@ -115,7 +126,7 @@ cd desktop
 cargo run --release -p sintropia-desktop
 ```
 
-> **Avviso di Windows.** Il programma **non è ancora firmato digitalmente**: alla prima esecuzione SmartScreen può
+> **Avviso di Windows.** Il programma **per ora non è firmato digitalmente e verrà firmato a breve**: alla prima esecuzione SmartScreen può
 > mostrare «Windows ha protetto il PC» (*Ulteriori informazioni → Esegui comunque*). I checksum permettono di verificare
 > che il file sia quello pubblicato (e gli artefatti di una Release hanno l'attestazione di provenienza). Come ottenere la firma,
 > e il comando già predisposto nello script di build, è in [`docs/sicurezza.md`](docs/sicurezza.md).

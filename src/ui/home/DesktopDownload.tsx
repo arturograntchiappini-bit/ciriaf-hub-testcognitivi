@@ -64,8 +64,9 @@ export function DesktopDownload(): JSX.Element {
       </h3>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
         La stessa dashboard dei test, come programma nativo scritto in Rust: stessi motori, stessi test, nessuna connessione
-        necessaria. I dati restano sul tuo computer. Il programma non è ancora firmato digitalmente: Windows può mostrare un avviso
-        di SmartScreen alla prima esecuzione.
+        necessaria. I dati restano sul tuo computer. Il programma per ora non è firmato digitalmente (la firma arriverà a breve): Windows
+        può mostrare un avviso di SmartScreen alla prima esecuzione. Il progetto è in sviluppo e sperimentale, molte parti
+        devono ancora essere testate.
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
         <a

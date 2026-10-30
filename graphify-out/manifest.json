@@ -528,9 +528,9 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1793365052.3420117,
-    "seen": 1793365588.52618,
-    "ast_hash": "0fcee17561069f8f103c9954e1612a35",
+    "mtime": 1793370679.9205985,
+    "seen": 1793370720.204069,
+    "ast_hash": "cdfc6f309b27bfcb526e6a03dc7d787c",
     "semantic_hash": ""
   },
   "docs/architettura.md": {
@@ -1056,8 +1056,8 @@
     "semantic_hash": ""
   },
   "desktop/crates/app/src/papers.rs": {
-    "mtime": 1793365503.4415946,
-    "seen": 1793365588.4786332,
+    "mtime": 1793370371.7484152,
+    "seen": 1793370720.1589556,
     "ast_hash": "f9b14a1b1edb1dfe4818e0b7645103c8",
     "semantic_hash": ""
   },
@@ -2136,9 +2136,9 @@
     "semantic_hash": ""
   },
   "src/ui/home/DesktopDownload.tsx": {
-    "mtime": 1793296321.9874883,
-    "seen": 1793296826.532328,
-    "ast_hash": "0ee7859191b42fc5db8581a5066c7c44",
+    "mtime": 1793370680.8147416,
+    "seen": 1793370720.1913657,
+    "ast_hash": "2518345375de5a1116cfed2a0bc95776",
     "semantic_hash": ""
   },
   "src/ui/runtime/RtTestRunner.test.tsx": {
@@ -2214,9 +2214,9 @@
     "semantic_hash": ""
   },
   "docs/scientific/migrazione-rust.md": {
-    "mtime": 1793365098.7288892,
-    "seen": 1793365588.5281918,
-    "ast_hash": "adc5fe7da3ce05f9f50193e848189f00",
+    "mtime": 1793370354.4391496,
+    "seen": 1793370720.2055838,
+    "ast_hash": "ef5cb7d21fef027b2dce3125f1fb23bb",
     "semantic_hash": ""
   },
   "docs/scientific/trail-making.md": {
