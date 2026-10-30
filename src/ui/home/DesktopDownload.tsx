@@ -68,7 +68,17 @@ export function DesktopDownload(): JSX.Element {
         può mostrare un avviso di SmartScreen alla prima esecuzione. Il progetto è in sviluppo e sperimentale, molte parti
         devono ancora essere testate.
       </p>
-      <div className="mt-6 flex flex-wrap gap-3">
+      <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.28em] text-accent-glow">Opzione 1 · dal terminale (consigliata)</p>
+      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+        Il comando PowerShell scarica l&apos;installer, verifica lo SHA-256 e installa per utente, senza permessi di amministratore.
+      </p>
+      <div className="mt-3 grid gap-3 lg:grid-cols-2">
+        {installCommands(currentSiteBase()).map((c) => (
+          <CopyableCommand key={c.label} {...c} />
+        ))}
+      </div>
+      <p className="mt-10 font-mono text-[11px] uppercase tracking-[0.28em] text-muted">Opzione 2 · scarica l&apos;installer</p>
+      <div className="mt-3 flex flex-wrap gap-3">
         <a
           href={INSTALLER_URL}
           className="inline-flex min-h-[48px] items-center gap-3 bg-accent px-6 font-mono text-[12px] font-medium uppercase tracking-[0.16em] text-paper transition-colors duration-200 hover:bg-accent-glow"
@@ -90,12 +100,6 @@ export function DesktopDownload(): JSX.Element {
           Note di rilascio (nuova scheda)
         </a>
       </p>
-      <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.28em] text-muted">Oppure dal terminale</p>
-      <div className="mt-3 grid gap-3 lg:grid-cols-2">
-        {installCommands(currentSiteBase()).map((c) => (
-          <CopyableCommand key={c.label} {...c} />
-        ))}
-      </div>
     </section>
   );
 }

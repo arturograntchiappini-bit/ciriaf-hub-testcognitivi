@@ -90,19 +90,7 @@ con export, impostazioni, modalità Sessione e lettore dei paper, con la stessa 
 
 ### Installare
 
-**Dal sito (consigliato).** Nella home della web app, sezione *Sintropia sul tuo computer*, il pulsante **Scarica
-l'installer** scarica direttamente `Sintropia-Setup-x64.msi`. Doppio clic e basta: l'installazione è **per utente**, senza
-permessi di amministratore, e aggiunge Sintropia al menu Start. Per chi preferisce non installare c'è lo zip portatile.
-
-**Dal repository.** I file sono in [`public/download/`](public/download/), con `SHA256SUMS.txt`:
-
-| File | Cos'è |
-|---|---|
-| [`Sintropia-Setup-x64.msi`](public/download/Sintropia-Setup-x64.msi) | installer per utente (Windows 10/11, 64 bit) |
-| [`Sintropia-Desktop-x64.zip`](public/download/Sintropia-Desktop-x64.zip) | versione portatile, nessuna installazione |
-| [`SHA256SUMS.txt`](public/download/SHA256SUMS.txt) | checksum per verificare i file |
-
-**Da terminale (PowerShell, senza amministratore).** Lo script scarica, **verifica lo SHA-256** e installa:
+**Da terminale (consigliato; PowerShell, senza amministratore).** Lo script scarica, **verifica lo SHA-256** e installa:
 
 ```powershell
 # installazione per utente
@@ -116,6 +104,18 @@ irm https://raw.githubusercontent.com/arturograntchiappini-bit/ciriaf-hub-testco
 ```
 
 Installazione silenziosa a mano: `msiexec /i Sintropia-Setup-x64.msi /qn`; rimozione: `msiexec /x Sintropia-Setup-x64.msi /qn`.
+
+**Dal sito (installer).** Nella home della web app, sezione *Sintropia sul tuo computer*, il pulsante **Scarica
+l'installer** scarica direttamente `Sintropia-Setup-x64.msi`. Doppio clic e basta: l'installazione è **per utente**, senza
+permessi di amministratore, e aggiunge Sintropia al menu Start. Per chi preferisce non installare c'è lo zip portatile.
+
+**Dal repository.** I file sono in [`public/download/`](public/download/), con `SHA256SUMS.txt`:
+
+| File | Cos'è |
+|---|---|
+| [`Sintropia-Setup-x64.msi`](public/download/Sintropia-Setup-x64.msi) | installer per utente (Windows 10/11, 64 bit) |
+| [`Sintropia-Desktop-x64.zip`](public/download/Sintropia-Desktop-x64.zip) | versione portatile, nessuna installazione |
+| [`SHA256SUMS.txt`](public/download/SHA256SUMS.txt) | checksum per verificare i file |
 
 **Dai sorgenti** (serve [Rust](https://rustup.rs) stabile):
 
