@@ -52,3 +52,12 @@ Per rimuovere l'avviso SmartScreen servono un certificato di firma del codice e,
 Qualunque sia la scelta, basta impostare `SINTROPIA_SIGN_COMMAND` con il comando di firma e il segnaposto `{file}`, ad esempio
 `signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /sha1 <thumbprint> {file}`; `build-installer.ps1` firma l'eseguibile e l'MSI
 e verifica la firma prima di proseguire.
+
+## Impostazioni del repository su GitHub
+
+Le regole sono in [`.github/rulesets/`](../.github/rulesets/) e si importano da *Settings → Rules → Rulesets → New ruleset → Import a ruleset*:
+
+- `protect-main.json`: su `main` niente cancellazione né force push, cronologia lineare, modifiche solo tramite pull request con discussioni risolte e i cinque controlli della CI verdi. Gli amministratori possono aggirare le regole solo passando da una pull request.
+- `protect-tags.json`: i tag `v*` non si possono cancellare, spostare né riscrivere (una Release con attestazione di provenienza deve restare riferita allo stesso commit).
+
+Da attivare a mano in *Settings → Code security*: Private vulnerability reporting, Dependency graph, Dependabot alerts e security updates, Secret scanning con push protection. In *Settings → Actions → General*: permessi del `GITHUB_TOKEN` in sola lettura per default e approvazione obbligatoria per i workflow dei collaboratori esterni alla prima contribuzione.

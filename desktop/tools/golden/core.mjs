@@ -198,7 +198,7 @@ const session = {
 
 const out = {
   meta: {
-    generator: 'desktop/tools/golden/core.mjs', node: process.version, floatTolerance: 1e-9, seeds: SEEDS,
+    generator: 'desktop/tools/golden/core.mjs', node: `v${process.versions.node.split('.')[0]}`, floatTolerance: 1e-9, seeds: SEEDS,
     note: 'Valori non finiti come stringhe. engineVersion (JSON) e il piè di pagina HTML del Rust non esistono nel TS: il test li rimuove prima del confronto.',
   },
   rng, validation, sdt: sdtOut, export: exports_, session,

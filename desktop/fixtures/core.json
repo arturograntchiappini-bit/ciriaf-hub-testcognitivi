@@ -1,7 +1,7 @@
 {
  "meta": {
   "generator": "desktop/tools/golden/core.mjs",
-  "node": "v24.15.0",
+  "node": "v24",
   "floatTolerance": 1e-9,
   "seeds": [
    1,
