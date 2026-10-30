@@ -25,8 +25,8 @@ $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 if ($BaseUrl -and $BaseUrl -notmatch '^https://') { throw "BaseUrl deve usare https:// (ricevuto: $BaseUrl)." }
 $GitHubBases = @(
-    'https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/releases/latest/download',
-    'https://raw.githubusercontent.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/main/public/download'
+    'https://github.com/arturograntchiappini-bit/sintropia-hub/releases/latest/download',
+    'https://raw.githubusercontent.com/arturograntchiappini-bit/sintropia-hub/main/public/download'
 )
 $PortableDir = Join-Path $env:LOCALAPPDATA 'Sintropia'
 $AssetName = if ($Portable) { 'Sintropia-Desktop-x64.zip' } else { 'Sintropia-Setup-x64.msi' }

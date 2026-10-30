@@ -28,7 +28,7 @@ Per studiare come l'ambiente fisico influisce sulla mente. Nessun account, nessu
 > senza preavviso. I test e le metriche sono strumenti di **ricerca**, non dispositivi diagnostici né clinici, e i
 > risultati non vanno usati per decisioni sulla salute. Il confine tra ciò che è verificato e ciò che non lo è è
 > dichiarato nei [paper](docs/scientific/) e in [`docs/scientific/migrazione-rust.md`](docs/scientific/migrazione-rust.md).
-> Segnala problemi tramite le [issue](https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/issues).
+> Segnala problemi tramite le [issue](https://github.com/arturograntchiappini-bit/sintropia-hub/issues).
 >
 > **L'installer per Windows non è ancora firmato digitalmente**; la firma arriverà a breve. Fino ad allora Windows
 > SmartScreen mostrerà un avviso: verifica lo SHA-256 (lo script da terminale lo fa da solo) prima di eseguirlo.
@@ -94,7 +94,7 @@ con export, impostazioni, modalità Sessione e lettore dei paper, con la stessa 
 
 ```powershell
 # installazione per utente
-irm https://raw.githubusercontent.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/arturograntchiappini-bit/sintropia-hub/main/scripts/install.ps1 | iex
 
 # oppure, dopo aver scaricato lo script, con le opzioni
 .\scripts\install.ps1 -Portable          # zip in %LOCALAPPDATA%\Sintropia, senza MSI
@@ -120,7 +120,7 @@ permessi di amministratore, e aggiunge Sintropia al menu Start. Per chi preferis
 **Dai sorgenti** (serve [Rust](https://rustup.rs) stabile):
 
 ```powershell
-cargo install --git https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi sintropia-desktop
+cargo install --git https://github.com/arturograntchiappini-bit/sintropia-hub sintropia-desktop
 # oppure, dal repository clonato:
 cd desktop
 cargo run --release -p sintropia-desktop
@@ -301,8 +301,8 @@ schermate caricate a richiesta, font locali; nessun HTML grezzo nel rendering de
 Requisiti: **Node.js ≥ 20** (web); **Rust stabile** con target `wasm32-unknown-unknown` per controllare la compilazione WASM (desktop).
 
 ```bash
-git clone https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi.git
-cd ciriaf-hub-testcognitivi
+git clone https://github.com/arturograntchiappini-bit/sintropia-hub.git
+cd sintropia-hub
 npm install
 npm run dev        # web su http://localhost:5173
 ```
@@ -352,13 +352,13 @@ in `public/download/` e vengono serviti dallo stesso sito.
 ## Contribuire
 
 Segnalazioni e proposte sono benvenute tramite
-[issue](https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/issues) e pull request. Per i test nuovi o
+[issue](https://github.com/arturograntchiappini-bit/sintropia-hub/issues) e pull request. Per i test nuovi o
 le modifiche ai parametri, **cita la fonte** (con DOI) e aggiorna il paper corrispondente.
 
 ## Come citare
 
 > Grant Chiappini, A. (2026). *Sintropia - Cognitive tests Hub* [Software open source, licenza MIT].
-> https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi
+> https://github.com/arturograntchiappini-bit/sintropia-hub
 
 Le fonti scientifiche dei singoli paradigmi vanno citate separatamente: sono nei paper e nella bibliografia.
 Il file [`CITATION.cff`](CITATION.cff) permette a GitHub di generare la citazione.

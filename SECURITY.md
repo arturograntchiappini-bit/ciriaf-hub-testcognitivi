@@ -7,7 +7,7 @@ Si supporta l'ultima versione pubblicata (ramo `main` e ultima Release). Le corr
 ## Come segnalare una vulnerabilità
 
 **Non aprire una issue pubblica.** Usa la segnalazione privata di GitHub:
-[Security → Report a vulnerability](https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/security/advisories/new).
+[Security → Report a vulnerability](https://github.com/arturograntchiappini-bit/sintropia-hub/security/advisories/new).
 
 Indica, se puoi: componente (sito web, app desktop, installer, script `install.ps1`), passi per riprodurre, impatto atteso e versione.
 Si risponde entro pochi giorni; le correzioni confermate vengono pubblicate con una nota di rilascio e, se serve, un advisory.
@@ -38,6 +38,6 @@ Ogni Release pubblica `SHA256SUMS.txt`. Dopo aver scaricato l'installer:
 ```
 
 Il valore deve coincidere con la riga corrispondente di `SHA256SUMS.txt`. Gli artefatti della Release hanno anche un'attestazione di provenienza
-(`gh attestation verify <file> --repo arturograntchiappini-bit/ciriaf-hub-testcognitivi`).
+(`gh attestation verify <file> --repo arturograntchiappini-bit/sintropia-hub`).
 
 Dettagli della revisione di sicurezza e delle correzioni: [docs/sicurezza.md](docs/sicurezza.md).

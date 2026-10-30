@@ -10,7 +10,7 @@
 
     <Icon Id="AppIcon.ico" SourceFile="$(IconPath)" />
     <Property Id="ARPPRODUCTICON" Value="AppIcon.ico" />
-    <Property Id="ARPURLINFOABOUT" Value="https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/arturograntchiappini-bit/sintropia-hub" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
     <WixVariable Id="WixUILicenseRtf" Value="$(LicenseRtf)" />
     <ui:WixUI Id="WixUI_FeatureTree" />

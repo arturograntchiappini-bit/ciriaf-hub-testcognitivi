@@ -88,7 +88,7 @@ describe('Home', () => {
     const repoLink = screen.getByRole('link', { name: /Codice open source \(licenza MIT\)/ });
     expect(repoLink).toHaveAttribute(
       'href',
-      'https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi',
+      'https://github.com/arturograntchiappini-bit/sintropia-hub',
     );
   });
 

@@ -1,7 +1,7 @@
 import portrait from '../../assets/arturo.jpg';
 
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/arturo-grant-chiappini/';
-export const REPOSITORY_URL = 'https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi';
+export const REPOSITORY_URL = 'https://github.com/arturograntchiappini-bit/sintropia-hub';
 
 const EXTERNAL_LINK = { target: '_blank', rel: 'noopener noreferrer' } as const;
 const LINK_BASE =

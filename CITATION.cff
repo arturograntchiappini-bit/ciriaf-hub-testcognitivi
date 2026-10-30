@@ -5,7 +5,7 @@ type: software
 authors:
   - family-names: "Grant Chiappini"
     given-names: "Arturo"
-repository-code: "https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi"
+repository-code: "https://github.com/arturograntchiappini-bit/sintropia-hub"
 license: MIT
 keywords:
   - cognitive testing

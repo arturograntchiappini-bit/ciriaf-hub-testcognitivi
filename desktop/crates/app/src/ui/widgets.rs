@@ -255,7 +255,7 @@ pub fn footer(ui: &mut Ui) {
                 .monospace()
                 .size(theme::LABEL_SIZE)
                 .color(theme::ACCENT_GLOW),
-            "https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi",
+            "https://github.com/arturograntchiappini-bit/sintropia-hub",
         );
     });
     ui.add_space(space::XL);

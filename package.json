@@ -8,11 +8,11 @@
   "author": "Arturo Grant Chiappini (https://www.linkedin.com/in/arturo-grant-chiappini/)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi.git"
+    "url": "git+https://github.com/arturograntchiappini-bit/sintropia-hub.git"
   },
-  "homepage": "https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi#readme",
+  "homepage": "https://github.com/arturograntchiappini-bit/sintropia-hub#readme",
   "bugs": {
-    "url": "https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/issues"
+    "url": "https://github.com/arturograntchiappini-bit/sintropia-hub/issues"
   },
   "scripts": {
     "dev": "vite",

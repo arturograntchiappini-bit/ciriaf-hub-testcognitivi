@@ -6,7 +6,7 @@ export const RELEASES_URL = `${REPOSITORY_URL}/releases/latest`;
 export const INSTALLER_URL = './download/Sintropia-Setup-x64.msi';
 export const PORTABLE_URL = './download/Sintropia-Desktop-x64.zip';
 export const CHECKSUMS_URL = './download/SHA256SUMS.txt';
-const INSTALL_SCRIPT_URL = 'https://raw.githubusercontent.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/main/scripts/install.ps1';
+const INSTALL_SCRIPT_URL = 'https://raw.githubusercontent.com/arturograntchiappini-bit/sintropia-hub/main/scripts/install.ps1';
 
 /** Con il sito servito in https il comando PowerShell scarica da qui (script e MSI sono in public/); altrimenti da GitHub. */
 export function installCommands(siteBase: string | null): ReadonlyArray<{ label: string; command: string }> {
