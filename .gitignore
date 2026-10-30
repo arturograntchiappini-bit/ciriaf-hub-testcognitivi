@@ -10,6 +10,7 @@ coverage
 # artefatti di test/verifica
 .playwright-mcp/
 *.png
+!docs/images/desktop/*.png
 
 # Artefatti di build dell app desktop
 dist-desktop/

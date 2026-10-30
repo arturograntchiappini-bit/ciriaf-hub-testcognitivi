@@ -307,12 +307,6 @@ async function runGenerations(test, cases) {
   return { results, hangs, errors };
 }
 
-/** Divergenza attesa #3 (DIVERGENZE.md): il TS accetta "feature-present-" (Number('') === 0), il Rust la scarta come condizione malformata. */
-function markEmptySize(kase, input) {
-  const malformed = input.trials.map((t) => (t.condition === 'feature-present-' ? { ...t, condition: 'garbage' } : t));
-  return { ...kase, expectedDivergence: { reason: "Number('') === 0 in JS: numerosità vuota accettata dal TS, scartata dal Rust", ...ENGINES.visual_search.score({ trials: malformed }) } };
-}
-
 // ---------- extras per test ----------
 function buildExtras(test, R) {
   const E = ENGINES[test].extras ?? {};
@@ -386,9 +380,10 @@ for (const [testIndex, test] of Object.keys(ENGINES).entries()) {
     const result = gens.results.get(c.id);
     if (result === undefined) throw new Error(`${test} ${c.id}: ${gens.errors.find((e) => e.id === c.id)?.error ?? 'nessun risultato'}`);
     const { tsMaxNoGoRun, ...fields } = result;
-    const kase = { id: c.id, seed: c.seed, params: c.params, ...(c.lengths ? { lengths: c.lengths } : {}), ...fields };
-    if (tsMaxNoGoRun > 2) kase.expectedDivergence = { reason: 'TS: più di 2 No-Go consecutivi in coda (DIVERGENZE.md #1)', tsMaxNoGoRun };
-    generation.push(kase);
+    const nGo = Math.round(c.params.nTrials * c.params.goRatio);
+    const feasible = c.params.nTrials - nGo <= 2 * nGo; // con più di 2 No-Go per Go il vincolo non è realizzabile: l'eccesso si accoda
+    if (test === 'gonogo' && feasible && tsMaxNoGoRun > 2) throw new Error(`${test} ${c.id}: il TS viola il vincolo anti-cluster (serie di ${tsMaxNoGoRun} No-Go)`);
+    generation.push({ id: c.id, seed: c.seed, params: c.params, ...(c.lengths ? { lengths: c.lengths } : {}), ...fields });
   }
 
   const scoring = [];
@@ -396,9 +391,7 @@ for (const [testIndex, test] of Object.keys(ENGINES).entries()) {
     const input = scoringInput(R, test);
     const full = ENGINES[test].score(input);
     const { trials, ...rest } = input;
-    let kase = { id: `score-${i}`, ...rest, trials: trials.map(packTrial), ...full };
-    if (test === 'visual_search' && trials.some((t) => t.condition === 'feature-present-')) kase = markEmptySize(kase, input);
-    scoring.push(kase);
+    scoring.push({ id: `score-${i}`, ...rest, trials: trials.map(packTrial), ...full });
   }
   const data = { test, masterSeed: MASTER_SEED + testIndex * 7919, testId: TEST_ID[test], generation, scoring, tsHang, tsErrors: gens.errors, ...buildExtras(test, R) };
   summary[test] = { generation: generation.length, scoring: scoring.length, tsHang: tsHang.length, seconds: (Date.now() - started) / 1000 };

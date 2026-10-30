@@ -22,11 +22,18 @@ const CSV_HEADER = [
   'timestamp_onset',
 ].join(CSV_SEPARATOR);
 
-/** Mette tra virgolette e raddoppia le virgolette se il campo contiene separatore/newline/virgolette. */
+/** Inizio di cella che un foglio di calcolo interpreta come formula (OWASP «CSV injection»). */
+const FORMULA_START = /^[=+@\t\r]|^-(?![0-9.]+$)/;
+
+/**
+ * Mette tra virgolette e raddoppia le virgolette se il campo contiene separatore/newline/virgolette.
+ * Le stringhe che iniziano come una formula (`=`, `+`, `@`, `-x`) ricevono un apice iniziale: i numeri restano intatti.
+ */
 export function csvField(value: string | number | boolean | null, separator: string = CSV_SEPARATOR): string {
   if (value === null) return '';
-  const s = String(value);
-  if (s.includes(separator) || s.includes('"') || s.includes('\n')) {
+  let s = String(value);
+  if (typeof value === 'string' && FORMULA_START.test(s)) s = `'${s}`;
+  if (s.includes(separator) || s.includes('"') || s.includes('\n') || s.includes('\r')) {
     return `"${s.replace(/"/g, '""')}"`;
   }
   return s;

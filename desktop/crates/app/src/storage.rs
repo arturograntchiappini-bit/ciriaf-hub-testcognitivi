@@ -52,7 +52,7 @@ pub fn save_export(
         "Sintropia Desktop",
     );
     let path = dir.join(export::format_filename(result, format));
-    std::fs::write(&path, content).map_err(|e| format!("scrittura {}: {e}", path.display()))?;
+    crate::fsutil::write_atomic(&path, content.as_bytes())?;
     Ok(path)
 }
 
@@ -64,7 +64,7 @@ pub fn load_result(path: &Path) -> Result<TestResult, String> {
     if !path.is_file() {
         return Err(format!("File non trovato: {}", path.display()));
     }
-    let text = std::fs::read_to_string(path)
+    let text = crate::fsutil::read_text_capped(path, crate::fsutil::MAX_RESULT_BYTES)
         .map_err(|e| format!("Impossibile leggere {}: {e}", path.display()))?;
     serde_json::from_str(&text)
         .map_err(|e| format!("Il file non è un risultato Sintropia valido ({e})."))

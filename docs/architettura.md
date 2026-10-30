@@ -275,8 +275,8 @@ Regole che valgono per il Rust:
 - **Il TS è la specifica.** `src/engine/**` non si modifica per la migrazione. Le fixture golden
   (`desktop/tools/golden/*.mjs` → `desktop/fixtures/<test>.json`) e il fuzz differenziale (`desktop/tools/fuzz`) lo eseguono e il Rust
   deve riprodurle: sequenze, conteggi e ordini esattamente uguali, float entro `1e-9` (`FLOAT_TOLERANCE`, un solo punto).
-- **I bug del TS non si copiano.** Le divergenze sono classificate in `desktop/fixtures/DIVERGENZE.md` e nel paper
-  `docs/scientific/migrazione-rust.md`; le fixture le marcano `expectedDivergence`.
+- **I difetti si correggono in entrambi i motori.** Quelli trovati dal confronto sono registrati in `desktop/fixtures/DIVERGENZE.md` e nel paper
+  `docs/scientific/migrazione-rust.md`; sono corretti nel TS e nel Rust (`ENGINE_VERSION` 0.2.0) e le fixture rigenerate: nessuna `expectedDivergence` residua.
 - **Evidenze.** `desktop/fixtures/evidence/*.json` (scritte con `SINTROPIA_WRITE_EVIDENCE=1`) e `BENCHMARK.md` sono la fonte dei numeri del paper.
 
 I contenuti scientifici (paper) sono gli stessi file di `docs/scientific/`, incorporati nell'app desktop a tempo di compilazione.
@@ -285,4 +285,17 @@ I contenuti scientifici (paper) sono gli stessi file di `docs/scientific/`, inco
 
 `desktop/installer/` produce `Sintropia-Setup-x64.msi` (WiX 5, per utente, senza UAC), `Sintropia-Desktop-x64.zip` e `SHA256SUMS.txt`;
 `publish-to-site.ps1` li copia in `public/download/` (e `scripts/install.ps1` in `public/`), serviti da Netlify con le intestazioni di
-`public/_headers`. La home web linka `./download/Sintropia-Setup-x64.msi` (`src/ui/home/DesktopDownload.tsx`). L'eseguibile non è firmato.
+`public/_headers`. La home web linka `./download/Sintropia-Setup-x64.msi` (`src/ui/home/DesktopDownload.tsx`). L'eseguibile non è ancora firmato: `build-installer.ps1` firma exe e MSI se è impostata `SINTROPIA_SIGN_COMMAND` (vedi `docs/sicurezza.md`).
+
+## 11. Sicurezza
+
+Il sito è statico e senza backend: i confini di fiducia sono i dati salvati, i file importati e i file esportati. Regole che il codice rispetta:
+
+- **Mai fidarsi di ciò che torna dal disco.** `localStorage`, `settings.json` e i protocolli importati passano da `sanitizeParams` (web, `src/ui/params/sanitize.ts`)
+  e `sanitize_params` (Rust, `desktop/crates/app/src/data.rs`): solo chiavi note, numeri finiti, valori entro i limiti di `PARAM_SECTIONS`.
+  I modelli di sessione importati hanno parser strutturale con limiti di dimensione e di numero di elementi (`src/ui/session/storage.ts`).
+- **Export sicuri.** Le celle CSV che iniziano come una formula sono neutralizzate (TS `csvField`, Rust `csv_field`); il report HTML ha tutto escapato e una CSP propria; i nomi file passano da `safeFilename`.
+- **Desktop.** Nessun processo esterno, `forbid(unsafe_code)` nei crate `core`/`engines`/`content`, letture con tetto (`read_text_capped`), scritture atomiche (`write_atomic`) in `fsutil.rs`.
+- **Distribuzione.** CSP e intestazioni in `public/_headers`; `install.ps1` solo HTTPS con controllo anti zip-slip; CI (`.github/workflows/ci.yml`) e release con azioni fissate per SHA e attestazione di provenienza.
+
+Politica di segnalazione: [`SECURITY.md`](../SECURITY.md). Esiti della revisione e residui: [`sicurezza.md`](sicurezza.md).

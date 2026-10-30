@@ -52,8 +52,8 @@ riportato** perché non sono stati letti.
 
 | Parametro | Valore adottato | Origine |
 |---|---|---|
-| **Cerchi per parte** | **25** (parte B: 13 numeri e 12 lettere) | Numero classico del TMT; modificabile (8–51) |
-| **Disposizione** | posizioni casuali con distanza minima | **Scelta di progetto**: non è il layout cartaceo originale |
+| **Cerchi per parte** | **25** (parte B: 13 numeri e 12 lettere) | Numero classico del TMT; modificabile (8–51). Il motore limita comunque la parte B a 53 cerchi (1, A, 2, B, …, Z, 27), finite le lettere |
+| **Disposizione** | posizioni casuali con distanza minima fra i centri di **0,11** (frazione del lato del campo) | **Scelta di progetto**: non è il layout cartaceo originale |
 | **Risposta** | clic del mouse o tocco sul cerchio | **Scelta di progetto** (il test originale è carta e matita con tracciamento) |
 | **Errore** | il cerchio lampeggia, non si avanza, il tempo scorre | **Scelta di progetto** (nel test cartaceo lo sperimentatore corregge l'errore a tempo in corso) |
 | **Pratica** | 8 cerchi per parte | **Scelta di progetto** |
@@ -66,8 +66,8 @@ Codice: `src/engine/tests/trailMaking.ts`, `src/config/defaults.ts`, `src/ui/tes
 
 | Elemento | Dove | Comportamento |
 |---|---|---|
-| Etichette | `trailLabels` | A: 1…n. B: 1, A, 2, B… |
-| Layout | `generateTrail` | Posizioni casuali (RNG a seme) a distanza minima, ripiego su griglia se il campo è troppo affollato |
+| Etichette | `trailLabels` | A: 1…n. B: 1, A, 2, B…, al massimo 53 etichette (fino a Z, 27) |
+| Layout | `generateTrail` | Posizioni casuali (RNG a seme) a distanza minima 0,11, con margine 0,06, fino a 4000 estrazioni. Se il campo è troppo affollato si scarta tutto e si scelgono celle a caso di una griglia `⌈√n⌉ × ⌈√n⌉`, i cui centri distano almeno 0,11 fino a 64 cerchi (il parametro arriva a 51) |
 | Registrazione | `TrailRun` | Ogni clic è un trial: `rtMs` = tempo dal clic precedente (o dall'inizio); un clic errato non fa avanzare |
 | Metriche | `scoreTrailMaking` | Solo `phase = 'test'`; il tempo di una parte conta solo se completata |
 
@@ -93,3 +93,5 @@ sbagliato) e il tempo medio per clic di ciascuna parte.
 
 - **2026-10.** Prima versione: motore, vista, paper. Fonti verificate su Crossref; abstract di Sánchez-Cubillo et al. su
   Europe PMC.
+- **2026-10-30.** Documentati la distanza minima (0,11), il ripiego a griglia che la rispetta (prima i cerchi mancanti
+  venivano messi su una griglia senza controllare la distanza) e il limite di 53 cerchi della parte B.

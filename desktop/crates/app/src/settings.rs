@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use crate::data;
+use crate::{data, fsutil};
 
 /// Solo gli override dell'utente: ciò che manca ricade sui default.
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
@@ -40,13 +40,25 @@ impl Settings {
         if let Some(over) = self.overrides.get(test_key) {
             params.extend(over.iter().map(|(k, v)| (k.clone(), *v)));
         }
-        params
+        data::sanitize_params(test_key, &params)
     }
 
     /// Come `load_from`, ma segnala a parole un file presente e illeggibile (l'assenza non è un errore).
     pub fn load_checked(path: &Path) -> (Self, Option<String>) {
-        let Ok(text) = std::fs::read_to_string(path) else {
+        if !path.exists() {
             return (Self::default(), None);
+        }
+        let text = match fsutil::read_text_capped(path, fsutil::MAX_CONFIG_BYTES) {
+            Ok(text) => text,
+            Err(e) => {
+                return (
+                    Self::default(),
+                    Some(format!(
+                        "Il file delle impostazioni ({}) non è leggibile: {e}. Si usano i valori predefiniti; salvando lo sovrascrivi.",
+                        path.display()
+                    )),
+                )
+            }
         };
         match serde_json::from_str(&text) {
             Ok(settings) => (settings, None),
@@ -63,7 +75,7 @@ impl Settings {
     /// Carica da file; file assente o corrotto dà i default (mai un crash all'avvio).
     #[cfg(test)]
     pub fn load_from(path: &Path) -> Self {
-        std::fs::read_to_string(path)
+        fsutil::read_text_capped(path, fsutil::MAX_CONFIG_BYTES)
             .ok()
             .and_then(|text| serde_json::from_str(&text).ok())
             .unwrap_or_default()
@@ -74,7 +86,7 @@ impl Settings {
             std::fs::create_dir_all(dir).map_err(|e| format!("cartella {}: {e}", dir.display()))?;
         }
         let json = serde_json::to_string_pretty(self).map_err(|e| e.to_string())?;
-        std::fs::write(path, json).map_err(|e| format!("scrittura {}: {e}", path.display()))
+        fsutil::write_atomic(path, json.as_bytes())
     }
 }
 

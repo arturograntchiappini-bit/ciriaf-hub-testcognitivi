@@ -43,6 +43,8 @@ pub struct TrailCircle {
 }
 
 const LETTERS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+/// Cerchi massimi della parte B: 1, A, 2, B, …, Z, 27.
+const MAX_B_CIRCLES: usize = 2 * LETTERS.len() + 1;
 /// Distanza minima fra i centri, in frazioni del lato del campo.
 pub const MIN_DISTANCE: f64 = 0.11;
 pub const MARGIN: f64 = 0.06;
@@ -50,15 +52,16 @@ const PLACEMENT_ATTEMPTS: usize = 4000;
 
 /// Etichette nell'ordine da collegare: 1…n (A) oppure 1, A, 2, B… (B).
 pub fn trail_labels(part: TrailPart, n: usize) -> Vec<String> {
-    (0..n)
+    // Finite le lettere la sequenza 1, A, 2, B… non può proseguire: la parte B si ferma a MAX_B_CIRCLES.
+    let count = match part {
+        TrailPart::A => n,
+        TrailPart::B => n.min(MAX_B_CIRCLES),
+    };
+    (0..count)
         .map(|i| match part {
             TrailPart::A => (i + 1).to_string(),
             TrailPart::B if i % 2 == 0 => (i / 2 + 1).to_string(),
-            // Oltre 52 cerchi le lettere finiscono (il TS darebbe `undefined`): '?' al loro posto.
-            TrailPart::B => LETTERS
-                .get((i - 1) / 2)
-                .map_or('?', |&c| char::from(c))
-                .to_string(),
+            TrailPart::B => char::from(LETTERS[(i - 1) / 2]).to_string(),
         })
         .collect()
 }
@@ -78,17 +81,22 @@ fn place_points(count: usize, rand: &mut dyn FnMut() -> f64) -> Vec<(f64, f64)> 
             points.push((x, y));
         }
     }
-    // Ripiego: griglia con scarto, se il campo è troppo affollato per l'estrazione casuale.
+    if points.len() >= count {
+        return points;
+    }
+    // Ripiego: il campo è troppo affollato per l'estrazione casuale. Si scarta tutto e si scelgono `count` celle a
+    // caso di una griglia: i centri distano almeno `step`, che fino a 64 cerchi è >= MIN_DISTANCE.
     let side = (count as f64).sqrt().ceil() as usize;
     let step = span / side as f64;
-    while points.len() < count {
-        let cell = points.len();
-        points.push((
-            MARGIN + ((cell % side) as f64 + 0.5) * step,
-            MARGIN + ((cell / side) as f64 + 0.5) * step,
-        ));
-    }
-    points
+    let cells: Vec<(f64, f64)> = (0..side * side)
+        .map(|i| {
+            (
+                MARGIN + ((i % side) as f64 + 0.5) * step,
+                MARGIN + ((i / side) as f64 + 0.5) * step,
+            )
+        })
+        .collect();
+    shuffle(&cells, rand).into_iter().take(count).collect()
 }
 
 /// Cerchi della parte, in ordine di collegamento (`circles[i]` è il bersaglio i-esimo); le posizioni sono casuali.

@@ -1,11 +1,17 @@
 {
   "test": "gonogo",
+  "proptestCases": {
+    "primo_go_e_run_nogo_max_2": 256,
+    "conteggi_go_nogo_esatti": 256,
+    "determinismo_a_parita_di_seme": 256,
+    "isi_nell_intervallo": 256
+  },
   "toleranceAbsolute": 1e-9,
   "fixtureCases": {
     "generation": 48,
     "scoring": 28
   },
-  "exactComparisons": 8589,
+  "exactComparisons": 9300,
   "floatComparisons": 280,
   "maxAbsoluteDeviation": 0.0,
   "maxAbsoluteDeviationAt": "nessuna deviazione (tutti i float identici bit a bit)",
@@ -47,15 +53,5 @@
     "un-solo-rt-sd-zero",
     "arrotondamento-meta-decimale"
   ],
-  "expectedDivergences": [
-    "rapporto-0.5@1",
-    "rapporto-0.5@42",
-    "rapporto-0.5@2026"
-  ],
-  "proptestCases": {
-    "isi_nell_intervallo": 256,
-    "primo_go_e_run_nogo_max_2": 256,
-    "conteggi_go_nogo_esatti": 256,
-    "determinismo_a_parita_di_seme": 256
-  }
+  "expectedDivergences": []
 }

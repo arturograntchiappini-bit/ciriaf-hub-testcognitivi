@@ -302,6 +302,8 @@ export function conditionLabel(same: boolean, angle: number): string {
 
 function parseCondition(condition: string): { same: boolean; angle: number } | null {
   const [kind, angle] = condition.split('-');
+  // Number() accetta anche '0x1A', '0b11', '0o7': non sono angoli.
+  if (angle === undefined || /^\s*[+-]?0[xob]/i.test(angle)) return null;
   return (kind === 'same' || kind === 'different') && Number.isFinite(Number(angle)) ? { same: kind === 'same', angle: Number(angle) } : null;
 }
 

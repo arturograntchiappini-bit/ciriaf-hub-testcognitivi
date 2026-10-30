@@ -13,8 +13,8 @@ Il **Go/No-Go Task** è un paradigma cronometrico di inibizione della risposta i
 prevalente ("Go") il partecipante deve emettere una risposta motoria rapida e prepotente, mentre a uno
 stimolo raro ("No-Go") deve **sopprimere** la risposta già innescata. La misura centrale è la capacità di
 inibire un'azione automatizzata sotto pressione temporale — un indice di *controllo inibitorio prepotente*
-distinto dall'inibizione reattiva "a segnale" dello Stop-Signal Task (in cui lo stop arriva *dopo* l'avvio
-del movimento).
+distinto dall'inibizione reattiva "a segnale" dello Stop-Signal Task (in cui il segnale di stop arriva *dopo* lo
+stimolo Go, con un ritardo, quando la risposta è già in preparazione).
 
 **Citazione primaria.**
 
@@ -22,11 +22,13 @@ del movimento).
 > learning in the go/no-go and stop-signal paradigms.* **Journal of Experimental Psychology: General,
 > 137**(4), 649–672. https://doi.org/10.1037/a0013170
 
-Verbruggen e Logan dimostrano che, quando uno stimolo è **coerentemente associato all'azione di "andare"**,
-si sviluppa con la pratica un'associazione stimolo→risposta automatica ("automatic response activation");
-simmetricamente, l'inibizione può divenire in parte automatica quando uno stimolo è associato in modo
-consistente allo "stop". Ne consegue che l'inibizione richiesta sul No-Go è tanto più impegnativa quanto più
-la risposta Go è stata resa **prepotente** dall'alta frequenza e dalla rapidità dei trial Go.
+In cinque esperimenti Verbruggen e Logan mostrano che l'inibizione della risposta può divenire in parte
+**automatica** con la pratica, quando uno stimolo è associato in modo consistente allo "stop": la risposta a uno
+stimolo prima associato allo stop risulta rallentata, e l'inibizione trae beneficio da associazioni stimolo-stop
+consistenti. Poiché nel go/no-go la corrispondenza stimolo-stop è di norma consistente (mentre nello stop-signal non
+lo è), i due paradigmi **non sono equivalenti**: consentono forme diverse di inibizione. Che il No-Go sia tanto più
+impegnativo quanto più la risposta Go è resa **prepotente** da frequenza e ritmo dei Go è sostenuto invece da
+Wessel (2018) e Wilson et al. (2016), qui sotto.
 
 **Riferimenti di supporto.**
 
@@ -54,10 +56,11 @@ Il Go/No-Go isola l'**inibizione motoria**: la soppressione, entro una finestra 
 risposta motoria già preparata e automatizzata.
 
 - **Costruzione della prepotenza (ruolo dell'alta frequenza dei Go).** L'elevata proporzione di trial Go
-  (tipicamente 70–80%) e il ritmo rapido di presentazione fanno sì che la risposta motoria diventi
-  *prepotente*: viene innescata quasi automaticamente alla comparsa dello stimolo. Verbruggen & Logan (2008)
-  formalizzano questo come apprendimento associativo stimolo→azione: più lo stimolo è consistentemente
-  legato al "go", più forte è l'attivazione motoria automatica. Wilson et al. (2016) mostrano
+  (per esempio il 75% di questa implementazione) e il ritmo rapido di presentazione fanno sì che la risposta motoria
+  diventi *prepotente*: viene innescata quasi automaticamente alla comparsa dello stimolo. Wessel (2018) nota che
+  molti studi usano invece Go e No-Go equiprobabili (~40% degli studi esaminati) o intervalli fra stimoli lunghi,
+  oltre 4 s (~20%). Wilson et al. (2016), in 30
+  partecipanti, mostrano
   empiricamente che, aumentando la proporzione di Go da .50 a .95, i tempi di reazione **diminuiscono** e gli
   **errori di commissione aumentano** — segno diretto di una risposta motoria resa prepotente.
 
@@ -80,19 +83,19 @@ e **capacità di controllo top-down** che la sopprime sul No-Go.
 
 ## 3. Parametri adottati
 
-Valori raccomandati per l'implementazione Sintropia. I default proposti sono stati verificati contro la
-letteratura; dove opportuno è indicata una nota di razionale o un caveat.
+Valori adottati nell'implementazione Sintropia. «Confermato» indica un valore coerente con le fonti citate nella
+riga; dove nessuna fonte è citata il valore è una **scelta di progetto** con il suo razionale.
 
 | Parametro | Valore adottato | Fonte / razionale |
 |---|---|---|
 | **Numero totale di trial** | **80** | Compromesso per una batteria breve. Confermato con caveat: i 20 trial No-Go sono il **minimo** ragionevole per una stima stabile degli errori di commissione; per protocolli dedicati alla sola inibizione conviene aumentarne il numero (scelta del ricercatore: la letteratura citata non fissa un minimo universale). Per screening rapido multi-test, 80 è accettabile. **Scelta di progetto.** |
-| **Proporzione Go / No-Go** | **75% Go (60) / 25% No-Go (20)** | **Confermato.** Rapporto standard che crea prepotenza mantenendo abbastanza No-Go per stime stabili. Sostenuto da Wessel (2018) (No-Go rari necessari per attività motoria prepotente) e Wilson et al. (2016) (prepotenza cresce con la proporzione di Go). |
-| **Durata stimolo / finestra di risposta** | **800 ms fissi** | **Confermato** come *response deadline* (deadline di risposta). Il ritmo rapido favorisce la prepotenza (Wessel, 2018). 800 ms è moderato-veloce: impone velocità senza tagliare troppe risposte lente valide. Nota: è la finestra entro cui la risposta è conteggiata come Go corretto. |
-| **ISI (inter-stimulus interval) variabile** | **Uniforme 500–1000 ms (jitter)** | **Confermato.** La *variabilità* dell'ISI è l'elemento chiave: impedisce l'entrainment temporale e le risposte anticipatorie ritmiche. Intervallo entro il range standard; Hasegawa et al. (2021) hanno confrontato ISI di 400, 600, 800 e 1000 ms con stimolo di 250 ms: gli ISI brevi producono più errori di commissione e, a 400 ms, anche più omissioni sui Go, il che rende l'errore di commissione meno valido come indice di inibizione. L'intervallo 500–1000 ms evita la zona più critica (400 ms); lo stimolo di Sintropia (800 ms) è però più lungo di quello dello studio (250 ms), quindi il confronto è qualitativo. |
-| **Vincolo anti-cluster No-Go** | **Mai più di 2 No-Go consecutivi** | **Confermato** come pseudo-randomizzazione. Sequenze lunghe di No-Go indebolirebbero la prepotenza Go e consentirebbero un rallentamento strategico proattivo, alterando la misura dell'inibizione. Il vincolo mantiene la risposta Go dominante trial-per-trial. |
+| **Proporzione Go / No-Go** | **75% Go (60) / 25% No-Go (20)** | **Confermato.** Rapporto che crea prepotenza mantenendo abbastanza No-Go per stime stabili. Sostenuto da Wessel (2018) (No-Go rari necessari per attività motoria prepotente) e Wilson et al. (2016) (prepotenza cresce con la proporzione di Go). |
+| **Durata stimolo / finestra di risposta** | **800 ms fissi** | **Scelta di progetto**, come *response deadline* (deadline di risposta). Il ritmo rapido favorisce la prepotenza (Wessel, 2018). 800 ms è moderato-veloce: impone velocità senza tagliare troppe risposte lente valide. Nota: è la finestra entro cui la risposta è conteggiata come Go corretto. |
+| **ISI (inter-stimulus interval) variabile** | **Uniforme 500–1000 ms (jitter)** | **Scelta di progetto.** La *variabilità* dell'ISI serve a ostacolare l'entrainment temporale e le risposte anticipatorie ritmiche. L'ISI è uno schermo vuoto fra lo stimolo e il successivo (nessuna croce di fissazione). Hasegawa et al. (2021) hanno confrontato ISI di 400, 600, 800 e 1000 ms con stimolo di 250 ms: gli ISI brevi producono più errori di commissione e, a 400 ms, anche più omissioni sui Go, il che rende l'errore di commissione meno valido come indice di inibizione. L'intervallo 500–1000 ms evita la zona più critica (400 ms); lo stimolo di Sintropia (800 ms) è però più lungo di quello dello studio (250 ms), quindi il confronto è qualitativo. |
+| **Vincolo anti-cluster No-Go** | **Mai più di 2 No-Go consecutivi** | **Scelta di progetto** (pseudo-randomizzazione). Garantito quando i No-Go non superano il doppio dei Go (sempre vero con i default); oltre, il vincolo non è realizzabile e i No-Go in eccesso si accodano (§4). Sequenze lunghe di No-Go indebolirebbero la prepotenza Go e consentirebbero un rallentamento strategico proattivo, alterando la misura dell'inibizione. Il vincolo mantiene la risposta Go dominante trial-per-trial. |
 | **Numero trial di pratica** | **10 (con entrambi i tipi Go e No-Go)** | **Scelta di progetto.** La pratica deve includere almeno alcuni No-Go affinché il partecipante comprenda la regola di inibizione prima della fase sperimentale. Esclusi dall'analisi. |
-| **Stimoli** | **Cerchio verde = Go; cerchio rosso = No-Go** | **Confermato** come mappatura comune e intuitiva (semaforo: verde→vai, rosso→ferma). Cerchi colorati sono una scelta diffusa nei go/no-go computerizzati. Caveat: la coppia verde/rosso **può non essere distinguibile** da chi ha una deficienza nella visione dei colori rosso-verde: per quei partecipanti il test va adattato (cambiando forma o luminanza). Altro caveat minore: la congruenza semantica verde/rosso può fornire un piccolo vantaggio di codifica; è accettabile e anzi rafforza la prepotenza del Go. Mantenere costanti dimensione, luminanza e posizione centrale. |
-| **Tasto di risposta** | **Barra spaziatrice** | **Confermato.** Risposta a tasto singolo ("go response" unimanuale): il partecipante preme sul Go e trattiene sul No-Go. Standard per il go/no-go a risposta singola. |
+| **Stimoli** | **Cerchio verde = Go; cerchio rosso = No-Go** | **Scelta di progetto**: mappatura comune e intuitiva (semaforo: verde→vai, rosso→ferma). Cerchi colorati sono una scelta diffusa nei go/no-go computerizzati. Caveat: la coppia verde/rosso **può non essere distinguibile** da chi ha una deficienza nella visione dei colori rosso-verde: per quei partecipanti il test va adattato (cambiando forma o luminanza). Altro caveat minore: la congruenza semantica verde/rosso può fornire un piccolo vantaggio di codifica; è accettabile e anzi rafforza la prepotenza del Go. Mantenere costanti dimensione, luminanza e posizione centrale. |
+| **Tasto di risposta** | **Barra spaziatrice** | **Scelta di progetto.** Risposta a tasto singolo ("go response" unimanuale): il partecipante preme sul Go e trattiene sul No-Go. Standard per il go/no-go a risposta singola. |
 
 ---
 
@@ -105,7 +108,7 @@ Corrispondenza fra i parametri della tabella §3 e il codice (`src/engine/tests/
 |---|---|---|
 | Parametri | `DEFAULTS.gonogo` | `nTrials 80`, `goRatio 0.75`, `stimulusMs 800`, `isiMinMs 500`, `isiMaxMs 1000`, `practiceTrials 10`; modificabili in Impostazioni e scritti in ogni esportazione |
 | Conteggio Go / No-Go | `generateGoNoGo` | `nGo = round(nTrials · goRatio)` (60), `nNoGo = nTrials − nGo` (20): il rapporto è **esatto**, non probabilistico |
-| Ordine | `arrangeKinds` | Disposizione casuale (RNG con seme) con vincolo di **non più di 2 No-Go consecutivi** e **primo trial sempre Go**; se dopo 500 tentativi non si trova una disposizione valida, ripiega su un'alternanza deterministica |
+| Ordine | `arrangeKinds` | Disposizione casuale (RNG con seme) con vincolo di **non più di 2 No-Go consecutivi** e **primo trial sempre Go**; un tentativo che richiederebbe una terza No-Go di fila viene scartato. Se dopo 500 tentativi non si trova una disposizione valida, ripiega su una disposizione deterministica: dopo ogni Go una quota uniforme di No-Go, al massimo 2; solo se `nNoGo > 2·nGo` (vincolo irrealizzabile) i No-Go in eccesso si accodano in fondo |
 | ISI | `generateGoNoGo` | Un valore intero uniforme in [`isiMinMs`, `isiMaxMs`] per ogni trial, schermo vuoto |
 | Stimolo e finestra | `GoNoGoView` | Cerchio verde (Go) o rosso (No-Go) al centro, visibile per tutti gli 800 ms; la finestra di risposta coincide con la durata dello stimolo e **il trial non termina alla pressione** (`endOnResponse: false`) |
 | Risposta | `GoNoGoView` | Barra spaziatrice. Go corretto = pressione nella finestra; No-Go corretto = nessuna pressione |
@@ -186,6 +189,11 @@ risposta; le metriche §5.1–5.4 restano quelle di riferimento. Il calcolo è c
 > d′.* **Behavior Research Methods, Instruments, & Computers, 27**(1), 46–51. https://doi.org/10.3758/BF03203619
 
 ## Cronologia delle revisioni
+
+- **2026-10-30 (revisione delle fonti).** Il contributo di Verbruggen e Logan (2008) è ora descritto come nel loro riassunto
+  (inibizione automatica da associazioni stimolo-stop; non equivalenza fra go/no-go e stop-signal), senza attribuire loro la
+  crescita della prepotenza con la frequenza dei Go. Le righe di §3 senza fonte sono marcate come scelte di progetto;
+  descritti il ripiego deterministico e il caso in cui il vincolo anti-cluster non è realizzabile.
 
 - **2026-10 (correzione).** Le commissioni e le omissioni erano dedotte dal flag di validazione, così un No-Go
   correttamente trattenuto (`VALID` senza risposta) veniva contato come commissione. Ora si usa la risposta registrata;

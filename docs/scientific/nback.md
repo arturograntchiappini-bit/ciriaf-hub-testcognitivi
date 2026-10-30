@@ -31,8 +31,8 @@ Le proprietà psicometriche del paradigma come misura della memoria di lavoro (W
 > 394–412. DOI: [10.1080/09658211003702171](https://doi.org/10.1080/09658211003702171)
 
 Jaeggi et al. (2010) hanno rivisto la letteratura e condotto tre esperimenti con varianti del compito (stimoli e carichi
-diversi). La conclusione è netta: l'N-back **non è una misura utile delle differenze individuali** di memoria di lavoro,
-soprattutto per **affidabilità insufficiente**, ma resta utile nella **ricerca sperimentale** sulla WM e predice
+diversi). Concludono che l'N-back **non è una misura utile delle differenze individuali** di memoria di lavoro,
+in parte per **affidabilità insufficiente**, ma resta utile nella **ricerca sperimentale** sulla WM e predice
 differenze individuali in altre funzioni cognitive superiori, come l'intelligenza fluida, specie ai carichi alti.
 Questo orienta l'uso del test su Sintropia: è adatto a confronti **entro i partecipanti tra condizioni** (per esempio
 due condizioni ambientali), meno a classificare le persone con un punteggio singolo (§6).
@@ -64,7 +64,8 @@ Poiché lo stream è ininterrotto, il sistema deve gestire in parallelo codifica
 nuovo item, ricalcolo delle posizioni e decisione di risposta, sotto pressione
 temporale. La meta-analisi di **Owen et al. (2005)**, su 668 insiemi di coordinate di attivazione tratti da 24 studi,
 trova attivazioni consistenti in regioni **frontali e parietali** — premotorie, prefrontali, cingolate e parietali
-posteriori — simili tra compiti verbali e non verbali e tra monitoraggio dell'identità e della posizione. Le
+posteriori — in linea di massima simili tra compiti verbali e non verbali e tra monitoraggio dell'identità e della
+posizione, con qualche indizio di pattern fronto-parietali distinti fra le varianti. Le
 localizzazioni sono un risultato di gruppo sul paradigma, non una mappatura dei punteggi individuali.
 
 Un punto metodologico critico riguarda la **strategia di familiarità**: un
@@ -173,7 +174,7 @@ d′   = z(H_ll) − z(F_ll)
 
 > Hautus, M. J. (1995). *Corrections for extreme proportions and their biasing effects
 > on estimated values of d′.* **Behavior Research Methods, Instruments, & Computers,
-> 27**, 46–51. DOI: [10.3758/BF03203619](https://doi.org/10.3758/BF03203619)
+> 27**(1), 46–51. DOI: [10.3758/BF03203619](https://doi.org/10.3758/BF03203619)
 
 *(Complementare — criterio di risposta / bias, opzionale):*
 
@@ -197,13 +198,14 @@ entra negli RT. Non si applicano altri scarti di outlier.
 
 ### 5.5 Analisi per quartili temporali del blocco (stabilità nel tempo)
 
-Il blocco è suddiviso in **4 quartili** contigui di trial (~90 trial, ~3 min ciascuno). Per ogni quartile la
+Il blocco è suddiviso in **4 quartili** contigui di trial (~90 trial, ~3 min ciascuno), il più bilanciati possibile: se
+il numero di trial non è divisibile per 4, i primi `n mod 4` quartili hanno un trial in più (nessun quartile resta vuoto). Per ogni quartile la
 piattaforma riporta il `d′`, con la correzione loglinear applicata ai conteggi del singolo quartile. Hit, falsi allarmi
 e RT per quartile non sono calcolati nel riepilogo ma si ricavano dai dati grezzi (una riga per trial, con condizione,
 risposta e flag).
 
-Il confronto Q1→Q4 indica un eventuale calo nel tempo (vigilanza, affaticamento). Con circa 25 target e 65 non-target
-per quartile, il $d'$ di un quartile è una stima **rumorosa**: va letto come tendenza, non come misura puntuale.
+Il confronto Q1→Q4 indica un eventuale calo nel tempo (vigilanza, affaticamento). Con circa 27 target e 63 non-target
+per quartile (107 e 253 sul blocco), il $d'$ di un quartile è una stima **rumorosa**: va letto come tendenza, non come misura puntuale.
 
 ### 5.6 Falsi allarmi sui lure
 
@@ -226,17 +228,13 @@ non-target indica una strategia basata sulla familiarità. I lure contano anche 
 
 ---
 
-
-
----
-
 ### Riferimenti (elenco)
 
 - Kirchner, W. K. (1958). *Age differences in short-term retention of rapidly changing information.* **Journal of Experimental Psychology, 55**(4), 352–358. DOI: [10.1037/h0043688](https://doi.org/10.1037/h0043688)
 - Jaeggi, S. M., Buschkuehl, M., Perrig, W. J., & Meier, B. (2010). *The concurrent validity of the N-back task as a working memory measure.* **Memory, 18**(4), 394–412. DOI: [10.1080/09658211003702171](https://doi.org/10.1080/09658211003702171)
 - Owen, A. M., McMillan, K. M., Laird, A. R., & Bullmore, E. (2005). *N-back working memory paradigm: A meta-analysis of normative functional neuroimaging studies.* **Human Brain Mapping, 25**(1), 46–59. DOI: [10.1002/hbm.20131](https://doi.org/10.1002/hbm.20131)
 - Kane, M. J., Conway, A. R. A., Miura, T. K., & Colflesh, G. J. H. (2007). *Working memory, attention control, and the N-back task: A question of construct validity.* **Journal of Experimental Psychology: LMC, 33**(3), 615–622. DOI: [10.1037/0278-7393.33.3.615](https://doi.org/10.1037/0278-7393.33.3.615)
-- Hautus, M. J. (1995). *Corrections for extreme proportions and their biasing effects on estimated values of d′.* **Behavior Research Methods, Instruments, & Computers, 27**, 46–51. DOI: [10.3758/BF03203619](https://doi.org/10.3758/BF03203619)
+- Hautus, M. J. (1995). *Corrections for extreme proportions and their biasing effects on estimated values of d′.* **Behavior Research Methods, Instruments, & Computers, 27**(1), 46–51. DOI: [10.3758/BF03203619](https://doi.org/10.3758/BF03203619)
 
 ## Cronologia delle revisioni
 
@@ -247,10 +245,11 @@ non-target indica una strategia basata sulla familiarità. I lure contano anche 
   Kane); aggiunta la sezione dei limiti con l'affidabilità. Le istruzioni e il suggerimento a schermo seguono ora il
   livello n scelto (prima erano fissi a 2). Il paper dichiarava hit, FA e RT per quartile, mentre il codice calcola solo
   il d′: allineato al codice.
-- **Criterio c.**
-
-Accanto a **d′** viene ora riportato il **criterio decisionale c** (bias di
-risposta), con la stessa correzione loglinear di Hautus:
-`c = −0.5 · (z(H) + z(F))`. `c > 0` indica un criterio conservativo (tende a non
-rispondere), `c < 0` liberale; separa la *tendenza di risposta* dalla
-*sensibilità* (d′). Restano d′ globale e per quartile temporale.
+- **Criterio c.** Accanto a **d′** viene ora riportato il **criterio decisionale c** (bias di
+  risposta), con la stessa correzione loglinear di Hautus:
+  `c = −0.5 · (z(H) + z(F))`. `c > 0` indica un criterio conservativo (tende a non
+  rispondere), `c < 0` liberale; separa la *tendenza di risposta* dalla
+  *sensibilità* (d′). Restano d′ globale e per quartile temporale.
+- **2026-10-30.** Quartili bilanciati documentati (corretto in `splitIntoChunks` l'ultimo quartile che poteva restare
+  vuoto); corretti i conteggi per quartile (circa 27 target e 63 non-target); attenuate le sintesi di Jaeggi et al. (2010)
+  («in parte» per affidabilità insufficiente) e di Owen et al. (2005), come nei riassunti.

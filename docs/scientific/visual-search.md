@@ -19,7 +19,7 @@ ricerca è di *congiunzione*.
 > Treisman, A. M., & Gelade, G. (1980). *A feature-integration theory of attention.* **Cognitive Psychology,
 > 12**(1), 97–136. https://doi.org/10.1016/0010-0285(80)90005-5
 
-Dall'abstract (letto attraverso una ricerca web; il record Europe PMC non esiste per questo articolo): la teoria
+Dall'abstract (letto attraverso una ricerca web; il record Europe PMC esiste ma non riporta l'abstract): la teoria
 dell'integrazione delle caratteristiche propone che le caratteristiche siano registrate presto, in modo automatico e in
 parallelo su tutto il campo visivo, mentre gli oggetti sono identificati in una fase successiva; l'attenzione deve essere
 diretta in modo **seriale** a ciascuno stimolo quando servono congiunzioni di più caratteristiche separabili per

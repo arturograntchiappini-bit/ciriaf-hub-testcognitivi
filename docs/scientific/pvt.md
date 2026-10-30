@@ -62,7 +62,7 @@ complessa o inibizione, solo rilevare uno stimolo semplice e rispondere.
 | **ISI** | **2000–10 000 ms**, uniforme | Intervallo tipico del PVT a 10 minuti; non verificato sul testo di Dinges e Powell (1985) |
 | **Tempo massimo di risposta** | **10 000 ms**, poi omissione | **Scelta di progetto**. Le omissioni contano come lapse |
 | **Pratica** | **5 trial** con feedback | **Scelta di progetto**; esclusi dalle metriche |
-| **Soglia di lapse** | **RT ≥ 500 ms** | PVT a 10 minuti (Basner & Dinges, 2011, e documentazione del software Inquisit); per il PVT breve di 3 minuti si usa 355 ms |
+| **Soglia di lapse** | **RT ≥ 500 ms** | Soglia convenzionale del PVT a 10 minuti (il manuale del PVT di Inquisit, consultato il 2026-10-30, classifica come lapse le risposte **> 500 ms**: il confine esatto differisce di 1 ms da quello di Sintropia; il riassunto di Basner & Dinges, 2011, parla di lapse senza indicare la soglia, e il testo completo non è stato riletto). Il PVT breve di 3 minuti usa una soglia più bassa, non verificata qui |
 | **Soglia di anticipazione** | **RT < 150 ms** | Soglia comune a tutta la piattaforma ([validazione RT](validazione-rt.md)); altre fonti usano 100 ms per le *false starts* |
 
 Nota: l'ISI massimo di 10 s è anche il tempo massimo di risposta, quindi un trial con stimolo visibile per 10 s senza
@@ -173,3 +173,5 @@ Limiti da considerare:
   superiore), aggiunta la **velocità di risposta (1/RT)** raccomandata come esito primario. Corretto nel sequencer
   condiviso un difetto per cui un tasto premuto durante la fissazione veniva registrato con un RT calcolato sull'onset
   del trial precedente.
+- **2026-10-30.** Attenuata l'attribuzione della soglia di 500 ms (non presente nel riassunto di Basner e Dinges) e
+  rimossa la soglia di 355 ms del PVT breve, priva di fonte verificata.

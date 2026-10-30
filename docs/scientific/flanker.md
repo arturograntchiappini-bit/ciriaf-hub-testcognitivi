@@ -63,7 +63,7 @@ misurano forme diverse di conflitto.
 | Trial | 96 (39 congruenti, 38 incongruenti, 19 neutri) | **Scelta di progetto**: numero sufficiente per stimare effetto e adattamento |
 | Proporzioni | 40% incongruenti, 20% neutri | **Scelta di progetto** |
 | Bilanciamento | direzione sinistra/destra bilanciata in ogni condizione | Prassi per evitare bias di risposta |
-| Run massimi | ≤ 3 trial consecutivi con stessa condizione o stessa risposta | **Scelta di progetto** (evita attesa ritmica) |
+| Run massimi | ≤ 3 trial consecutivi con stessa condizione o stessa risposta | **Scelta di progetto** (evita attesa ritmica). Costruzione passo per passo con fino a 300 tentativi; se falliscono tutti si usa un rimescolamento senza vincolo, quindi il limite non è garantito in assoluto |
 | Fissazione | 500 ms | Convenzione jsPsych/PsyToolkit |
 | Finestra di risposta | 1500 ms (stimolo fino a risposta) | **Scelta di progetto**; oltre = omissione |
 | ISI | 700–1100 ms uniforme | **Scelta di progetto** (jitter anti-anticipazione) |

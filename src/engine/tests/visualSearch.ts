@@ -57,6 +57,7 @@ export function conditionLabel(type: SearchType, present: boolean, setSize: numb
 function parseCondition(condition: string): { type: SearchType; present: boolean; setSize: number } | null {
   const [type, presence, size] = condition.split('-');
   if ((type !== 'feature' && type !== 'conjunction') || (presence !== 'present' && presence !== 'absent')) return null;
+  if (size === undefined || size.trim() === '') return null; // Number('') === 0 farebbe passare una numerosità vuota
   const setSize = Number(size);
   return Number.isInteger(setSize) ? { type, present: presence === 'present', setSize } : null;
 }

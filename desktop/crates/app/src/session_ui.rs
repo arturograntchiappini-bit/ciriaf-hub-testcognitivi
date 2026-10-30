@@ -338,12 +338,12 @@ impl SessionStore {
         std::fs::create_dir_all(&self.dir)
             .map_err(|e| format!("cartella {}: {e}", self.dir.display()))?;
         let json = serde_json::to_string_pretty(value).map_err(|e| e.to_string())?;
-        std::fs::write(path, json).map_err(|e| format!("scrittura {}: {e}", path.display()))
+        crate::fsutil::write_atomic(path, json.as_bytes())
     }
 
     /// File assente o corrotto dà una lista vuota (mai un crash).
     pub fn load_templates(&self) -> Vec<SessionTemplate> {
-        std::fs::read_to_string(self.templates_path())
+        crate::fsutil::read_text_capped(&self.templates_path(), crate::fsutil::MAX_RESULT_BYTES)
             .ok()
             .and_then(|text| serde_json::from_str(&text).ok())
             .unwrap_or_default()
@@ -369,7 +369,9 @@ impl SessionStore {
     }
 
     pub fn load_run(&self) -> Option<SessionRun> {
-        let text = std::fs::read_to_string(self.run_path()).ok()?;
+        let text =
+            crate::fsutil::read_text_capped(&self.run_path(), crate::fsutil::MAX_RESULT_BYTES)
+                .ok()?;
         serde_json::from_str(&text).ok()
     }
 
@@ -1031,7 +1033,9 @@ impl BuilderState {
 
     fn import_from_path(&mut self, rand: &mut dyn FnMut() -> f64) -> Result<(), String> {
         let path = self.path_input.trim();
-        let text = std::fs::read_to_string(path).map_err(|e| format!("lettura {path}: {e}"))?;
+        let text =
+            crate::fsutil::read_text_capped(Path::new(path), crate::fsutil::MAX_CONFIG_BYTES)
+                .map_err(|e| format!("lettura {path}: {e}"))?;
         self.draft = import_template_json(&text, &iso_now(), rand)?;
         self.selected_pin = None;
         Ok(())
@@ -1046,7 +1050,7 @@ impl BuilderState {
         };
         let path = dir.join(format!("protocollo_{}.json", export::sanitize_id(name)));
         let json = serde_json::to_string_pretty(&self.draft).map_err(|e| e.to_string())?;
-        std::fs::write(&path, json).map_err(|e| format!("scrittura {}: {e}", path.display()))?;
+        crate::fsutil::write_atomic(&path, json.as_bytes())?;
         Ok(path)
     }
 }
@@ -1474,16 +1478,17 @@ fn play_alert(ctx: &egui::Context) {
     ));
     #[cfg(windows)]
     {
-        use std::os::windows::process::CommandExt;
-        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
-        let _ = std::process::Command::new("powershell")
-            .args([
-                "-NoProfile",
-                "-Command",
-                "[console]::Beep(880,250);[console]::Beep(1175,350)",
-            ])
-            .creation_flags(CREATE_NO_WINDOW)
-            .spawn();
+        // `Beep` blocca per la durata del suono: va su un thread a parte. Nessun processo esterno.
+        std::thread::spawn(|| {
+            extern "system" {
+                fn Beep(frequency_hz: u32, duration_ms: u32) -> i32;
+            }
+            // SAFETY: `Beep` di kernel32 accetta due interi per valore e non tocca memoria del chiamante.
+            unsafe {
+                Beep(880, 250);
+                Beep(1175, 350);
+            }
+        });
     }
 }
 
@@ -1790,7 +1795,7 @@ pub fn export_session(
     };
     std::fs::create_dir_all(dir).map_err(|e| format!("cartella {}: {e}", dir.display()))?;
     let path = dir.join(name);
-    std::fs::write(&path, content).map_err(|e| format!("scrittura {}: {e}", path.display()))?;
+    crate::fsutil::write_atomic(&path, content.as_bytes())?;
     Ok(path)
 }
 

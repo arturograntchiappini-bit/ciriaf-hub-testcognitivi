@@ -26,7 +26,7 @@ di parole-colore incongruenti:
 > reactions.* Journal of Experimental Psychology, 18(6), 643–662.
 > https://doi.org/10.1037/h0054651
 
-La sintesi integrativa di riferimento — che consolida oltre 400 studi e isola
+La sintesi integrativa di riferimento — che organizza mezzo secolo di ricerca e isola
 18 risultati empirici robusti che ogni teoria dell'effetto Stroop deve
 spiegare — è:
 
@@ -92,7 +92,7 @@ riverificata** nelle loro versioni correnti) e ciò che è una **scelta di proge
 | **Proporzione congruenti / incongruenti** | **50% / 50%** | **Scelta di progetto**, neutra: la proporzione di prove incongruenti modula l'ampiezza dell'interferenza (*proportion-congruent effect*), quindi un rapporto 50/50 evita di gonfiarla o comprimerla artificialmente. Il fenomeno è discusso nella rassegna di MacLeod (1991). |
 | **Fissazione** | **500 ms** | **Prassi** dei software di riferimento: orienta l'attenzione al centro prima dello stimolo. |
 | **Timeout di risposta** | **3000 ms** | **Scelta di progetto**: finestra ampia, che include le risposte lente sotto interferenza. Oltre = omissione. |
-| **ISI** | **500 ms, costante** | **Scelta di progetto con vincolo di fonte.** Galer et al. (2014) hanno variato l'intervallo risposta-stimolo da 1000 a 5000 ms in bambini (8–10 anni) e adulti: l'intervallo più breve (1000 ms) ha prodotto l'interferenza maggiore in entrambi i gruppi. L'ISI di Sintropia (500 ms) è **più breve dell'intervallo studiato**, quindi l'interferenza misurata può risultare amplificata rispetto a protocolli con ISI più lunghi. Va tenuto **costante** tra trial e partecipanti, così l'effetto è comparabile. |
+| **ISI** | **500 ms, costante** | **Scelta di progetto con vincolo di fonte.** Galer et al. (2014) hanno variato l'intervallo risposta-stimolo da 1000 a 5000 ms in bambini (8–10 anni) e adulti: l'intervallo più breve (1000 ms, nell'esperimento a intervalli fissi) ha prodotto l'interferenza maggiore in entrambi i gruppi. In Sintropia l'intervallo risposta-stimolo è ISI (500 ms) + fissazione (500 ms) = **1000 ms** nel test (si aggiunge la durata del feedback in pratica, e nel test se l'opzione «feedback durante il test», disattivata per default, è attiva): coincide con il livello più breve di Galer et al., quello con l'interferenza maggiore, ed è più breve dei protocolli con intervalli lunghi. Va tenuto **costante** tra trial e partecipanti, così l'effetto è comparabile. |
 | **Pratica** | **8 trial con feedback** | **Prassi**. Serve a imparare la mappatura tasto-colore; i trial di pratica sono esclusi dalle metriche. |
 | **Colori e parole** | **ROSSO, VERDE, BLU, GIALLO** | Set a 4 colori molto diffuso nella letteratura. Nelle prove incongruenti la parola è uno degli altri 3 colori. |
 | **Tasti** | **R, V, B, G** (iniziali italiane) | **Scelta di progetto**: le quattro iniziali sono univoche. Una legenda tasto-colore resta visibile e si impara in pratica. |
@@ -197,3 +197,6 @@ stretta. Il dettaglio per condizione è nei dati grezzi (CSV/JSON, una riga per 
   interrotti esclusi); aggiunto il **costo in accuratezza**; documentata la condizione di bilanciamento perfetto
   (`nTrials` multiplo di 24) e la discussione dell'ISI alla luce di Galer et al. (2014).
 - **Coefficiente di variazione.** Aggiunto il CV del RT per condizione (`SD/media · 100`).
+- **2026-10-30.** Corretto il confronto con Galer et al. (2014): si confrontava l'ISI (500 ms) con l'intervallo
+  risposta-stimolo dello studio, mentre in Sintropia quest'ultimo è ISI + fissazione = 1000 ms. Rimossa la cifra
+  «oltre 400 studi» attribuita a MacLeod (1991), non verificata sul testo.

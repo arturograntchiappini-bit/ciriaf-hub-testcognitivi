@@ -347,10 +347,15 @@ export function scoreNBack(trials: readonly TrialResult[], nQuartiles = 4): Summ
 
 /** Divide una lista in `k` blocchi contigui il più bilanciati possibile. */
 export function splitIntoChunks<T>(items: readonly T[], k: number): T[][] {
+  if (k <= 0) return [];
   const chunks: T[][] = [];
-  const size = Math.ceil(items.length / k);
+  const base = Math.floor(items.length / k);
+  const extra = items.length % k; // i primi `extra` blocchi hanno un elemento in più: nessun blocco resta vuoto se n >= k
+  let start = 0;
   for (let i = 0; i < k; i++) {
-    chunks.push(items.slice(i * size, (i + 1) * size));
+    const end = start + base + (i < extra ? 1 : 0);
+    chunks.push(items.slice(start, end));
+    start = end;
   }
   return chunks;
 }

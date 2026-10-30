@@ -1,26 +1,34 @@
 name: release-desktop
+
+# Si avvia con un tag `vX.Y.Z`: verifica, costruisce MSI, zip e checksum, attesta la provenienza e pubblica la Release.
 on:
   push:
     tags: ['v*']
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: write # crea la Release
+      id-token: write # attestazione di provenienza
+      attestations: write
     defaults:
       run:
         shell: pwsh
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
           targets: wasm32-unknown-unknown
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: desktop
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: '8.0.x'
       - name: Installa WiX
@@ -30,12 +38,21 @@ jobs:
       - name: Test
         working-directory: desktop
         run: |
-          cargo test --workspace
-          cargo check -p sintropia-engines --target wasm32-unknown-unknown
+          cargo test --workspace --release --locked
+          cargo check -p sintropia-engines --target wasm32-unknown-unknown --locked
       - name: Installer, zip e checksum
+        # Per firmare l'MSI e l'exe imposta il segreto SINTROPIA_SIGN_COMMAND (vedi docs/sicurezza.md).
+        env:
+          SINTROPIA_SIGN_COMMAND: ${{ secrets.SINTROPIA_SIGN_COMMAND }}
         run: ./desktop/installer/build-installer.ps1
+      - name: Attesta la provenienza degli artefatti
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
+        with:
+          subject-path: |
+            dist-desktop/Sintropia-Setup-x64.msi
+            dist-desktop/Sintropia-Desktop-x64.zip
       - name: Pubblica la Release
-        uses: softprops/action-gh-release@v2.0.8
+        uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191 # v2.0.8
         with:
           files: |
             dist-desktop/Sintropia-Setup-x64.msi

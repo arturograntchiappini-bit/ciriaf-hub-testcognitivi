@@ -1,4 +1,6 @@
 //! Utilità condivise dai test golden: tolleranza unica e lettura delle fixture generate dal TypeScript.
+//! Ogni binario di test ne usa un sottoinsieme: gli elementi non usati sono attesi.
+#![allow(dead_code, unused_imports)]
 use std::path::PathBuf;
 
 /// Tolleranza per i confronti in virgola mobile con le fixture golden (dichiarata in un solo punto).

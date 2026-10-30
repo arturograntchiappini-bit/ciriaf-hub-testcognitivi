@@ -3,6 +3,7 @@ name = "sintropia-engines"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+publish = false
 
 [dependencies]
 sintropia-core = { path = "../core" }

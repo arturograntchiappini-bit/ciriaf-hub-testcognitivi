@@ -78,7 +78,7 @@ export function toHtmlReport(result: TestResult, title: string, exportedAt: stri
   const params = Object.entries(result.params).map(([k, v]) => [k, String(v)] as const);
   const testTrials = result.trials.filter((t) => t.phase === 'test').length;
   return `<!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="it"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${escapeHtml(title)} — ${escapeHtml(result.sessionId)}</title>
 <style>body{font:15px/1.5 system-ui,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem;color:#111}h1{font-size:1.6rem;margin:.2rem 0}h2{font-size:1rem;margin:2rem 0 .5rem;text-transform:uppercase;letter-spacing:.08em;color:#444}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:.4rem .6rem;border-bottom:1px solid #ddd}th{font-weight:500;width:60%}td{font-variant-numeric:tabular-nums}.meta{color:#555;font-size:.85rem}@media print{body{margin:0}}</style></head>
 <body><p class="meta">Sintropia — Cognitive tests Hub</p><h1>${escapeHtml(title)}</h1>

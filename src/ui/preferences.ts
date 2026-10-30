@@ -24,8 +24,9 @@ export function loadPreferences(): Preferences {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return { ...DEFAULT_PREFERENCES };
-    const parsed = JSON.parse(raw) as Partial<Preferences>;
-    return { ...DEFAULT_PREFERENCES, ...parsed };
+    const parsed = JSON.parse(raw) as Partial<Preferences> | null;
+    const feedback = parsed?.feedbackDuringTest;
+    return { feedbackDuringTest: typeof feedback === 'boolean' ? feedback : DEFAULT_PREFERENCES.feedbackDuringTest };
   } catch {
     return { ...DEFAULT_PREFERENCES };
   }

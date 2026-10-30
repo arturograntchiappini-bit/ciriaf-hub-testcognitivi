@@ -84,6 +84,7 @@ pub struct RtPlan<S> {
     pub expects_response: fn(&TrialSpec) -> bool,
     pub evaluate: fn(&TrialSpec, Option<&str>) -> bool,
     pub status_hint: String,
+    #[allow(clippy::type_complexity)]
     pub score: Box<dyn Fn(&[TrialResult]) -> Vec<SummaryMetric>>,
     pub draw: fn(&StimulusCtx, &S),
 }

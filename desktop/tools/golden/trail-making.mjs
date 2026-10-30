@@ -42,7 +42,7 @@ export function build() {
       }
     }
   }
-  const labels = ['A', 'B'].flatMap((part) => [0, 1, 2, 3, 6, 25, 26, 51].map((n) => ({ part, n, labels: m.trailLabels(part, n) })));
+  const labels = ['A', 'B'].flatMap((part) => [0, 1, 2, 3, 6, 25, 26, 51, 53, 80].map((n) => ({ part, n, labels: m.trailLabels(part, n) })));
 
   const runs = [];
   const addRun = (id, part, n, seed, phase, startMs, clicks) => {

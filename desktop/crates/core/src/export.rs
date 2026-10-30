@@ -73,13 +73,27 @@ impl From<usize> for CsvValue {
     }
 }
 
+/// Inizio di cella che un foglio di calcolo interpreta come formula (OWASP «CSV injection»):
+/// `=`, `+`, `@`, tab, ritorno a capo, oppure `-` seguito da altro che non sia un numero semplice.
+fn starts_like_formula(s: &str) -> bool {
+    match s.chars().next() {
+        Some('=' | '+' | '@' | '\t' | '\r') => true,
+        Some('-') => !(s.len() > 1 && s[1..].chars().all(|c| c.is_ascii_digit() || c == '.')),
+        _ => false,
+    }
+}
+
 /// Mette tra virgolette e raddoppia le virgolette se il campo contiene separatore/newline/virgolette.
+/// Le stringhe che iniziano come una formula ricevono un apice iniziale: i numeri restano intatti.
 pub fn csv_field(value: &CsvValue, separator: &str) -> String {
     if *value == CsvValue::Null {
         return String::new();
     }
-    let s = value.to_text();
-    if s.contains(separator) || s.contains('"') || s.contains('\n') {
+    let mut s = value.to_text();
+    if matches!(value, CsvValue::Text(_)) && starts_like_formula(&s) {
+        s.insert(0, '\'');
+    }
+    if s.contains(separator) || s.contains('"') || s.contains('\n') || s.contains('\r') {
         format!("\"{}\"", s.replace('"', "\"\""))
     } else {
         s
@@ -399,7 +413,7 @@ pub fn to_html_report(result: &TestResult, title: &str, exported_at: &str) -> St
         .count();
     let (title_e, session_e) = (escape_html(title), escape_html(&result.session_id));
     format!(
-        "<!doctype html>\n<html lang=\"it\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n\
+        "<!doctype html>\n<html lang=\"it\"><head><meta charset=\"utf-8\"><meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n\
 <title>{title_e} \u{2014} {session_e}</title>\n\
 <style>body{{font:15px/1.5 system-ui,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem;color:#111}}h1{{font-size:1.6rem;margin:.2rem 0}}h2{{font-size:1rem;margin:2rem 0 .5rem;text-transform:uppercase;letter-spacing:.08em;color:#444}}table{{border-collapse:collapse;width:100%}}th,td{{text-align:left;padding:.4rem .6rem;border-bottom:1px solid #ddd}}th{{font-weight:500;width:60%}}td{{font-variant-numeric:tabular-nums}}.meta{{color:#555;font-size:.85rem}}@media print{{body{{margin:0}}}}</style></head>\n\
 <body><p class=\"meta\">Sintropia \u{2014} Cognitive tests Hub</p><h1>{title_e}</h1>\n\
@@ -585,6 +599,13 @@ mod tests {
         assert_eq!(csv_field(&"a,b".into(), ";"), "a,b");
         assert_eq!(csv_field(&"a,b".into(), ","), "\"a,b\"");
         assert_eq!(csv_field(&CsvValue::Null, ";"), "");
+        assert_eq!(csv_field(&"=1+1".into(), ";"), "'=1+1");
+        assert_eq!(csv_field(&"@SUM(A1)".into(), ";"), "'@SUM(A1)");
+        assert_eq!(csv_field(&"-cmd|calc".into(), ";"), "'-cmd|calc");
+        assert_eq!(csv_field(&"-30".into(), ";"), "-30");
+        assert_eq!(csv_field(&"same--30".into(), ";"), "same--30");
+        assert_eq!(csv_field(&CsvValue::Num(-12.5), ";"), "-12.5");
+        assert_eq!(csv_field(&"a\rb".into(), ";"), "\"a\rb\"");
     }
 
     #[test]
@@ -641,7 +662,7 @@ mod tests {
             "2026-07-07T10:00:00.000Z",
             "Sintropia Desktop",
         );
-        assert!(json.starts_with("{\n  \"app\": \"Sintropia - Cognitive tests Hub\",\n  \"engineVersion\": \"0.1.0\",\n  \"testId\": \"stroop1\",\n  \"sessionId\": \"S-AB12-0930\","));
+        assert!(json.starts_with("{\n  \"app\": \"Sintropia - Cognitive tests Hub\",\n  \"engineVersion\": \"0.2.0\",\n  \"testId\": \"stroop1\",\n  \"sessionId\": \"S-AB12-0930\","));
         assert!(json.contains("\"exportedAt\": \"2026-07-07T10:00:00.000Z\""));
         assert!(json.contains("\"params\": {\n    \"trials\": 20,\n    \"nome\": \"a<b\"\n  }"));
         assert!(json.contains("\"rtMs\": null"));
@@ -657,7 +678,7 @@ mod tests {
         assert!(html.contains("<td>a&lt;b</td>"));
         assert!(html.contains("1 trial di test"));
         assert!(!html.contains("<script"));
-        assert!(html.contains("<p class=\"meta\">Motore Sintropia v0.1.0</p></body></html>"));
+        assert!(html.contains("<p class=\"meta\">Motore Sintropia v0.2.0</p></body></html>"));
     }
 
     #[test]
@@ -665,7 +686,7 @@ mod tests {
         let csv = to_csv(&sample_result());
         assert!(csv.starts_with("test;session_id;"));
         let tagged = with_engine_version_header(&csv);
-        assert_eq!(tagged, format!("# engineVersion=0.1.0\r\n{csv}"));
+        assert_eq!(tagged, format!("# engineVersion=0.2.0\r\n{csv}"));
     }
 
     #[test]

@@ -117,7 +117,8 @@ cargo run --release -p sintropia-desktop
 
 > **Avviso di Windows.** Il programma **non è ancora firmato digitalmente**: alla prima esecuzione SmartScreen può
 > mostrare «Windows ha protetto il PC» (*Ulteriori informazioni → Esegui comunque*). I checksum permettono di verificare
-> che il file sia quello pubblicato. Come ottenere la firma è spiegato in [`desktop/README.md`](desktop/README.md).
+> che il file sia quello pubblicato (e gli artefatti di una Release hanno l'attestazione di provenienza). Come ottenere la firma,
+> e il comando già predisposto nello script di build, è in [`docs/sicurezza.md`](docs/sicurezza.md).
 
 L'app accetta opzioni per aprire direttamente una schermata o un test (`--screen`, `--test`, `--size`, `--no-practice`), utili per prove e documentazione.
 
@@ -204,7 +205,7 @@ Ogni paper segue la stessa struttura: paradigma e citazione primaria, meccanismo
 limiti. Il trattamento dei tempi di reazione è in [`validazione-rt.md`](docs/scientific/validazione-rt.md).
 
 Un documento di metodo, [**Migrazione dei motori da TypeScript a Rust**](docs/scientific/migrazione-rust.md), riporta la
-dimostrazione sperimentale che il motore Rust riproduce il riferimento: metodo, divergenze trovate, prestazioni, limiti.
+dimostrazione sperimentale che il motore Rust riproduce il riferimento: metodo, difetti trovati dal confronto (corretti in entrambe le implementazioni), prestazioni, limiti.
 
 ## Formati di export
 
@@ -260,6 +261,11 @@ flowchart LR
 
 ## Qualità e verifiche
 
+**Sicurezza.** Politica di segnalazione in [`SECURITY.md`](SECURITY.md), revisione completa con esiti e residui in
+[`docs/sicurezza.md`](docs/sicurezza.md): CSP stretta, parametri e file importati validati, neutralizzazione della CSV injection,
+scritture atomiche, nessun processo esterno nell'app, installer solo HTTPS con controllo dell'archivio, CI con `npm audit`, `cargo deny`,
+clippy `-D warnings` e azioni fissate per SHA.
+
 **Equivalenza Rust ↔ TypeScript** (dati completi in [`desktop/fixtures/`](desktop/fixtures/) e nel [paper di migrazione](docs/scientific/migrazione-rust.md)):
 
 - **Fixture golden** generate dal TS per ogni test: sequenze, conteggi e ordini **esattamente** uguali, float entro **1e-9**
@@ -267,7 +273,7 @@ flowchart LR
   nessuna commissione, meno di due punti per le regressioni).
 - **Fuzz differenziale**: per ogni test circa 500 casi di generazione e 500 di punteggio casuali, eseguiti sia nel TS sia nel Rust e confrontati.
 - **Test di proprietà** (proptest) sugli invarianti: bilanciamento, nessuna ripetizione immediata, bersagli attesi, ISI nell'intervallo.
-- **Bug del TS trovati dal confronto** sono documentati in [`DIVERGENZE.md`](desktop/fixtures/DIVERGENZE.md): il Rust non li copia; il TS resta invariato come oracolo.
+- **Difetti trovati dal confronto** (TS e Rust) sono registrati in [`DIVERGENZE.md`](desktop/fixtures/DIVERGENZE.md): sono stati corretti in entrambi i motori e le fixture rigenerate; non resta nessuna divergenza attesa.
 - **Prestazioni**: in generazione e punteggio il Rust nativo è più veloce del TS su tutte le operazioni misurate
   (da circa 1,3× a oltre 30×), e il WebAssembly è comparabile al nativo; metodo e numeri in [`BENCHMARK.md`](desktop/fixtures/BENCHMARK.md).
 - `ENGINE_VERSION` è scritta in ogni export, così un dato dichiara con quale motore è stato prodotto.
@@ -317,7 +323,7 @@ in `public/download/` e vengono serviti dallo stesso sito.
   dedicato senza calibrazione. Vedi [`validazione-rt.md`](docs/scientific/validazione-rt.md).
 - L'angolo visivo degli stimoli dipende da distanza e schermo del partecipante.
 - Per confrontare gruppi servono stesso hardware, stessa versione del motore e stessi parametri.
-- L'app per Windows non è firmata digitalmente; la web app non usa ancora il motore Rust (la migrazione verso WebAssembly è il passo successivo).
+- L'app per Windows non è ancora firmata digitalmente (vedi [`docs/sicurezza.md`](docs/sicurezza.md)); la web app non usa ancora il motore Rust (la migrazione verso WebAssembly è il passo successivo).
 
 ## Roadmap
 

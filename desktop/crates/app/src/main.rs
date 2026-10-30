@@ -8,6 +8,7 @@ mod app;
 mod cli;
 mod data;
 mod demo;
+mod fsutil;
 mod markdown;
 mod papers;
 mod runner;

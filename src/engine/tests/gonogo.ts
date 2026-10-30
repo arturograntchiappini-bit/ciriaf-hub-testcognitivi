@@ -53,7 +53,7 @@ function arrangeKinds(nGo: number, nNoGo: number, rand: () => number): GoNoGoKin
     const result = tryArrange(nGo, nNoGo, rand);
     if (result) return result;
   }
-  // Fallback deterministico: intercala i No-Go tra i Go (mai consecutivi).
+  // Fallback deterministico: intercala i No-Go tra i Go (al massimo MAX_NOGO_RUN consecutivi).
   return deterministicArrange(nGo, nNoGo);
 }
 
@@ -73,6 +73,7 @@ function tryArrange(nGo: number, nNoGo: number, rand: () => number): GoNoGoKind[
     else chooseNoGo = rand() < noGoLeft / (goLeft + noGoLeft);
 
     if (chooseNoGo) {
+      if (noGoRun >= MAX_NOGO_RUN) return null; // Go finiti: la terza No-Go di fila violerebbe il vincolo, si ritenta
       seq.push('nogo');
       noGoLeft--;
       noGoRun++;
@@ -85,20 +86,22 @@ function tryArrange(nGo: number, nNoGo: number, rand: () => number): GoNoGoKind[
   return goLeft === 0 && noGoLeft === 0 ? seq : null;
 }
 
+/**
+ * Ripiego deterministico: ogni Go è seguito da una quota di No-Go distribuita in modo uniforme, mai più di
+ * MAX_NOGO_RUN per volta; i No-Go che non trovano posto (rapporto Go troppo basso per il vincolo) si accodano.
+ */
 function deterministicArrange(nGo: number, nNoGo: number): GoNoGoKind[] {
   const seq: GoNoGoKind[] = [];
-  let goLeft = nGo;
-  let noGoLeft = nNoGo;
-  while (goLeft > 0 || noGoLeft > 0) {
-    if (goLeft > 0) {
-      seq.push('go');
-      goLeft--;
-    }
-    if (noGoLeft > 0 && (goLeft > 0 || seq[seq.length - 1] === 'go')) {
+  let placed = 0;
+  for (let go = 1; go <= nGo; go++) {
+    seq.push('go');
+    const due = Math.floor((go * nNoGo) / nGo);
+    for (let k = Math.min(due - placed, MAX_NOGO_RUN); k > 0; k--) {
       seq.push('nogo');
-      noGoLeft--;
+      placed++;
     }
   }
+  for (; placed < nNoGo; placed++) seq.push('nogo');
   return seq;
 }
 

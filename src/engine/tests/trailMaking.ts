@@ -27,6 +27,8 @@ export interface TrailCircle {
 }
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+/** Cerchi massimi della parte B: 1, A, 2, B, …, Z, 27. */
+const MAX_B_CIRCLES = 2 * LETTERS.length + 1;
 const MIN_DISTANCE = 0.11; // distanza minima fra i centri, in frazioni del lato del campo
 const MARGIN = 0.06;
 const PLACEMENT_ATTEMPTS = 4000;
@@ -34,7 +36,8 @@ const PLACEMENT_ATTEMPTS = 4000;
 /** Etichette nell'ordine da collegare: 1…n (A) oppure 1, A, 2, B… (B). */
 export function trailLabels(part: TrailPart, n: number): string[] {
   if (part === 'A') return Array.from({ length: n }, (_, i) => String(i + 1));
-  return Array.from({ length: n }, (_, i) => (i % 2 === 0 ? String(i / 2 + 1) : (LETTERS[(i - 1) / 2] as string)));
+  // Finite le lettere la sequenza 1, A, 2, B… non può proseguire: la parte B si ferma a MAX_B_CIRCLES.
+  return Array.from({ length: Math.min(n, MAX_B_CIRCLES) }, (_, i) => (i % 2 === 0 ? String(i / 2 + 1) : (LETTERS[(i - 1) / 2] as string)));
 }
 
 function placePoints(count: number, rand: () => number): [number, number][] {
@@ -44,13 +47,13 @@ function placePoints(count: number, rand: () => number): [number, number][] {
     const y = MARGIN + rand() * (1 - 2 * MARGIN);
     if (points.every(([px, py]) => Math.hypot(px - x, py - y) >= MIN_DISTANCE)) points.push([x, y]);
   }
-  // Ripiego: griglia con scarto, se il campo è troppo affollato per l'estrazione casuale.
+  if (points.length >= count) return points;
+  // Ripiego: il campo è troppo affollato per l'estrazione casuale. Si scarta tutto e si scelgono `count` celle a caso di
+  // una griglia: i centri distano almeno `step`, che fino a 64 cerchi è >= MIN_DISTANCE.
   const side = Math.ceil(Math.sqrt(count));
-  while (points.length < count) {
-    const cell = points.length;
-    points.push([MARGIN + ((cell % side) + 0.5) * ((1 - 2 * MARGIN) / side), MARGIN + (Math.floor(cell / side) + 0.5) * ((1 - 2 * MARGIN) / side)]);
-  }
-  return points;
+  const step = (1 - 2 * MARGIN) / side;
+  const cells = Array.from({ length: side * side }, (_, i): [number, number] => [MARGIN + ((i % side) + 0.5) * step, MARGIN + (Math.floor(i / side) + 0.5) * step]);
+  return shuffle(cells, rand).slice(0, count);
 }
 
 /** Cerchi della parte, in ordine di collegamento (`circles[i]` è il bersaglio i-esimo); le posizioni sono casuali. */

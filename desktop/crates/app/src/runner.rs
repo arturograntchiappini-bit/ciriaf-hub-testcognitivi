@@ -30,6 +30,7 @@ pub fn create_runner(
     feedback_during_test: bool,
 ) -> Result<Box<dyn TestRunner>, String> {
     use crate::views::{self, RunContext};
+    let params = crate::data::sanitize_params(test.as_str(), &params);
     let run = RunContext {
         session_id,
         started_at,

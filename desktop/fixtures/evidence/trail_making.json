@@ -6,7 +6,7 @@
     "run": 9,
     "scoring": 17
   },
-  "exactComparisons": 5230,
+  "exactComparisons": 5473,
   "floatComparisons": 4075,
   "maxAbsoluteDeviation": 1.1102230246251563e-16,
   "maxAbsoluteDeviationAt": "A-n3@1.stimuli[2].y",

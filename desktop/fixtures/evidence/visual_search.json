@@ -47,9 +47,7 @@
     "arrotondamento-meta-decimale",
     "rapporto-meta-centesimo"
   ],
-  "expectedDivergences": [
-    "condizione-numerosita-vuota"
-  ],
+  "expectedDivergences": [],
   "proptestCases": {
     "isi_nell_intervallo": 256,
     "distrattori_e_posizioni": 256,

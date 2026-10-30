@@ -4,22 +4,16 @@
  * @see docs/architettura.md — sezione "Impostazioni"
  */
 import { DEFAULTS, type AllParams } from '../config/defaults';
+import { sanitizeParams } from './params/sanitize';
 
 const STORAGE_KEY = 'ciriaf-cth-settings-v1';
 
-/** Merge superficiale per-test: ogni campo mancante ricade sul default. */
+/** Merge per-test: ogni campo mancante, non numerico o fuori scala ricade sul default (vedi sanitizeParams). */
 function mergeWithDefaults(stored: unknown): AllParams {
+  const source = typeof stored === 'object' && stored !== null ? (stored as Record<string, unknown>) : {};
   const result = structuredCloneSafe(DEFAULTS);
-  if (typeof stored !== 'object' || stored === null) return result;
-  const s = stored as Record<string, unknown>;
   for (const key of Object.keys(DEFAULTS) as (keyof AllParams)[]) {
-    const testStored = s[key];
-    if (typeof testStored === 'object' && testStored !== null) {
-      (result as unknown as Record<string, unknown>)[key] = {
-        ...(result[key] as object),
-        ...(testStored as object),
-      };
-    }
+    (result as unknown as Record<string, unknown>)[key] = sanitizeParams(key, Object.prototype.hasOwnProperty.call(source, key) ? source[key] : undefined);
   }
   return result;
 }

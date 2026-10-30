@@ -330,17 +330,32 @@ fn round1(x: f64) -> f64 {
     js_round(x * 10.0) / 10.0
 }
 
+/// Associa ogni trial valutabile (test, non interrotto) alla sua meta. Se le due liste sono parallele (stessa
+/// lunghezza) l'indice è quello del trial originale, così i trial interrotti non sfalsano le meta; altrimenti
+/// le meta si considerano già filtrate e si associano in ordine.
+fn align_metas<'a>(trials: &[TrialResult], metas: &'a [TrialMeta]) -> (Vec<&'a TrialMeta>, usize) {
+    let parallel = metas.len() == trials.len();
+    let mut rows = Vec::new();
+    let mut scored = 0;
+    for (i, t) in trials.iter().enumerate() {
+        if t.phase != Phase::Test || t.flag == ValidationFlag::Interrupted {
+            continue;
+        }
+        if let Some(meta) = metas.get(if parallel { i } else { scored }) {
+            rows.push(meta);
+        }
+        scored += 1;
+    }
+    (rows, scored)
+}
+
 /// Metriche del WCST. I trial interrotti sono esclusi.
 pub fn score_wcst(
     trials: &[TrialResult],
     metas: &[TrialMeta],
     params: &Params,
 ) -> Vec<SummaryMetric> {
-    let test_len = trials
-        .iter()
-        .filter(|t| t.phase == Phase::Test && t.flag != ValidationFlag::Interrupted)
-        .count();
-    let rows: Vec<&TrialMeta> = metas.iter().take(test_len).collect();
+    let (rows, test_len) = align_metas(trials, metas);
     let steps: Vec<Step> = rows
         .iter()
         .map(|m| Step {

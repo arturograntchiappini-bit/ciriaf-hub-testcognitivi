@@ -1,4 +1,5 @@
 //! Motori dei test cognitivi di Sintropia (porting dei motori TypeScript di `src/engine/tests`).
+#![forbid(unsafe_code)]
 pub mod corsi;
 pub mod defaults;
 pub mod flanker;

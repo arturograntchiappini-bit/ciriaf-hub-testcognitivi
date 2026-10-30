@@ -70,6 +70,7 @@ fn should_generate_default_sequences_within_budget() {
 
 #[test]
 #[ignore = "benchmark di regressione: eseguire in release con --ignored"]
+#[allow(clippy::type_complexity)]
 fn should_score_400_trials_within_budget() {
     let cases: [(&str, Vec<TrialResult>, Box<dyn Fn(&[TrialResult]) -> usize>); 6] = [
         (

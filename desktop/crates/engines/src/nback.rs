@@ -295,9 +295,11 @@ pub fn score_nback(trials: &[TrialResult], n_quartiles: usize) -> Vec<SummaryMet
     ];
 
     // Stessa partizione di `split_into_chunks`, ma per sottofette (nessuna copia).
-    let size = test.len().div_ceil(n_quartiles.max(1));
-    for idx in 0..n_quartiles {
-        let chunk = &test[(idx * size).min(test.len())..((idx + 1) * size).min(test.len())];
+    for (idx, range) in chunk_ranges(test.len(), n_quartiles)
+        .into_iter()
+        .enumerate()
+    {
+        let chunk = &test[range];
         let cc = count_hits_fa(chunk.iter().copied());
         metrics.push(SummaryMetric::new(
             format!("d' quartile {}", idx + 1),
@@ -308,18 +310,28 @@ pub fn score_nback(trials: &[TrialResult], n_quartiles: usize) -> Vec<SummaryMet
     metrics
 }
 
-/// Divide una lista in `k` blocchi contigui il più bilanciati possibile.
-pub fn split_into_chunks<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
+/// Intervalli di `k` blocchi contigui il più bilanciati possibile: i primi `len % k` hanno un elemento in più.
+fn chunk_ranges(len: usize, k: usize) -> Vec<std::ops::Range<usize>> {
     if k == 0 {
         return Vec::new();
     }
-    let size = items.len().div_ceil(k);
+    let (base, extra) = (len / k, len % k);
+    let mut start = 0;
     (0..k)
         .map(|i| {
-            let start = (i * size).min(items.len());
-            let end = ((i + 1) * size).min(items.len());
-            items[start..end].to_vec()
+            let end = start + base + usize::from(i < extra);
+            let range = start..end;
+            start = end;
+            range
         })
+        .collect()
+}
+
+/// Divide una lista in `k` blocchi contigui il più bilanciati possibile.
+pub fn split_into_chunks<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
+    chunk_ranges(items.len(), k)
+        .into_iter()
+        .map(|range| items[range].to_vec())
         .collect()
 }
 

@@ -4,10 +4,10 @@
   "fixtureCases": {
     "generation": 24,
     "perseveration": 74,
-    "scoring": 55
+    "scoring": 56
   },
-  "exactComparisons": 1387,
-  "floatComparisons": 574,
+  "exactComparisons": 1408,
+  "floatComparisons": 584,
   "maxAbsoluteDeviation": 5.551115123125783e-17,
   "maxAbsoluteDeviationAt": "deck64@123456789.nextRand",
   "seeds": [
@@ -78,6 +78,7 @@
     "hand-correct_run_shorter_than_shift_resets",
     "hand-empty",
     "interrupted-excluded",
+    "interrupted-parallel-metas",
     "practice-excluded",
     "metas-shorter-than-trials",
     "metas-empty",

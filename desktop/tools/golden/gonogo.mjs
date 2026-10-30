@@ -27,11 +27,11 @@ const ok = { correct: true }; // No-Go trattenuto: VALID, response e rtMs null
 const commission = (rt) => ({ response: ' ', correct: false, rtMs: rt });
 
 export function build() {
-  // Bug del TS (DIVERGENZE.md #2): quando i Go finiscono, arrangeKinds accoda i No-Go rimasti ignorando il limite di 2
-  // consecutivi (docs/scientific/gonogo.md). Il Rust ritenta: per quei casi si verificano gli invarianti, non l'uguaglianza.
+  // Il vincolo anti-cluster (mai più di 2 No-Go consecutivi) vale anche per il TS: il generatore lo verifica qui.
   const generation = generationCases(variants, SEEDS, mulberry32, generateGoNoGo, (stimuli) => {
     const maxNoGoRun = stimuli.reduce((acc, s) => ({ run: s.kind === 'nogo' ? acc.run + 1 : 0, max: Math.max(acc.max, s.kind === 'nogo' ? acc.run + 1 : 0) }), { run: 0, max: 0 }).max;
-    return maxNoGoRun > 2 ? { expectedDivergence: { reason: 'TS: piu di 2 No-Go consecutivi in coda', tsMaxNoGoRun: maxNoGoRun } } : {};
+    if (maxNoGoRun > 2) throw new Error(`gonogo: serie di ${maxNoGoRun} No-Go consecutivi`);
+    return {};
   });
   const scoring = [];
   const push = (id, kind, trials) => scoring.push({ id, kind, trials, metrics: metricsJson(scoreGoNoGo(trials)) });

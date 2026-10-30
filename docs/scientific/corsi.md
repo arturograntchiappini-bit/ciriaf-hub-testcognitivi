@@ -7,7 +7,7 @@
 
 ## 1. Paradigma e citazione primaria
 
-Il **Corsi Block-Tapping Task** è la prova di riferimento per la misura dello *span* di memoria a breve termine **visuo-spaziale**. L'apparato originale consiste in **9 cubetti di legno identici** (lato 3 cm) fissati in disposizione **irregolare e asimmetrica** su una tavoletta. L'esaminatore tocca una sequenza di blocchi al ritmo di circa un blocco al secondo e il partecipante deve riprodurre la stessa sequenza; la lunghezza della sequenza cresce progressivamente fino al fallimento.
+Il **Corsi Block-Tapping Task** è la prova di riferimento per la misura dello *span* di memoria a breve termine **visuo-spaziale**. L'apparato consiste in **9 cubetti identici** (3 cm di lato nella versione di Kessels, secondo PEBL; le dimensioni dell'apparato variano fra gli studi, Berch et al., 1998) fissati in disposizione **irregolare e asimmetrica** su una tavoletta. L'esaminatore tocca una sequenza di blocchi al ritmo di circa un blocco al secondo e il partecipante deve riprodurre la stessa sequenza; la lunghezza della sequenza cresce progressivamente fino al fallimento.
 
 Citazione primaria (tesi originale):
 
@@ -21,7 +21,7 @@ Rassegna metodologica di riferimento (parametri, varianti, criticità di standar
 
 > Berch, D. B., Krikorian, R., & Huha, E. M. (1998). "The Corsi block-tapping task: Methodological and theoretical considerations." *Brain and Cognition, 38*(3), 317–338. DOI: 10.1006/brcg.1998.1039
 
-**Nota metodologica importante.** Come documentato dalla letteratura di rassegna (Berch et al., 1998; rassegne successive sulla digitalizzazione del test), **nessuno degli autori originari — Corsi compreso — ha pubblicato le distanze inter-blocco in forma numerica esatta**; Kessels et al. (2000) hanno fornito lo schema grafico della tavoletta e un sistema di coordinate (in mm, misurate rispetto all'angolo inferiore-sinistro della board, con cubetti da 30 mm). Le coordinate numeriche adottate in questo documento (§3bis) sono la trascrizione di quella configurazione standard, così come digitalizzata e resa riproducibile nelle implementazioni open-source più diffuse (PEBL, che dichiara esplicitamente di seguire le raccomandazioni di Kessels et al., 2000).
+**Nota metodologica importante.** Come documentato dalla letteratura di rassegna (Berch et al., 1998; rassegne successive sulla digitalizzazione del test), **nessuno degli autori originari — Corsi compreso — ha pubblicato le distanze inter-blocco in forma numerica esatta** (Berch et al., 1998, documentano in generale l'eterogeneità dell'apparato; l'affermazione puntuale non è stata riverificata sul testo); secondo l'intestazione di PEBL, Kessels et al. (2000) hanno fornito lo schema della tavoletta con le coordinate dei blocchi (in mm, con cubetti da 30 mm). L'articolo di Kessels non è stato consultato direttamente. Le coordinate numeriche adottate in questo documento (§3bis) sono la trascrizione di quella configurazione standard, così come digitalizzata e resa riproducibile nelle implementazioni open-source più diffuse (PEBL, che dichiara esplicitamente di seguire le raccomandazioni di Kessels et al., 2000).
 
 ---
 
@@ -48,14 +48,14 @@ Rispetto allo span verbale (Digit Span), il CBT è impiegato come misura di memo
 | Numero di blocchi | 9 | Corsi (1972); Kessels et al. (2000) |
 | Lunghezza iniziale della sequenza | **3** (valore di piattaforma) | Default di piattaforma. La versione classica Kessels/PEBL parte da 2 (`startlength = 2`); si adotta 3 per evitare l'effetto pavimento negli adulti sani |
 | Lunghezza massima | 9 | Kessels et al. (2000); corrisponde al numero di blocchi (in PEBL `endlength` non è tra i parametri di default della versione a sequenze fisse) |
-| Durata illuminazione per blocco | **1000 ms** | PEBL default `isi = 1000` ms; ritmo classico ≈ 1 blocco/secondo. Variante nota: 500 ms di accensione + 1000 ms di intervallo onset-onset (implementazioni digitali tipo eCorsi) |
-| Intervallo tra i blocchi (ITI/gap) | 1000 ms (onset-to-onset) | PEBL default `iti = 1000` ms |
+| Ritmo di presentazione (`presentMsPerBlock`) | **1000 ms** onset-to-onset | Ritmo classico ≈ 1 blocco/secondo; PEBL usa 1000 ms (`isi`, valore non riverificato sul sorgente) |
+| Durata illuminazione per blocco | **700 ms** (70% di `presentMsPerBlock`), poi 300 ms spento | **Scelta di progetto** del codice (`CorsiView`): la fase di risposta inizia `n · 1000 + 200` ms dopo l'avvio della sequenza, cioè 1200 ms dopo l'accensione dell'ultimo blocco (500 ms dopo il suo spegnimento) |
 | N. trial per livello | **2** | Kessels et al. (2000); PEBL (`timesperlength = 2`) |
 | Regola di arresto | Interruzione quando **entrambi** i trial di uno stesso livello sono falliti | Kessels et al. (2000), come riportato dai manuali Inquisit (il test si ferma quando non si riescono due sequenze di pari lunghezza); si avanza se **almeno un** trial del livello è corretto |
 | Punteggio ponderato | **`startLength − 1` + 0,5 per ogni trial superato** (0 se nessuno) | Scelta di progetto: con 2 trial per livello, superarli entrambi porta il punteggio esattamente alla lunghezza del livello (§5.1) |
 | Punteggio classico (riferimento) | Corsi span = lunghezza massima riprodotta; **Total score = span × n. sequenze corrette** | Kessels et al. (2000), come riportato dai manuali Inquisit: prodotto span × sequenze corrette |
 | Indice di complessità del percorso | Distanza euclidea totale **L(S)** + numero di incroci geometrici **X(S)** | Le due variabili sono quelle studiate da Orsini et al. (2004); la loro combinazione in un indice per il bilanciamento è una scelta di progetto (§5) |
-| Bilanciamento intra-livello | Stessa **L(S)** e stesso **X(S)** tra i trial dello stesso livello | Controllo della difficoltà geometrica a parità di lunghezza |
+| Bilanciamento intra-livello | **L(S)** entro `complexityTolerance` dal bersaglio del livello e stesso **X(S)** tra i trial dello stesso livello (§4, ultima sezione) | Controllo della difficoltà geometrica a parità di lunghezza |
 
 ---
 
@@ -176,8 +176,14 @@ In questo modo la variazione di prestazione tra trial dello stesso livello è at
   rimossa l'affermazione neuroanatomica senza fonte; documentata la differenza di punto di partenza (3 invece di 2) e
   la formula del punteggio ponderato, prima descritta in modo diverso dal codice; aggiunto il punteggio totale di
   Kessels.
+- **2026-10-30.** Corretta la temporizzazione: il blocco resta acceso 700 ms (70% di `presentMsPerBlock`) con
+  ritmo onset-onset di 1000 ms, non 1000 ms di accensione più 1000 ms di intervallo. Le affermazioni sull'apparato e
+  sulle coordinate di Kessels et al. (2000) sono attribuite a PEBL, perché l'articolo non è stato consultato.
 
 ## Aggiornamento metriche e generazione (revisione)
+
+> **Superato in parte.** Il punto «Bilanciamento dei trial» qui sotto descrive una versione intermedia (finestra mobile
+> senza ancoraggio); il criterio in vigore è quello della sezione successiva (bersaglio di difficoltà + tolleranza) e del §4.
 
 - **Punteggio.** Lo scoring ora riporta lo **Span Visuo-Spaziale (MBS, Maximum
   Block Span)** — la lunghezza massima riprodotta correttamente, indice classico

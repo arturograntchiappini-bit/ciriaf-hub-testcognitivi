@@ -83,7 +83,7 @@ La colonna *Origine* distingue ciò che è **riportato dalle fonti** (con la cau
 | Mazzo-risposta | Le **64 combinazioni** 4 × 4 × 4, ciascuna una volta, in **ordine casuale** (con seme); se `deckSize` > 64 il mazzo si ripete in permutazioni successive | Il WCST-64 usa 64 carte (Kongs et al., 2000). **Differenza:** nel test ufficiale l'ordine delle carte è prestabilito; qui è casuale, quindi i punteggi non sono strettamente confrontabili con i dati normativi |
 | Dimensione mazzo | **64** (default); la versione completa usa 128 | Heaton et al. (1993) = 128; Kongs et al. (2000) = 64 |
 | Ordine dei criteri | **Colore → Forma → Numero**, ciclico | Heaton et al. (1993) |
-| Corrette consecutive per il cambio | **10** (`runToShift`) | Valore classico (Grant & Berg, 1948; Heaton et al., 1993) |
+| Corrette consecutive per il cambio | **10** (`runToShift`) | Valore classico della versione standardizzata (Heaton et al., 1993, non consultato direttamente); il criterio usato da Grant & Berg (1948) non è stato riverificato sul testo |
 | Categorie per terminare | **6** (`maxCategories`), oppure esaurimento del mazzo | Heaton et al. (1993). Con 64 carte e 10 corrette per categoria, sei categorie richiedono almeno 60 risposte corrette: il test finisce di norma per esaurimento del mazzo |
 | Feedback | Binario («Corretto» / «Errato») dopo ogni risposta, **900 ms** | Il feedback binario è del test originale; la durata è una **scelta di progetto**, fissa nel codice (non è un parametro modificabile) |
 
@@ -104,7 +104,7 @@ Corrispondenza fra §3, §5 e il codice (`src/engine/tests/wcst.ts`, `src/config
 | Confronto | `matchingDims` | Dimensioni su cui la carta-risposta combacia con la carta-stimolo **scelta** |
 | Cambio categoria | `WcstView` | Dopo `runToShift` corrette consecutive la categoria avanza e il contatore si azzera |
 | Fine del test | `WcstView` | `maxCategories` categorie completate oppure mazzo esaurito |
-| Punteggio | `scoreWcst` | Rielabora la sequenza dei trial con le regole attive di ciascuno; formule in §5 |
+| Punteggio | `scoreWcst` | Rielabora la sequenza dei trial con le regole attive di ciascuno; formule in §5. Se trial e metadati sono liste parallele (stessa lunghezza) i metadati si associano per **indice originale**, così un trial interrotto o di pratica non sfalsa i successivi; altrimenti si considerano già filtrati |
 | Principio perseverato | `PerseverationScanner` | Vedi §5.2 |
 | Parametri | `DEFAULTS.wcst` | `deckSize 64`, `runToShift 10`, `maxCategories 6` |
 
@@ -135,7 +135,8 @@ Notazione: un **trial** è una presentazione carta + risposta + feedback. Si con
 ### 5.2 Scoring perseverativo
 
 Si segue la procedura di Heaton et al. (1993) come descritta da **Howlett e Moseley (2024)**, un aggiornamento del
-diagramma di scoring di Berry (1996) pensato proprio per controllare che le versioni computerizzate seguano il manuale:
+diagramma di scoring di Berry (1996) pensato, fra l'altro, per aiutare a verificare se le versioni computerizzate
+diverse da quella PAR seguono il metodo di Heaton et al. (1993):
 
 > Howlett, C. A., & Moseley, G. L. (2024). *An improved diagrammatic procedure for interpreting and scoring the
 > Wisconsin Card Sorting Test: An update to Steve Berry's 1996 edition.* **Behavior Research Methods, 56**(8),
@@ -222,6 +223,10 @@ errori non perseverativi.
   non «Steinke & Kopp») e quella dell'aggiornamento 2024 (Howlett & Moseley, non «Heaton, 2024»). Rimossi i passaggi
   attribuiti ai manuali senza verifica (equivalenza 64/128 con correlazioni .7–.9) e le citazioni testuali; descritte
   durata del feedback (900 ms, fissa) e mazzo casuale come scelte di progetto.
+
+- **2026-10-30.** Documentato l'allineamento dei metadati per indice originale (correzione del difetto per cui un trial
+  interrotto sfalsava i metadati successivi); attenuate l'attribuzione del criterio di 10 corrette a Grant & Berg (1948)
+  e la descrizione dello scopo di Howlett & Moseley (2024), allineata al riassunto.
 
 ## Aggiornamento metriche (revisione)
 

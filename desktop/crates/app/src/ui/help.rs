@@ -4,6 +4,7 @@ use eframe::egui::{self, Align2, RichText, Ui};
 use crate::theme::{self, space};
 
 /// Gruppi di scorciatoie: titolo e coppie (tasti, azione). I tasti sono disegnati come keycap.
+#[allow(clippy::type_complexity)]
 const GROUPS: &[(&str, &[(&[&str], &str)])] = &[
     (
         "Ovunque",

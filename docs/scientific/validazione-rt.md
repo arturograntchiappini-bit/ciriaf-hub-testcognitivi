@@ -37,10 +37,11 @@ soggetto era disattento o distratto:
 Di conseguenza, prima di calcolare qualunque indicatore (media, mediana,
 deviazione standard, tassi di errore) è necessaria una fase di **validazione e
 pulizia deterministica** che separi i trial validi da quelli spuri. Ratcliff
-(1993), attraverso simulazioni Monte Carlo, ha mostrato che la scelta del metodo
-di trattamento degli outlier incide fortemente sulla potenza dei test, pur senza
-gonfiare in modo apprezzabile l'errore di Tipo I. La pulizia, quindi, non è un
-optional cosmetico ma una condizione di validità dell'inferenza.
+(1993) ha valutato la potenza di diversi metodi per limitare l'effetto degli
+outlier nell'ANOVA (trasformazioni e cutoff) e ha mostrato che le misure robuste
+sono molto meno influenzate da outlier e cutoff delle misure basate sui momenti
+(media, varianza). La pulizia, quindi, non è un optional cosmetico ma una scelta
+che incide sull'inferenza.
 
 **Riferimenti:** Whelan (2008), DOI: [10.1007/BF03395630](https://doi.org/10.1007/BF03395630);
 Ratcliff (1993), DOI: [10.1037/0033-2909.114.3.510](https://doi.org/10.1037/0033-2909.114.3.510).
@@ -80,8 +81,8 @@ appartengono al processo misurato.
 
 La letteratura non fissa una soglia unica ma un **intervallo di consenso tra 100
 e 200 ms** (Whelan, 2008; Luce, 1986). Il valore di **150 ms** adottato dalla
-piattaforma si colloca al centro di questa finestra ed è la scelta prudenziale
-standard nei paradigmi attentivi e di reazione:
+piattaforma si colloca al centro di questa finestra (è una **scelta di
+progetto**, non un valore prescritto da una fonte):
 
 - è **sopra** il minimo assoluto di ~100 ms, quindi cattura anche le
   anticipazioni "quasi plausibili" che un cutoff a 100 ms lascerebbe passare;
@@ -89,8 +90,10 @@ standard nei paradigmi attentivi e di reazione:
   rapidi (che in molti compiti semplici sono legittimi).
 
 In sintesi: `RT < 150 ms` non identifica una risposta "molto brava", bensì una
-risposta **impossibile da produrre per via cognitiva**, e viene quindi trattata
-come errore di anticipazione.
+risposta che **con ogni probabilità non è guidata dallo stimolo** (sotto ~100 ms
+non lo è, secondo Luce, 1986, come riportato da Whelan, 2008; tra 100 e 150 ms la
+soglia è una scelta prudenziale), e viene
+quindi trattata come errore di anticipazione.
 
 **Riferimenti:** Whelan (2008), DOI: [10.1007/BF03395630](https://doi.org/10.1007/BF03395630);
 Luce, R. D. (1986). *Response Times: Their Role in Inferring Elementary Mental
@@ -103,7 +106,8 @@ Organization.* Oxford University Press (fonte primaria del limite dei ~100 ms).
 **Regola:** se la **finestra di risposta si chiude senza che il soggetto abbia
 risposto**, il trial viene marcato come **`OMISSION`** ("Errore di Omissione").
 L'RT associato **non deve mai essere memorizzato come valore numerico
-convenzionale** (`null`, `0`, `-1`, `NaN`, `Infinity`, o il valore del timeout).
+convenzionale** (`0`, `-1`, `NaN`, `Infinity`, o il valore del timeout): il codice
+lo registra come `null` (assenza di valore, non un numero), cella vuota nel CSV.
 
 ### Razionale
 
@@ -114,9 +118,10 @@ come un numero introduce un errore metodologico grave:
   simula una prestazione velocissima inesistente;
 - inserire il valore di timeout o `Infinity` **gonfia media e varianza** e
   distrugge la forma della distribuzione;
-- inserire `null`/`NaN` in un vettore numerico rende **non deterministici** i
-  calcoli a valle (propagazione di `NaN`, ordinamenti indefiniti, crash dei
-  motori statistici).
+- inserire `NaN` (o un `null` trattato come numero) in un vettore numerico rende
+  **non deterministici** i calcoli a valle (propagazione di `NaN`, ordinamenti
+  indefiniti, crash dei motori statistici): per questo le metriche filtrano i
+  trial senza RT prima di ogni calcolo.
 
 Per questo l'omissione è codificata come **evento categoriale distinto**, non come
 misura di tempo. L'informazione che essa porta (una lacuna attentiva, un mancato
@@ -157,9 +162,10 @@ deviazione standard intrasoggetto misura *quanto è costante*. È un indicatore 
 
 La variabilità intra-individuale degli RT è riconosciuta in letteratura come un
 **marcatore comportamentale** sensibile: elevata variabilità intra-soggetto è
-associata a disfunzioni attentive ed è, ad esempio, una caratteristica robusta e
-stabile dell'ADHD, dove l'indicatore classicamente usato è proprio la deviazione
-standard degli RT (SDRT) (Kofler et al., 2013). Per questo la piattaforma la
+associata a disfunzioni attentive: nella meta-analisi di Kofler et al. (2013) su
+319 studi, una maggiore variabilità degli RT risulta una caratteristica stabile
+dell'ADHD (e di altri disturbi clinici), robusta alle differenze fra studi; non
+è quindi specifica dell'ADHD. Per questo la piattaforma la
 tratta come una metrica di primo piano, non come un semplice sottoprodotto della
 media.
 
@@ -248,7 +254,7 @@ metodologica**:
    equivarrebbe a perdere segnale.
 
 **Sintesi operativa:** l'export contiene **tutti** i trial, ciascuno con il proprio
-flag e il proprio RT grezzo (dove applicabile). Le pipeline di analisi filtrano
+flag e il proprio RT grezzo (dove applicabile; esatto nel JSON, arrotondato al millisecondo nel CSV). Le pipeline di analisi filtrano
 *a valle* per `VALID` quando servono gli RT, ma il dato di partenza rimane
 **completo, immutato e conservato**.
 
@@ -273,7 +279,7 @@ Corrispondenza fra i principi di questo documento e il codice (`src/engine/valid
 | Una sola risposta per trial | sequencer | La seconda pressione è ignorata |
 | Omissione | `classifyRt` | RT registrato come `null`, mai come numero convenzionale |
 | SD intrasoggetto | `standardDeviation` | Divisore `n − 1`; con `n < 2` restituisce 0 (vedi §4) |
-| Conservazione del dato grezzo | export CSV / JSON | Tutti i trial, con flag, RT grezzo, condizione e parametri; le metriche filtrano a valle per `VALID` |
+| Conservazione del dato grezzo | export CSV / JSON | Tutti i trial, con flag, RT, condizione e parametri; le metriche filtrano a valle per `VALID`. Il **JSON** conserva i valori esatti; il **CSV** arrotonda `rt_ms` e `timestamp_onset` al millisecondo e antepone un apice ai campi testuali che un foglio di calcolo leggerebbe come formula (`=`, `+`, `@`, `-` seguito da testo), lasciando intatti i numeri |
 
 Il filtro *VALID* è applicato nei riepiloghi di tutti i test; ogni test dichiara nel proprio paper quali trial entrano in
 ciascuna metrica.
@@ -311,3 +317,7 @@ misurabili; valori assoluti brevi **non** sono confrontabili con laboratori a ha
   Kofler et al. (2013). Scritta la mappatura implementativa e corretto il requisito sulla SD con n < 2 (il codice
   restituisce 0). Rimosso Wilcox (1998), citato di seconda mano e non verificato. Documentata la correzione del
   sequencer sui tasti premuti prima dell'onset.
+- **2026-10-30.** Le affermazioni su Ratcliff (1993) e Kofler et al. (2013) sono state allineate ai loro riassunti
+  (rimossi «Monte Carlo», «errore di Tipo I» e l'«indicatore classico» SDRT, non verificabili); la soglia di 150 ms è
+  dichiarata come scelta di progetto; risolta la contraddizione sull'RT delle omissioni (`null`); documentati
+  l'arrotondamento al millisecondo e la neutralizzazione delle formule nel CSV.

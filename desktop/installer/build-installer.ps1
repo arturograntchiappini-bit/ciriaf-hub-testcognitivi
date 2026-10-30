@@ -21,6 +21,20 @@ if (-not $SkipBuild) {
 }
 if (-not (Test-Path $exe)) { throw "Eseguibile non trovato: $exe" }
 
+# Firma digitale opzionale. SINTROPIA_SIGN_COMMAND e un comando con il segnaposto {file}, ad esempio
+#   signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /sha1 <thumbprint> {file}
+# (certificato su token/HSM, Azure Trusted Signing, SignPath...). Se non e impostato i file restano non firmati.
+function Invoke-Sign([string]$File) {
+    $template = $env:SINTROPIA_SIGN_COMMAND
+    if (-not $template) { return }
+    Invoke-Expression ($template -replace '\{file\}', ('"' + $File + '"'))
+    if ($LASTEXITCODE) { throw "Firma fallita per $File" }
+    $sig = Get-AuthenticodeSignature $File
+    if ($sig.Status -ne 'Valid') { throw "Firma non valida per ${File}: $($sig.Status)" }
+    Write-Host "Firmato: $File ($($sig.SignerCertificate.Subject))"
+}
+Invoke-Sign $exe
+
 New-Item -ItemType Directory -Force $dist | Out-Null
 Get-ChildItem $dist -File | Remove-Item -Force
 
@@ -33,6 +47,7 @@ $msi = Join-Path $dist 'Sintropia-Setup-x64.msi'
 wix build (Join-Path $PSScriptRoot 'Sintropia.wxs') -arch x64 -ext WixToolset.UI.wixext -culture it-IT -pdbtype none `
     -d "Version=$version" -d "ExePath=$exe" -d "LicenseRtf=$rtf" -d "IconPath=$(Join-Path $PSScriptRoot 'icon.ico')" -o $msi
 if ($LASTEXITCODE) { throw 'wix build fallito' }
+Invoke-Sign $msi
 
 # Zip portatile
 $stage = Join-Path $env:TEMP "sintropia-portable-$version"

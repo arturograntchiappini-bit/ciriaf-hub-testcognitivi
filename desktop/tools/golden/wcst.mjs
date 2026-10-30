@@ -126,6 +126,8 @@ export async function build() {
   const baseMetas = toMetas(base);
   scoring.push(
     scoreCase('interrupted-excluded', base, 5, baseTrials.map((t, i) => (i % 7 === 3 ? { ...t, flag: 'INTERRUPTED' } : t)), baseMetas.filter((_, i) => i % 7 !== 3)),
+    // Liste parallele (una meta per trial, interrotti inclusi): l'indice è quello del trial originale.
+    scoreCase('interrupted-parallel-metas', base, 5, baseTrials.map((t, i) => (i % 7 === 3 ? { ...t, flag: 'INTERRUPTED' } : t)), baseMetas),
     scoreCase('practice-excluded', base, 5, [{ ...baseTrials[0], phase: 'practice' }, { ...baseTrials[1], phase: 'practice' }, ...baseTrials.slice(2)], baseMetas.slice(2)),
     scoreCase('metas-shorter-than-trials', base, 5, baseTrials, baseMetas.slice(0, 10)),
     scoreCase('metas-empty', base, 5, baseTrials, []),

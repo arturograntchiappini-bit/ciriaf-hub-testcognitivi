@@ -53,6 +53,7 @@
     "nessuna_ripetizione_immediata": 256,
     "bersagli_nel_numero_atteso": 256,
     "determinismo_a_parita_di_seme": 256,
-    "cifre_bilanciate": 256
+    "cifre_bilanciate": 256,
+    "corpi_del_carattere_bilanciati": 256
   }
 }

@@ -74,6 +74,7 @@ fn should_hold_wcst_invariants() {
         |(seed, size)| {
             let deck = build_deck(size, &mut mulberry32(seed));
             prop_assert_eq!(deck.len(), size);
+            #[allow(clippy::chunks_exact_to_as_chunks)]
             for block in deck.chunks_exact(64) {
                 prop_assert_eq!(counts(block.iter()).len(), 64);
             }

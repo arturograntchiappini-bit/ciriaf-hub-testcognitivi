@@ -24,8 +24,9 @@ Dall'abstract (verificato su Europe PMC, PMID 9204482): gli autori introducono i
 laboratorio che richiede di trattenere la pressione del tasto davanti a bersagli rari. In 34 persone con trauma
 cranico la prestazione seguiva la gravità del trauma e i fallimenti attentivi quotidiani; in 75 controlli sani
 correlava con i lapsus attentivi riferiti da sé e da altri. Le prestazioni al SART correlavano con test classici di
-attenzione sostenuta ma non con altre misure attentive, e gli errori erano **preceduti da tempi di reazione
-anormalmente rapidi**, interpretati come uno slittamento del controllo verso la risposta automatica.
+attenzione sostenuta ma non con altre misure attentive, e gli errori erano **preceduti da un accorciamento
+significativo dei tempi di reazione** nelle risposte immediatamente precedenti, interpretato come uno slittamento del
+controllo verso la risposta automatica. I bersagli erano rari (uno su nove).
 
 **Riferimenti di supporto.**
 
@@ -41,7 +42,7 @@ con un solo nome; l'elenco completo degli autori è stato confermato dalla sched
 > inattention: The Sustained Attention to Response Task does not measure sustained attention.*
 > **Experimental Brain Research, 236**(8), 2255–2262. https://doi.org/10.1007/s00221-018-5291-6
 
-In 36 partecipanti, ciascuno testato in quattro sessioni, gli autori trovano che le persone scelgono
+In 36 partecipanti, ciascuno sottoposto a una serie di quattro SART, gli autori trovano che le persone scelgono
 strategicamente quanto rispondere in fretta: i compromessi velocità-accuratezza dentro lo stesso individuo vanno
 considerati quando si interpretano i punteggi.
 
@@ -57,7 +58,7 @@ considerati quando si interpretano i punteggi.
   tende a rispondere senza elaborare ogni cifra. Il ritmo è serrato: la cifra segue la precedente senza pausa
   e la sequenza non ha alcun indizio che anticipi il bersaglio.
 - **Errore di commissione sul bersaglio.** Premere sul 3 è l'errore tipico del SART. Nello studio originale
-  era preceduto da risposte anormalmente rapide (Robertson et al., 1997): il controllo cede quando la risposta
+  era preceduto da un accorciamento dei tempi di reazione (Robertson et al., 1997): il controllo cede quando la risposta
   si fa più veloce e meno elaborata. Per questo la piattaforma riporta l'RT dei trial che precedono ogni
   commissione (§5.5).
 - **Che cosa NON è.** Il SART non è un test di inibizione "pura" come lo Stop-Signal: Manly et al. (1999) lo
@@ -98,7 +99,7 @@ Corrispondenza fra i parametri della tabella §3 e il codice (`src/engine/tests/
 | Elemento | Dove | Comportamento |
 |---|---|---|
 | Parametri | `DEFAULTS.sart` | `nTrials 225`, `targetDigit 3`, `digitMs 250`, `maskMs 900`, `practiceTrials 18`; modificabili in Impostazioni e scritti in ogni esportazione |
-| Sequenza | `generateSart` | Ogni cifra compare `⌊n/9⌋` volte (le eventuali cifre in più sono estratte a caso); ordine casuale con RNG a seme, **mai due cifre uguali di seguito** (ripiego deterministico se dopo 500 tentativi non si trova una disposizione) |
+| Sequenza | `generateSart` | Ogni cifra compare `⌊n/9⌋` volte (le eventuali cifre in più sono estratte a caso); ordine casuale con RNG a seme, **mai due cifre uguali di seguito**. Se dopo 500 tentativi non si trova una disposizione, ripiego: su un rimescolamento casuale ogni ripetizione viene scambiata con una cifra successiva diversa, se esiste (in questo caso il vincolo non è garantito; con i parametri realistici il ripiego non viene raggiunto) |
 | Corpi del carattere | `generateSart` | I cinque corpi sono distribuiti in modo bilanciato (45 trial ciascuno con 225 trial), indipendentemente dalla cifra |
 | Condizione | `SartView` | `nogo` se la cifra è il bersaglio, altrimenti `go` |
 | Cifra e maschera | `SartView` | Cifra per 250 ms, poi la maschera per 900 ms: nel sequencer `stimulusVisibleMs = 250` e `responseWindowMs = 1150` |
@@ -193,3 +194,6 @@ contate come risposte in $d'$.
 
 - **2026-10.** Prima versione: motore `sart.ts`, vista `SartView`, paper. Fonti verificate su Crossref ed Europe PMC;
   parametri del compito dichiarati come convenzione dei porting.
+- **2026-10-30.** Allineate al riassunto le descrizioni di Robertson et al. (1997) («accorciamento significativo» dei
+  tempi prima degli errori) e di Dang et al. (2018) (quattro SART, non quattro sessioni); descritto il ripiego reale
+  della sequenza (non deterministico e senza garanzia del vincolo).

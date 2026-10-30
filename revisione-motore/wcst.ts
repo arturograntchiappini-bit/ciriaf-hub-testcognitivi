@@ -288,23 +288,43 @@ export function countPerseveration(
  * perseverato di Heaton), errori non perseverativi, failure to maintain set, risposte a livello
  * concettuale e trial per la prima categoria. I trial interrotti sono esclusi.
  */
+/**
+ * Associa ogni trial valutabile (test, non interrotto) alla sua meta. Se le due liste sono parallele (stessa lunghezza)
+ * l'indice è quello del trial originale, così i trial interrotti non sfalsano le meta; altrimenti le meta si
+ * considerano già filtrate e si associano in ordine.
+ */
+function alignMetas(
+  trials: readonly TrialResult[],
+  metas: readonly WcstTrialMeta[],
+): { rows: WcstTrialMeta[]; testLength: number } {
+  const parallel = metas.length === trials.length;
+  const rows: WcstTrialMeta[] = [];
+  let scored = 0;
+  trials.forEach((t, i) => {
+    if (t.phase !== 'test' || t.flag === 'INTERRUPTED') return;
+    const meta = metas[parallel ? i : scored];
+    scored++;
+    if (meta) rows.push(meta);
+  });
+  return { rows, testLength: scored };
+}
+
 export function scoreWcst(
   trials: readonly TrialResult[],
   metas: readonly WcstTrialMeta[],
   params: WcstParams,
 ): SummaryMetric[] {
-  const test = trials.filter((t) => t.phase === 'test' && t.flag !== 'INTERRUPTED');
-  const rows = test.flatMap((_, i) => (metas[i] ? [metas[i] as WcstTrialMeta] : []));
+  const { rows, testLength } = alignMetas(trials, metas);
   const steps: Step[] = rows.map((m) => ({ correct: m.matchedDims.includes(m.currentRule), matched: m.matchedDims }));
 
   const run = scanRuns(steps, params.runToShift);
   const totalErrors = steps.filter((s) => !s.correct).length;
   const perseveration = countPerseveration(steps, rows.map((m) => m.currentRule), params.runToShift);
-  const pct = (n: number): number => (test.length > 0 ? round1((n / test.length) * 100) : 0);
+  const pct = (n: number): number => (testLength > 0 ? round1((n / testLength) * 100) : 0);
 
   return [
     { label: 'Categorie completate', value: run.categories },
-    { label: 'Trial totali', value: test.length },
+    { label: 'Trial totali', value: testLength },
     { label: 'Errori totali', value: totalErrors },
     { label: 'Errori perseverativi', value: perseveration.errors },
     { label: '% errori perseverativi', value: pct(perseveration.errors), unit: '%' },
@@ -312,7 +332,7 @@ export function scoreWcst(
     { label: 'Errori non perseverativi', value: totalErrors - perseveration.errors },
     { label: 'Failure to maintain set', value: run.failureToMaintainSet },
     { label: 'Risposte a livello concettuale', value: pct(run.conceptualResponses), unit: '%' },
-    { label: 'Trial per la 1ª categoria', value: run.trialsToFirstCategory ?? test.length },
+    { label: 'Trial per la 1ª categoria', value: run.trialsToFirstCategory ?? testLength },
   ];
 }
 

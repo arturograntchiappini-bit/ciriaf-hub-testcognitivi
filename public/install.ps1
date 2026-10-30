@@ -20,6 +20,10 @@ param(
     [string]$BaseUrl = $env:SINTROPIA_BASE_URL
 )
 $ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+# PowerShell 5.1 negozia TLS 1.0 se non richiesto altrimenti.
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+if ($BaseUrl -and $BaseUrl -notmatch '^https://') { throw "BaseUrl deve usare https:// (ricevuto: $BaseUrl)." }
 $GitHubBases = @(
     'https://github.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/releases/latest/download',
     'https://raw.githubusercontent.com/arturograntchiappini-bit/ciriaf-hub-testcognitivi/main/public/download'
@@ -44,6 +48,25 @@ function Save-Download([string]$Name, [string]$Folder) {
         } catch { Write-Warning "Download da $base non riuscito: $($_.Exception.Message)" }
     }
     throw "Impossibile scaricare $Name."
+}
+
+function Assert-SafeZip([string]$ZipFile, [string]$Destination) {
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $root = [IO.Path]::GetFullPath($Destination).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+    $zip = [IO.Compression.ZipFile]::OpenRead($ZipFile)
+    try {
+        foreach ($entry in $zip.Entries) {
+            $target = [IO.Path]::GetFullPath((Join-Path $Destination $entry.FullName))
+            if (-not $target.StartsWith($root, [StringComparison]::OrdinalIgnoreCase)) { throw "Archivio non sicuro: la voce '$($entry.FullName)' esce dalla cartella di destinazione." }
+        }
+    } finally { $zip.Dispose() }
+}
+
+function Show-Signature([string]$File) {
+    $sig = Get-AuthenticodeSignature $File
+    if ($sig.Status -eq 'Valid') { Write-Host "Firma digitale valida: $($sig.SignerCertificate.Subject)" }
+    elseif ($sig.Status -eq 'NotSigned') { Write-Warning 'File non firmato digitalmente: Windows SmartScreen puo mostrare un avviso. Verifica sempre lo SHA-256.' }
+    else { throw "Firma digitale non valida ($($sig.Status)) per $File. Installazione annullata." }
 }
 
 function Assert-Checksum([string]$File, [string]$SumsFile) {
@@ -79,7 +102,7 @@ try {
         if (-not (Test-Path $InstallerPath)) { throw "File non trovato: $InstallerPath" }
         $file = [IO.Path]::GetFullPath($InstallerPath)
         $sums = Join-Path (Split-Path $file) 'SHA256SUMS.txt'
-        if (Test-Path $sums) { Assert-Checksum $file $sums } else { Write-Warning 'SHA256SUMS.txt non trovato accanto al file: verifica saltata.' }
+        if (Test-Path $sums) { Assert-Checksum $file $sums } else { Write-Warning 'SHA256SUMS.txt non trovato accanto al file: integrita non verificata (file locale scelto da te).' }
     } elseif ($PSCmdlet.ShouldProcess($AssetName, 'Download e verifica SHA256')) {
         $base = Save-Download $AssetName $work
         Invoke-WebRequest "$base/SHA256SUMS.txt" -OutFile (Join-Path $work 'SHA256SUMS.txt') -UseBasicParsing
@@ -89,10 +112,12 @@ try {
 
     if ($Portable) {
         if ($PSCmdlet.ShouldProcess($PortableDir, 'Estrazione versione portatile')) {
+            Assert-SafeZip $file $PortableDir
             Expand-Archive $file $PortableDir -Force
             Write-Host "Installato (portatile) in $PortableDir. Avvia: $PortableDir\sintropia-desktop.exe"
         }
     } elseif ($PSCmdlet.ShouldProcess($file, 'Installazione MSI per-utente (silenziosa)')) {
+        Show-Signature $file
         $p = Start-Process msiexec -ArgumentList "/i `"$file`" /qn" -Wait -PassThru
         if ($p.ExitCode -notin 0, 3010) { throw "msiexec ha restituito $($p.ExitCode)." }
         Write-Host 'Sintropia installato. Lo trovi nel menu Start.'

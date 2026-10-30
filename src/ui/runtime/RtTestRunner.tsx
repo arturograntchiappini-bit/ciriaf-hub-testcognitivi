@@ -71,6 +71,7 @@ export function RtTestRunner({
   const seqRef = useRef<ReturnType<typeof createSequencer> | null>(null);
   const allTrialsRef = useRef<TrialResult[]>([]);
   const testCollectedRef = useRef<TrialResult[]>([]);
+  const practiceCollectedRef = useRef<TrialResult[]>([]);
   const stageRef = useRef<Stage>(stage);
   stageRef.current = stage;
   // Fase da cui si è entrati in pausa: la ripresa torna lì (la pratica non salta nel test).
@@ -97,7 +98,7 @@ export function RtTestRunner({
     (phase: 'practice' | 'test', fromIndex: number) => {
       const trials = phase === 'practice' ? plan.practiceTrials : plan.testTrials;
       const slice = trials.slice(fromIndex);
-      const collectInto = phase === 'test' ? testCollectedRef : { current: [] as TrialResult[] };
+      const collectInto = phase === 'test' ? testCollectedRef : practiceCollectedRef;
       const seq = createSequencer({
         testId: plan.testId,
         sessionId: plan.sessionId,
@@ -143,7 +144,7 @@ export function RtTestRunner({
   // Gestione delle transizioni di stage.
   useEffect(() => {
     if (stage === 'practice') {
-      startBlock('practice', 0);
+      startBlock('practice', practiceCollectedRef.current.length); // dopo una pausa riparte dal trial successivo, senza duplicare
       return () => seqRef.current?.cancel();
     }
     if (stage === 'test') {

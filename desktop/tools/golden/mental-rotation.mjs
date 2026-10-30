@@ -82,7 +82,7 @@ export async function build() {
     interrupted_excluded_from_accuracy: [T(0, true, 0, { flag: 'INTERRUPTED', correct: false, rtMs: null }), T(1, true, 30), T(2, false, 60)],
     errors_excluded_from_rt: [T(0, true, 0, { correct: false }), T(1, true, 0), T(2, true, 90), T(3, true, 90, { correct: false })],
     malformed_condition_ignored: [trial('mentalRotation', 0, 'foo', { correct: true, rtMs: 500 }), trial('mentalRotation', 1, 'same-abc', { correct: true, rtMs: 500 }), T(2, true, 30)],
-    condition_parsing_edge: ['same-', 'same-1e2', 'different- 60 ', 'same--30', 'same', 'same-1e999', 'same-.5', 'same-+30']
+    condition_parsing_edge: ['same-', 'same-1e2', 'different- 60 ', 'same--30', 'same', 'same-1e999', 'same-.5', 'same-+30', 'same-0x1A', 'same-0b11', 'same-0o7']
       .map((condition, i) => trial('mentalRotation', i, condition, { correct: true, rtMs: 500 + 10 * i, response: 'x' })),
     repeated_angle_averages: [T(0, true, 30, { rtMs: 700 }), T(1, true, 30, { rtMs: 750 }), T(2, true, 120, { rtMs: 900 }), T(3, true, 120, { rtMs: 1000 })],
     random_steep: randomSession(84, { slope: 6, noise: 200 }),

@@ -50,13 +50,14 @@ icona Desktop: `ADDLOCAL=Main,DesktopIcon`); rimozione: `msiexec /x Sintropia-Se
 
 ## Firma del codice (non ancora attiva)
 
-L'eseguibile e l'MSI **non sono firmati**: SmartScreen mostrera "Windows ha protetto il PC" (Ulteriori informazioni > Esegui comunque).
-Per firmarli in futuro serve un certificato di firma del codice (OV/EV, oppure Azure Trusted Signing):
+L'eseguibile e l'MSI **non sono firmati**: SmartScreen mostra "Windows ha protetto il PC" (Ulteriori informazioni > Esegui comunque).
+Serve un certificato di firma del codice che solo il titolare può ottenere (opzioni in [`docs/sicurezza.md`](../docs/sicurezza.md)).
+Lo script di build è già predisposto: imposta `SINTROPIA_SIGN_COMMAND` con il comando di firma e il segnaposto `{file}`, ad esempio
 
 ```powershell
-signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /a target\release\sintropia-desktop.exe
-# ricostruire l'MSI con l'exe firmato (-SkipBuild), poi firmare anche l'MSI:
-signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /a ..\dist-desktop\Sintropia-Setup-x64.msi
+$env:SINTROPIA_SIGN_COMMAND = 'signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /sha1 <thumbprint> {file}'
+./installer/build-installer.ps1
 ```
 
-Inserire i due passaggi in `build-installer.ps1` (prima del calcolo di `SHA256SUMS.txt`) e il certificato come segreto del workflow.
+`build-installer.ps1` firma l'eseguibile, ricostruisce l'MSI, firma anche l'MSI, verifica le firme e solo dopo calcola `SHA256SUMS.txt`.
+Nella CI la stessa variabile è il segreto `SINTROPIA_SIGN_COMMAND` del workflow di release.

@@ -89,24 +89,8 @@ export function build() {
     T('garbage', hit(500)), T('feature-present', hit(500)), T('feature-maybe-4', hit(500)), T('feature-present-4.5', hit(500)),
     T('hybrid-present-4', hit(500)), cell('feature', true, 4, 480),
   ]);
-  // Divergenza attesa (DIVERGENZE.md #1): in JS Number('') === 0, quindi il TS accetta "feature-present-" come numerosità 0.
-  // Il Rust rifiuta la condizione; l'atteso Rust è il TS sulla stessa lista senza il trial malformato.
-  {
-    const malformed = trialList('visualSearch', [T('feature-present-', hit(500)), cell('feature', true, 4, 480), cell('feature', true, 8, 520)]);
-    const cleaned = malformed.filter((t) => t.condition !== 'feature-present-');
-    scoring.push({
-      id: 'condizione-numerosita-vuota',
-      kind: 'edge',
-      trials: malformed,
-      metrics: metricsJson(scoreVisualSearch(malformed)),
-      extra: { slopes: slopes(malformed) },
-      expectedDivergence: {
-        reason: "Number('') === 0 in JS: il TS accetta una numerosità vuota come 0; il Rust la scarta",
-        metrics: metricsJson(scoreVisualSearch(cleaned)),
-        extra: { slopes: slopes(cleaned) },
-      },
-    });
-  }
+  // Una numerosità vuota non è una condizione valida (in JS Number('') === 0 la farebbe passare come 0).
+  edge('condizione-numerosita-vuota', [T('feature-present-', hit(500)), cell('feature', true, 4, 480), cell('feature', true, 8, 520)]);
   edge('un-solo-tipo-presente', [cell('feature', true, 4, 450), cell('feature', true, 8, 470), cell('feature', true, 16, 520)]);
   edge('arrotondamento-meta-decimale', [cell('feature', true, 4, 400.05), cell('feature', true, 8, 400.15), cell('feature', false, 4, 500.25), cell('feature', false, 8, 560.35)]);
   edge('rapporto-meta-centesimo', [

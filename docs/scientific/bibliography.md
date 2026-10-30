@@ -2,8 +2,9 @@
 
 Riferimenti bibliografici della piattaforma, in formato APA. Le citazioni sono nella lingua originale della fonte.
 Ogni riferimento con DOI è stato **verificato su Crossref** (autori, titolo, rivista, anno, volume, fascicolo, pagine);
-la data dell'ultima verifica è 2026-10-23. I testi senza DOI (tesi, manuali, monografie) sono indicati come tali e **non
-sono stati consultati direttamente**.
+la data dell'ultima verifica è 2026-10-30. Per gli articoli pubblicati prima online e poi in un fascicolo (de Leeuw, Stoet
+2017, Wessel, Hasegawa) Crossref registra l'anno della versione online; qui si usa l'anno del fascicolo, come da APA. I testi
+senza DOI (tesi, manuali, monografie) sono indicati come tali e **non sono stati consultati direttamente**.
 
 ## Stroop Task
 

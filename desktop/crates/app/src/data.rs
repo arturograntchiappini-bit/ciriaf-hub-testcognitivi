@@ -58,6 +58,26 @@ pub fn default_params(test_key: &str) -> BTreeMap<String, f64> {
     all.get(test_key).cloned().unwrap_or_default()
 }
 
+/// Parametri sicuri per un test: solo le chiavi note, numeri finiti, dentro i limiti di `PARAM_SECTIONS`.
+/// Ciò che manca, non è finito o è sconosciuto ricade sul default: un file manomesso non deve poter bloccare l'app.
+pub fn sanitize_params(test_key: &str, params: &BTreeMap<String, f64>) -> BTreeMap<String, f64> {
+    let fields = PARAM_SECTIONS
+        .iter()
+        .find(|s| s.test_key == test_key)
+        .map_or(&[][..], |s| s.fields);
+    let mut safe = default_params(test_key);
+    for (key, value) in safe.iter_mut() {
+        let Some(candidate) = params.get(key).copied().filter(|v| v.is_finite()) else {
+            continue;
+        };
+        *value = match fields.iter().find(|f| f.key == key) {
+            Some(f) => candidate.clamp(f.min, f.max),
+            None => candidate,
+        };
+    }
+    safe
+}
+
 fn numeric_fields(fields: &Map<String, Value>) -> BTreeMap<String, f64> {
     fields
         .iter()
@@ -76,6 +96,24 @@ pub fn instructions_for(id: TestId, params: &BTreeMap<String, f64>) -> Instructi
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn sanitize_params_clamps_and_drops_unknown() {
+        let hostile = BTreeMap::from([
+            ("nTrials".to_string(), 4e9),
+            ("fixationMs".to_string(), f64::NAN),
+            ("timeoutMs".to_string(), -1.0),
+            ("sconosciuto".to_string(), 7.0),
+        ]);
+        let safe = super::sanitize_params("stroop1", &hostile);
+        assert_eq!(safe["nTrials"], 400.0);
+        assert_eq!(
+            safe["fixationMs"],
+            super::default_params("stroop1")["fixationMs"]
+        );
+        assert_eq!(safe["timeoutMs"], 500.0);
+        assert!(!safe.contains_key("sconosciuto"));
+    }
+
     use super::*;
 
     #[test]

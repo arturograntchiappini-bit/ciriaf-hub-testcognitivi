@@ -163,8 +163,9 @@ fn reaction_times_before_commissions_refs(trials: &[&TrialResult], window: usize
         if t.condition != "nogo" || !is_responded(t) {
             continue;
         }
-        for k in i.saturating_sub(window)..i {
-            if is_usable_go_rt(trials[k]) && !picked.contains(&k) {
+        let from = i.saturating_sub(window);
+        for (k, candidate) in trials.iter().enumerate().take(i).skip(from) {
+            if is_usable_go_rt(candidate) && !picked.contains(&k) {
                 picked.push(k);
             }
         }

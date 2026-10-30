@@ -26,7 +26,7 @@
       "tsHangIds": [],
       "tsErrors": 0,
       "masterSeed": 20308537,
-      "rustSeconds": 8.989
+      "rustSeconds": 0.641
     },
     "flanker": {
       "sequenceCases": 500,
@@ -45,7 +45,7 @@
       "tsHangIds": [],
       "tsErrors": 0,
       "masterSeed": 20276861,
-      "rustSeconds": 0.789
+      "rustSeconds": 0.175
     },
     "gonogo": {
       "sequenceCases": 500,
@@ -54,8 +54,8 @@
         "generation": 500,
         "scoring": 500
       },
-      "exactComparisons": 118895,
-      "floatComparisons": 5393,
+      "exactComparisons": 163454,
+      "floatComparisons": 5500,
       "maxAbsoluteDeviation": 1.1102230246251563e-16,
       "maxAbsoluteDeviationAt": "generation/seq-40.nextRand",
       "divergencesFound": [
@@ -65,14 +65,12 @@
           "cases": 7
         }
       ],
-      "expectedDivergenceCases": {
-        "ts-more-than-2-consecutive-nogo": 107
-      },
+      "expectedDivergenceCases": {},
       "tsHang": 0,
       "tsHangIds": [],
       "tsErrors": 0,
       "masterSeed": 20268942,
-      "rustSeconds": 0.388
+      "rustSeconds": 0.14
     },
     "mental_rotation": {
       "sequenceCases": 500,
@@ -94,7 +92,7 @@
       "tsHangIds": [],
       "tsErrors": 0,
       "masterSeed": 20332294,
-      "rustSeconds": 3.103
+      "rustSeconds": 0.662
     },
     "nback": {
       "sequenceCases": 500,
@@ -116,7 +114,7 @@
       "tsHangIds": [],
       "tsErrors": 0,
       "masterSeed": 20316456,
-      "rustSeconds": 0.549
+      "rustSeconds": 0.113
     },
     "pvt": {
       "sequenceCases": 500,
@@ -135,7 +133,7 @@
       "tsHangIds": [],
       "tsErrors": 0,
       "masterSeed": 20300618,
-      "rustSeconds": 0.25
+      "rustSeconds": 0.113
     },
     "sart": {
       "sequenceCases": 500,
@@ -154,7 +152,7 @@
       "tsHangIds": [],
       "tsErrors": 0,
       "masterSeed": 20284780,
-      "rustSeconds": 0.634
+      "rustSeconds": 0.151
     },
     "stroop": {
       "sequenceCases": 500,
@@ -173,7 +171,7 @@
       "tsHangIds": [],
       "tsErrors": 0,
       "masterSeed": 20261023,
-      "rustSeconds": 0.923
+      "rustSeconds": 0.185
     },
     "trail_making": {
       "sequenceCases": 500,
@@ -194,7 +192,7 @@
       "tsHangIds": [],
       "tsErrors": 0,
       "masterSeed": 20340213,
-      "rustSeconds": 0.71
+      "rustSeconds": 0.136
     },
     "visual_search": {
       "sequenceCases": 500,
@@ -209,14 +207,12 @@
       "maxAbsoluteDeviation": 6.821210263296962e-13,
       "maxAbsoluteDeviationAt": "scoring/score-391.slope.conjunction-absent.intercept",
       "divergencesFound": [],
-      "expectedDivergenceCases": {
-        "empty-set-size-condition": 28
-      },
+      "expectedDivergenceCases": {},
       "tsHang": 0,
       "tsHangIds": [],
       "tsErrors": 0,
       "masterSeed": 20292699,
-      "rustSeconds": 2.06
+      "rustSeconds": 0.441
     },
     "wcst": {
       "sequenceCases": 500,
@@ -236,7 +232,7 @@
       "tsHangIds": [],
       "tsErrors": 0,
       "masterSeed": 20324375,
-      "rustSeconds": 0.56
+      "rustSeconds": 0.119
     }
   }
 }

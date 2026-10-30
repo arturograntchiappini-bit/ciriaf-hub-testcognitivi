@@ -6,7 +6,7 @@
 > software** che genera gli stimoli e calcola le metriche, non la validità psicometrica dei test.
 
 > **Provenienza dei numeri.** Ogni cifra di questo documento è letta dai file di evidenza in `desktop/fixtures/`
-> (`evidence/*.json`, `BENCHMARK.md`, `DIVERGENZE.md`) o è stata rigenerata eseguendo i comandi del §7 il 2026-10-23
+> (`evidence/*.json`, `BENCHMARK.md`, `DIVERGENZE.md`) o è stata rigenerata eseguendo i comandi del §7 il 2026-10-23 (le tabelle del §3.4 il 2026-10-30)
 > (esito dei test, determinismo della rigenerazione, esperimento di sensibilità del §3.5, ripartizione per `goRatio`
 > del §4.1). Il documento non cita articoli: non ci sono fonti bibliografiche nuove da verificare.
 
@@ -24,7 +24,7 @@ La scelta di progetto è quindi **un solo motore, in Rust**:
 - nell'app desktop è usato **nativamente**;
 - nella web app sarà usato compilato in **WebAssembly** (WASM, target `wasm32-unknown-unknown`).
 
-Il TS in `src/engine/` resta nel repository, invariato, come **oracolo**: il riferimento rispetto al quale si misura
+Il TS in `src/engine/` resta nel repository come **oracolo** (modificato solo per correggere i difetti del §4): il riferimento rispetto al quale si misura
 il Rust. Si ritirerà solo quando il Rust, compilato in WASM, sarà usato anche dalla web app (vedi
 `src/engine/README.md`). Finché ciò non accade, **il TS è la specifica**: dove TS e Rust differiscono, la differenza va
 spiegata e classificata (§4), non nascosta.
@@ -53,7 +53,7 @@ registrati; non misurano mai il tempo. L'orologio e lo scheduler sono iniettati 
 trial a tempo di reazione, con un ambiente simulato `FakeEnv` per i test). I motori sono quindi funzioni
 deterministiche del seme e dei parametri.
 
-**Versione del motore.** `ENGINE_VERSION` (semver, valore `0.1.0` al momento della scrittura) è definita in
+**Versione del motore.** `ENGINE_VERSION` (semver, valore `0.2.0` dopo la correzione dei difetti del §4) è definita in
 `sintropia-core` e scritta in ogni export: nel campo `engineVersion` dei JSON, in una riga `# engineVersion=...` dei CSV e nel
 piè di pagina del report HTML. Va incrementata a ogni cambiamento osservabile di sequenze, metriche o formati, così
 un dato esportato dichiara con quale motore è stato prodotto.
@@ -104,7 +104,7 @@ della rotazione mentale, etichette e partite simulate con clic casuali di Trail 
 
 Per ciascun motore, test basati su proprietà (`proptest`) verificano **invarianti** indipendenti dal TS: bilanciamento
 delle condizioni, nessuna ripetizione immediata, bersagli attesi, ISI nell'intervallo, conteggi esatti, determinismo a parità di
-seme, distanza minima fra i cerchi di Trail Making. In tutto 62 proprietà, per 13312 casi casuali complessivi.
+seme, distanza minima fra i cerchi di Trail Making. In tutto 63 proprietà, per 13568 casi casuali complessivi.
 
 ### 3.4 Risultati
 
@@ -113,17 +113,17 @@ seme, distanza minima fra i cerchi di Trail Making. In tutto 62 proprietà, per 
 | Test | Casi fixture | Varianti | Casi limite | Confronti esatti | Confronti float | Dev. max | Proprietà (casi) | Esito |
 |---|--:|--:|--:|--:|--:|--:|--:|---|
 | `stroop` | 64 | 7 | 12 | 4212 | 432 | 0 | 5 (1280) | ok |
-| `gonogo` | 76 | 12 | 16 | 8589 | 280 | 0 | 4 (1024) | ok, 3 divergenze attese |
+| `gonogo` | 76 | 12 | 16 | 9300 | 280 | 0 | 4 (1024) | ok |
 | `flanker` | 86 | 14 | 18 | 24727 | 345 | 1.1e-13 | 6 (1536) | ok |
-| `sart` | 74 | 11 | 18 | 13525 | 1295 | 0 | 4 (1024) | ok |
-| `visual_search` | 70 | 10 | 18 | 95592 | 41190 | 1.1e-13 | 6 (1536) | ok, 1 divergenza attesa |
+| `sart` | 74 | 11 | 18 | 13525 | 1295 | 0 | 5 (1280) | ok |
+| `visual_search` | 70 | 10 | 18 | 95592 | 41190 | 1.1e-13 | 6 (1536) | ok |
 | `pvt` | 31 | 4 | 12 | 3406 | 182 | 0 | 5 (1280) | ok |
 | `corsi` | 33 | 4 | 5 | 813 | 466 | 5.7e-14 | 6 (768) | ok |
 | `nback` | 122 | 23 | 24 | 1036 | 488 | 2.2e-16 | 8 (1920) | ok |
-| `wcst` | 153 | 6 | 57 | 1387 | 574 | 5.6e-17 | 7 (1472) | ok |
+| `wcst` | 154 | 6 | 58 | 1408 | 584 | 5.6e-17 | 7 (1472) | ok |
 | `mental_rotation` | 153 | 7 | 29 | 88295 | 11038 | 2.3e-13 | 7 (448) | ok |
-| `trail_making` | 82 | 14 | 14 | 5230 | 4075 | 1.1e-16 | 4 (1024) | ok |
-| **Totale** | **944** | | | **246812** | **60365** | **2.3e-13** | **62 (13312)** | |
+| `trail_making` | 82 | 14 | 14 | 5473 | 4075 | 1.1e-16 | 4 (1024) | ok |
+| **Totale** | **945** | | | **247787** | **60375** | **2.3e-13** | **63 (13568)** | |
 
 La colonna «Casi fixture» somma generazione, scoring e parti ausiliarie di ciascun file. La riga «0» di deviazione
 significa che tutti i float sono identici bit a bit. Il nucleo (`core.json`: RNG, validazione, SDT, export, sessioni)
@@ -131,37 +131,43 @@ ha un proprio golden con 11 test.
 
 **Fuzz** (`evidence/fuzz.json`; `tsHang` e `tsErrors` sono 0 per tutti gli 11 motori).
 
-| Test | Casi sequenza | Casi scoring | Confronti esatti | Confronti float | Dev. max | Divergenze attese (casi) | Esito |
+| Test | Casi sequenza | Casi scoring | Confronti esatti | Confronti float | Dev. max | Divergenze (casi) | Esito |
 |---|--:|--:|--:|--:|--:|--:|---|
 | `stroop` | 500 | 500 | 351844 | 6500 | 1.1e-16 | 0 | ok |
-| `gonogo` | 500 | 500 | 118895 | 5393 | 1.1e-16 | 107 | ok |
+| `gonogo` | 500 | 500 | 163454 | 5500 | 1.1e-16 | 0 | ok |
 | `flanker` | 500 | 500 | 289100 | 6880 | 3.4e-13 | 0 | ok |
 | `sart` | 500 | 500 | 197837 | 59858 | 1.1e-16 | 0 | ok |
-| `visual_search` | 500 | 500 | 827390 | 358626 | 6.8e-13 | 28 | ok |
+| `visual_search` | 500 | 500 | 827390 | 358626 | 6.8e-13 | 0 | ok |
 | `pvt` | 500 | 500 | 117842 | 6000 | 1.1e-16 | 0 | ok |
 | `corsi` | 500 | 500 | 16413 | 9394 | 5.7e-14 | 0 | ok |
 | `nback` | 500 | 500 | 70585 | 8480 | 4.6e-13 | 0 | ok |
 | `wcst` | 500 | 500 | 194844 | 5500 | 1.1e-16 | 0 | ok |
 | `mental_rotation` | 500 | 500 | 2710950 | 63726 | 2.3e-13 | 0 | ok |
 | `trail_making` | 500 | 500 | 180390 | 42422 | 2.9e-11 | 0 | ok |
-| **Totale** | **5500** | **5500** | **5076090** | **572779** | **2.9e-11** | **135** | |
+| **Totale** | **5500** | **5500** | **5120649** | **572886** | **2.9e-11** | **0** | |
 
-Le «divergenze attese» sono i casi in cui il TS è difettoso e il Rust, per scelta, non lo imita (§4); in quei casi il
-test non confronta con il TS ma verifica gli invarianti previsti.
+La colonna «Divergenze (casi)» conta le divergenze **aperte** (`expectedDivergenceCases`). Il file registra in `divergencesFound`
+per `gonogo` 7 casi già risolti (il bug del Rust del §4.2): nessuna divergenza resta aperta.
+Nessun caso richiede più una divergenza dichiarata: dopo la correzione dei difetti del TS (§4) il confronto è uguaglianza ovunque.
+Fixture e fuzz sono state rigenerate dall'oracolo corretto il 2026-10-30; i file di evidenza con
+`SINTROPIA_WRITE_EVIDENCE=1 cargo test -p sintropia-engines --release -- --test-threads=1`.
 
-**Esito dei test.** Il 2026-10-23, `cargo test -p sintropia-engines --release` ha dato 225 test superati e 0 falliti
-(168 test unitari nei moduli, golden, fuzz, proptest; i 2 test di budget di prestazione sono `#[ignore]`);
-`cargo test -p sintropia-core --release`: 49 test unitari e 11 di golden superati.
+**Esito dei test.** Il 2026-10-30, `cargo test -p sintropia-engines --release` ha dato 225 test superati e 0 falliti
+(unitari nei moduli, golden, fuzz, proptest; i 2 test di budget di prestazione sono `#[ignore]`);
+`cargo test --workspace --release`: 392 test superati e 0 falliti.
 
 ### 3.5 Analisi della deviazione massima e controllo di sensibilità
 
 La deviazione massima osservata è molto minore della tolleranza dichiarata: 2.3e-13 nei golden e 2.9e-11 nel fuzz, cioè
-rispettivamente circa 4 400 e 34 volte sotto $\varepsilon$. Non sono errori di calcolo, ma differenze di arrotondamento di
-**1-2 unità nell'ultima cifra** (ulp, *unit in the last place*):
+rispettivamente circa 4 400 e 34 volte sotto $\varepsilon$. Le due deviazioni analizzate qui sotto (il golden di N-Back, 2.2e-16, e il massimo del fuzz, 2.9e-11 su Trail Making) sono
+differenze di arrotondamento di **1-2 unità nell'ultima cifra** (ulp, *unit in the last place*). Il massimo dei golden (2.3e-13,
+intercetta di una regressione della rotazione mentale) e le altre deviazioni del fuzz non sono state analizzate una per una e non
+sono tutte di 1-2 ulp: per esempio quella di N-Back (4.6e-13 su `probit(0.9746)`, circa 1.95) vale circa 2·10³ ulp, pur restando oltre tre
+ordini di grandezza sotto $\varepsilon$.
 
 - **Parsing JSON.** Le fixture passano per JSON: la conversione decimale-binario di `serde_json` può differire di 1 ulp dalla lettura di V8
   (spiegazione data in `DIVERGENZE.md`).
-- **Logaritmo.** L'unico punto in cui un calcolo non banale dà un risultato diverso è il probit della SDT, che usa il logaritmo
+- **Logaritmo.** Nel golden di N-Back la deviazione massima è nel probit della SDT, che usa il logaritmo
   naturale: la deviazione massima del golden di N-Back è 2.2e-16 su `probit(0.1)` (circa $-1.28$), cioè esattamente 1 ulp per valori in $[1,2)$. È **coerente**
   con `Math.log` di V8 contro `ln` di Rust che differiscono di 1 ulp in qualche argomento; non è stato isolato con un esperimento dedicato.
 - **Cancellazione.** Il massimo del fuzz (2.9e-11) è su un `rtMs` di Trail Making (circa 537 ms) che è la differenza fra due
@@ -178,24 +184,26 @@ senza la modifica il test passa. Un errore tre ordini di grandezza sopra $\varep
 
 ---
 
-## 4. Divergenze trovate e loro classificazione
+## 4. Difetti trovati e corretti
 
-**Politica: il Rust non copia i bug del TS.** Se TS e Rust differiscono, la differenza si classifica in una di
-quattro categorie; la fixture marca il confronto come `expectedDivergence` e il test verifica gli **invarianti attesi**
-(dal paper del test) invece dell'uguaglianza con il TS. Tutto il resto coincide.
+**Politica: il Rust non copia i bug del TS, e i bug del TS si correggono.** Il confronto TS-Rust ha fatto emergere difetti in
+entrambe le implementazioni. Finché un difetto del TS non era corretto, la fixture lo marcava come `expectedDivergence` e il test
+verificava gli **invarianti attesi** (dal paper del test) invece dell'uguaglianza. Il 2026-10-30 tutti i difetti del TS sono stati
+corretti, le fixture rigenerate e le divergenze dichiarate sono scomparse: il confronto è di nuovo uguaglianza ovunque. Ogni correzione
+ha un test di regressione (`src/engine/tests/regressioni.test.ts`); l'insieme delle correzioni ha portato `ENGINE_VERSION` da 0.1.0 a 0.2.0.
 
 | Categoria | Significato |
 |---|---|
-| Bug TS | il TS viola una regola dichiarata nel suo stesso paper; Rust corretto, TS da correggere |
-| Limite TS | il TS ha un comportamento discutibile fuori dal dominio d'uso; Rust identico, segnalato |
-| Bug Rust | il Rust violava un invariante; corretto |
+| Bug TS | il TS violava una regola dichiarata nel suo stesso paper |
+| Limite TS | il TS aveva un comportamento discutibile fuori dal dominio d'uso |
+| Bug Rust | il Rust violava un invariante; corretto subito |
 | Quirk JS | differenza di semantica del linguaggio o della libreria |
 
-### 4.1 Go/No-Go: più di 2 No-Go consecutivi (bug TS, Rust diverso)
+### 4.1 Go/No-Go: più di 2 No-Go consecutivi (bug TS, corretto)
 
-Il paper ([gonogo.md](gonogo.md)) dichiara «mai più di 2 No-Go consecutivi». In `tryArrange` (`gonogo.ts`), quando i Go sono finiti il TS accoda
-No-Go **ignorando** il limite, e accetta sempre la sequenza. Nelle 500 sequenze casuali del fuzz (numerosità 0-397, `goRatio` da 0.05 a 1) il TS viola il vincolo in
-**107 casi**. Ripartizione per `goRatio`, ricalcolata dal file `fuzz/gonogo.json.gz`:
+Il paper ([gonogo.md](gonogo.md)) dichiara «mai più di 2 No-Go consecutivi». In `tryArrange` (`gonogo.ts`), quando i Go erano finiti il TS accodava
+No-Go **ignorando** il limite, e accettava sempre la sequenza. Nelle 500 sequenze casuali del fuzz (numerosità 0-397, `goRatio` da 0.05 a 1) il TS violava il vincolo in
+**107 casi**. Ripartizione per `goRatio`, misurata prima della correzione:
 
 | `goRatio` | Sequenze | Con serie di No-Go > 2 (TS) |
 |---|--:|--:|
@@ -206,40 +214,44 @@ No-Go **ignorando** il limite, e accetta sempre la sequenza. Nelle 500 sequenze 
 | ≥ 0.8 | 161 | 0 |
 | **Totale** | **500** | **107** |
 
-La serie più lunga nei dati TS del fuzz è 17 No-Go con `goRatio` tra 0.5 e 0.6, e 187 con `goRatio` < 0.2. Un caso minimo è
-`generateGoNoGo({nTrials: 80, goRatio: 0.5, ...}, mulberry32(1))`; le fixture golden lo mostrano con i semi 1, 42, 2026 (serie fino a 6). Con i
-default (75% Go) il difetto non compare nelle fixture, ma il fuzz mostra che è molto più frequente di quanto i casi pensati a mano suggerissero:
-la scoperta è un risultato diretto del livello 2. Il Rust ritenta (fino a 500 volte) e poi ripiega su una disposizione deterministica;
-il test verifica lunghezza, numero di Go (uguale al TS), ISI e serie ≤ 2 quando realizzabile (nNoGo ≤ 2·nGo).
+La serie più lunga era di 17 No-Go con `goRatio` tra 0.5 e 0.6, e di 187 con `goRatio` < 0.2. Un caso minimo era
+`generateGoNoGo({nTrials: 80, goRatio: 0.5, ...}, mulberry32(1))`. Con i default (75% Go) il difetto non compariva nelle fixture, ma il fuzz ha mostrato che era molto più
+frequente di quanto i casi pensati a mano suggerissero: la scoperta è un risultato diretto del livello 2.
+**Correzione:** `tryArrange` ora ritenta (fino a 500 volte) quando servirebbe una terza No-Go di fila, e poi ripiega su una disposizione deterministica
+(§4.2); TS e Rust usano lo stesso algoritmo e producono le stesse sequenze.
 
-**Il presunto «ciclo infinito» del Go/No-Go non esiste.** Una prima ipotesi, formulata leggendo il codice, era che
-`deterministicArrange` si bloccasse quando i No-Go superano i Go. Il fuzz l'ha smentita: `tryArrange` non restituisce mai `null`
-(accoda No-Go senza limite), quindi `deterministicArrange` è **codice morto, irraggiungibile**. Il watchdog del fuzz ha registrato 0 blocchi
-(`tsHang` = 0) in tutti i motori, verificato anche con 30 casi con `goRatio` 0.05-0.4 e numerosità fino a 400 e a mano con `goRatio`
-0, 0.1, 0.3, 0.4. Il difetto vero è quello di questo paragrafo. Si riporta l'errore dell'ipotesi iniziale perché il metodo serve
-anche a questo: correggere le proprie congetture con i dati.
+**Il presunto «ciclo infinito» del Go/No-Go non esisteva.** Una prima ipotesi, formulata leggendo il codice, era che
+`deterministicArrange` si bloccasse quando i No-Go superano i Go. Il fuzz l'ha smentita: `tryArrange` non restituiva mai `null`, quindi `deterministicArrange`
+era **codice morto, irraggiungibile**; il watchdog del fuzz ha registrato 0 blocchi (`tsHang` = 0). Con la correzione sopra il ripiego diventa raggiungibile ed è
+stato riscritto in modo che termini sempre (§4.2). Si riporta l'errore dell'ipotesi iniziale perché il metodo serve anche a questo: correggere le proprie congetture con i dati.
 
-### 4.2 Go/No-Go: bug del Rust, corretto
+### 4.2 Go/No-Go: ripiego deterministico (bug Rust, corretto)
 
 Lo stesso fuzz ha trovato un bug **nel Rust**: in 7 sequenze con `goRatio` 0.36-0.46 (dove il campionamento casuale quasi mai rispetta il
 vincolo e si arriva al ripiego) `deterministic_arrange` alternava Go e No-Go e accodava **tutti** i No-Go rimasti, con serie fino a 17,
-pur essendo il vincolo realizzabile. Correzione minima: dopo ogni Go si inserisce una quota uniforme di No-Go (al massimo 2); si
-accodano solo quelli che non trovano posto (nNoGo > 2·nGo). Due test unitari nuovi. Nessun effetto sul dominio dell'interfaccia (`goRatio` ≥ 0.5), dove il ripiego non scatta.
+pur essendo il vincolo realizzabile. Correzione: dopo ogni Go si inserisce una quota uniforme di No-Go (al massimo 2); si
+accodano solo quelli che non trovano posto (nNoGo > 2·nGo, caso in cui il vincolo non è realizzabile). Ora il TS usa lo stesso ripiego.
 
-### 4.3 Trail Making: il ripiego su griglia viola la distanza minima (limite TS, Rust identico)
+### 4.3 Trail Making: il ripiego violava la distanza minima (limite TS, corretto)
 
-`placePoints` mette i cerchi in posizioni casuali con distanza minima 0.11; esaurite le 4000 prove i cerchi mancanti sono messi su una griglia
+`placePoints` mette i cerchi in posizioni casuali con distanza minima 0.11; esaurite le 4000 prove i cerchi mancanti erano messi su una griglia
 **senza controllare** la distanza dai punti già piazzati. Misurato sul TS con 3000 semi per numerosità: distanza violata nello 0% dei casi fino a
-n = 40, 1.5% a n = 45, 86.6% a n = 51. Con il default (n = 25) non succede. Il Rust è **identico** al TS (correggere cambierebbe le posizioni a parità
-di seme) e il proptest verifica la distanza solo fino a 30 cerchi. Correzione suggerita: nel ripiego scartare le celle a distanza < 0.11. Un secondo
-limite, la parte B oltre 53 cerchi (etichetta mancante nel TS, `?` nel Rust), è fuori dal dominio dei parametri (massimo 51). Vedi [trail-making.md](trail-making.md).
+n = 40, 1.5% a n = 45, 86.6% a n = 51. Con il default (n = 25) non succedeva. **Correzione:** se l'estrazione casuale non arriva al numero richiesto, si scarta
+e si scelgono `n` celle a caso di una griglia, i cui centri distano almeno 0.11 fino a 64 cerchi (il limite del parametro è 51); vale per TS e Rust.
+Anche la parte B oltre 53 cerchi (etichetta mancante nel TS, `?` nel Rust) è ora limitata a 53 (1, A, 2, B, …, Z, 27). Vedi [trail-making.md](trail-making.md).
 
-### 4.4 N-Back: quartile vuoto (limite TS, Rust identico)
+### 4.4 N-Back: quartile vuoto (limite TS, corretto)
 
-`splitIntoChunks` usa `ceil(n/k)`: con n non divisibile i blocchi non sono i più bilanciati possibile (n = 5, k = 4 dà 2, 2, 1, 0) e l'ultimo
-quartile può essere vuoto, con $d'$ pari a 0. Irrilevante con i default (360 trial). Rust identico. Vedi [nback.md](nback.md).
+`splitIntoChunks` usava `ceil(n/k)`: con n non divisibile i blocchi non erano i più bilanciati possibile (n = 5, k = 4 dava 2, 2, 1, 0) e l'ultimo
+quartile poteva essere vuoto, con $d'$ pari a 0. **Correzione:** i primi `n mod k` blocchi hanno un elemento in più (n = 5, k = 4 dà 2, 1, 1, 1). Con i default (360 trial) il risultato è identico. Vedi [nback.md](nback.md).
 
-### 4.5 Quirk del linguaggio
+### 4.5 WCST: allineamento dei metadati (limite TS, corretto)
+
+`scoreWcst` allineava i metadati agli indici dei trial **già filtrati** (esclusi interrotti e pratica): con un trial interrotto in mezzo i metadati dei trial
+successivi si sfalsavano. La vista non lo manifestava perché produce solo trial validi. **Correzione:** se trial e metadati sono liste parallele (stessa lunghezza)
+l'indice è quello del trial originale; altrimenti i metadati si considerano già filtrati, come prima.
+
+### 4.6 Quirk del linguaggio
 
 - **`Math.hypot` (Corsi).** `distance()` usa `Math.hypot`; `f64::hypot` di Rust differisce di 1 ulp da V8 (distanza fra i blocchi 0 e 4:
   `403ea5adf8a76f92` contro `403ea5adf8a76f91`). Conta perché le sequenze sono ordinate per lunghezza di percorso e un ulp può invertire due
@@ -247,13 +259,21 @@ quartile può essere vuoto, con $d'$ pari a 0. Irrilevante con i default (360 tr
   più somma di Kahan) e il golden confronta **bit a bit** tutte le 81 distanze fra i blocchi: poiché ogni percorso è una somma di queste distanze,
   ordinamenti ed estrazioni coincidono per ogni seme. Nota: `Math.hypot` non è garantito al bit dal linguaggio (altri motori JS possono dare risultati
   diversi), quindi fuori da V8 la sequenza TS a parità di seme non è garantita; il Rust è deterministico.
-- **`Number('')` (Visual Search).** `Number('') === 0` è un intero, quindi la condizione `feature-present-` è accettata dal TS come numerosità 0.
-  Il Rust la scarta. I generatori non producono mai quella condizione: è solo robustezza su dati esterni (28 sessioni casuali del fuzz la contengono, confrontate
-  con l'atteso Rust dichiarato).
-- **`Number(...)` (rotazione mentale).** Accetta anche `0x1A` o `0b11`, `parse::<f64>` di Rust no: condizioni mai prodotte, non coperte dal fuzz.
+- **`Number('')` e `Number('0x1A')` (Visual Search, rotazione mentale).** `Number('')` vale 0 e `Number('0x1A')` vale 26: il TS accettava come numerosità
+  o angolo valori che non lo sono. `parseCondition` ora li scarta, come già faceva il Rust. I generatori non producono mai quelle condizioni: è solo robustezza su dati esterni.
 
-Altre note sul TS senza deviazione (WCST: `scoreWcst` allinea i metadati agli indici dei trial già filtrati, oggi non manifesto perché la vista produce solo trial
-validi; `js_round` contro `Math.round` su 0.49999999999999994) sono in `DIVERGENZE.md`.
+### 4.7 Ripresa dopo pausa (bug TS dell'interfaccia, corretto)
+
+Se si premeva Esc durante la **pratica**, la ripresa riavviava la pratica dal primo trial e i trial già svolti comparivano due volte nell'export. Ora la pratica
+riparte dal trial successivo, come già faceva il test.
+
+### 4.8 Export CSV: celle lette come formule (difetto di sicurezza, corretto)
+
+Un campo testuale che inizia con `=`, `+`, `@` o `-` poteva essere interpretato come formula da un foglio di calcolo (*CSV injection*).
+Ora, in TS e Rust, le sole **stringhe** che iniziano così (oltre a tabulazione e ritorno a capo) ricevono un apice iniziale; i numeri, compresi
+quelli negativi, restano intatti, e un `\r` nel campo fa mettere il campo tra virgolette. Il JSON non è toccato. Vedi `DIVERGENZE.md` (n. 10).
+
+Altre note, senza effetto sui risultati (`js_round` contro `Math.round` su 0.49999999999999994; ordine delle facce proiettate a profondità quasi uguali) sono in `DIVERGENZE.md`.
 
 ---
 
@@ -273,7 +293,41 @@ Il rapporto $R = t_{\text{TS}} / t_{\text{Rust}}$ è maggiore di 1 se il Rust è
 
 | Operazione | TS | Rust nativo | WASM (Os) | TS/Rust | TS/WASM |
 |---|--:|--:|--:|--:|--:|
-@@BENCH@@
+| `stroop.gen.default` | 647 ns | 379 ns | 250 ns | 1.71x | 2.59x |
+| `stroop.gen.x10` | 423.8 µs | 296.2 µs | 243.3 µs | 1.43x | 1.74x |
+| `stroop.score.400` | 38.5 µs | 4.8 µs | 4.4 µs | 8.04x | 8.76x |
+| `gonogo.gen.default` | 800 ns | 634 ns | 670 ns | 1.26x | 1.19x |
+| `gonogo.gen.x10` | 8.8 µs | 5.1 µs | 6.2 µs | 1.74x | 1.43x |
+| `gonogo.score.400` | 19.2 µs | 3.1 µs | 2.7 µs | 6.22x | 7.10x |
+| `flanker.gen.default` | 9.1 µs | 3.9 µs | 2.7 µs | 2.30x | 3.41x |
+| `flanker.gen.x10` | 118.8 µs | 41.8 µs | 27.8 µs | 2.84x | 4.27x |
+| `flanker.score.400` | 56.7 µs | 10.1 µs | 14.7 µs | 5.63x | 3.86x |
+| `sart.gen.default` | 93.7 µs | 17.5 µs | 10.6 µs | 5.36x | 8.81x |
+| `sart.gen.x10` | 1.25 ms | 183.0 µs | 115.9 µs | 6.81x | 11x |
+| `sart.score.400` | 39.5 µs | 4.2 µs | 3.9 µs | 9.36x | 10x |
+| `visual_search.gen.default` | 340.0 µs | 38.5 µs | 33.2 µs | 8.84x | 10x |
+| `visual_search.gen.x10` | 2.81 ms | 387.3 µs | 315.9 µs | 7.26x | 8.89x |
+| `visual_search.score.400` | 414.8 µs | 74.4 µs | 102.6 µs | 5.57x | 4.04x |
+| `pvt.gen.default` | 5.7 µs | 193 ns | 601 ns | 29x | 9.44x |
+| `pvt.gen.x10` | 50.2 µs | 1.6 µs | 5.8 µs | 32x | 8.69x |
+| `pvt.score.400` | 116.3 µs | 7.2 µs | 8.8 µs | 16x | 13x |
+| `nback.gen.default` | 95.0 µs | 7.3 µs | 8.5 µs | 13x | 11x |
+| `nback.gen.x10` | 1.22 ms | 117.2 µs | 143.3 µs | 10x | 8.51x |
+| `nback.score.400` | 10.7 µs | 2.8 µs | 3.8 µs | 3.81x | 2.83x |
+| `mental_rotation.gen.default` | 5.46 ms | 522.4 µs | 310.3 µs | 10x | 18x |
+| `mental_rotation.gen.x10` | 67.40 ms | 5.72 ms | 3.40 ms | 12x | 20x |
+| `mental_rotation.score.400` | 371.0 µs | 91.4 µs | 51.2 µs | 4.06x | 7.25x |
+| `trail_making.gen.default` | 34.1 µs | 7.2 µs | 5.4 µs | 4.74x | 6.37x |
+| `trail_making.gen.x10` | 2.28 ms | 740.0 µs | 770.7 µs | 3.08x | 2.96x |
+| `trail_making.score.400` | 7.9 µs | 3.8 µs | 1.9 µs | 2.08x | 4.27x |
+| `corsi.gen.default` | 8.64 ms | 2.21 ms | 2.17 ms | 3.90x | 3.98x |
+| `corsi.gen.x10` | 85.60 ms | 23.29 ms | 22.84 ms | 3.68x | 3.75x |
+| `corsi.score.400` | 11.9 µs | 1.9 µs | 6.4 µs | 6.29x | 1.88x |
+| `wcst.gen.default` | 824 ns | 427 ns | 336 ns | 1.93x | 2.45x |
+| `wcst.gen.x10` | 5.0 µs | 3.4 µs | 2.1 µs | 1.47x | 2.42x |
+| `wcst.score.400` | 22.4 µs | 10.2 µs | 7.7 µs | 2.19x | 2.90x |
+| `mental_rotation.project_faces` | 114.3 µs | 17.3 µs | 22.6 µs | 6.63x | 5.05x |
+| `mental_rotation.is_chiral` | 33.6 µs | 3.5 µs | 2.2 µs | 9.52x | 15x |
 
 ### 5.1 Prima e dopo l'ottimizzazione
 
@@ -315,12 +369,13 @@ ulteriore calo è atteso ma **non misurato**.
 - **Rumore.** La macchina è condivisa con altre compilazioni; sotto carico le operazioni ad alta allocazione variano fino a 2x. In 4 esecuzioni native il
   rapporto TS/Rust di `stroop.gen.x10` è andato da 0.92x a 1.47x e quello di `flanker.gen.default` da 1.40x a 2.30x. Differenze inferiori a 15-20% non sono significative.
 - **Confine JSON.** Dove i dati attraversano il confine JavaScript/WASM (`JSON.stringify`, copia in memoria lineare, `JSON.parse`) il costo supera il calcolo:
-  `stroop.score.400` costa 8 µs di calcolo contro circa 620 µs col confine completo. In alcune operazioni piccole con il confine JSON il WASM è più lento
+  `stroop.score.400` costa 4.4 µs di calcolo in WASM (Os) contro 342.3 µs col confine completo (`json+js`; 538.4 µs con O3). In alcune operazioni piccole con il confine JSON il WASM è più lento
   del TS (per esempio `wcst.gen.default.json`: 0.67x). Il WASM conviene per le generazioni pesanti (rotazione mentale, Visual Search, Corsi) e meno per il
   punteggio di 400 trial se il confine resta JSON; la mitigazione è chiamarlo una volta per sessione.
 - **Limite algoritmico.** `stroop.gen.x10` è lento in entrambi i linguaggi per i 200 rimescolamenti completi del campionamento per rifiuto; non si
   cambia perché altererebbe il consumo del RNG e quindi le sequenze.
-- Nessuna operazione di generazione o punteggio supera i 30 ms nemmeno in x10 (Corsi): a ritmo d'uso reale i valori sono trascurabili rispetto alla durata dei test.
+- In Rust (nativo e WASM) nessuna operazione di generazione o punteggio supera i 30 ms nemmeno in x10 (il massimo è Corsi, 23.29 ms nativo); nel TS
+  `mental_rotation.gen.x10` e `corsi.gen.x10` arrivano a 67.40 e 85.60 ms. A ritmo d'uso reale i valori sono trascurabili rispetto alla durata dei test.
 
 ---
 
@@ -344,10 +399,8 @@ ulteriore calo è atteso ma **non misurato**.
 **Lavoro futuro.**
 
 1. **Rimpiazzare i motori TS con il WASM** nella web app, chiamando il modulo una volta per sessione; solo allora ritirare `src/engine/`.
-2. **Correggere i bug del TS** (Go/No-Go, ripiego di Trail Making, quartile vuoto di N-Back) e rigenerare le fixture, così le «divergenze attese» spariscono e il
-   confronto torna a essere uguaglianza ovunque. Ogni correzione incrementa `ENGINE_VERSION`.
-3. **Firma dell'installer.** L'eseguibile e l'MSI Windows non sono firmati (SmartScreen mostra un avviso): serve un certificato di firma del codice.
-4. Misurare la latenza dei tasti su hardware, eseguire il WASM in browser e applicare `wasm-opt`.
+2. **Firma dell'installer.** L'eseguibile e l'MSI Windows non sono firmati (SmartScreen mostra un avviso): serve un certificato di firma del codice.
+3. Misurare la latenza dei tasti su hardware, eseguire il WASM in browser e applicare `wasm-opt`.
 
 ---
 
@@ -376,12 +429,15 @@ powershell -File tools/bench/run-bench.ps1
 cargo test -p sintropia-engines --release --test perf_budget -- --ignored
 ```
 
-Il seme maestro del fuzz è fisso e le fixture golden sono deterministiche. Il 2026-10-23 i comandi 1 e 2 sono stati rieseguiti e hanno prodotto file **byte per
-byte identici** a quelli presenti nel repository (confronto MD5). Il benchmark invece **non è riproducibile al bit**: dipende dalla macchina e dal carico. Il
+Il seme maestro del fuzz è fisso e le fixture golden sono deterministiche. Dopo le correzioni del 2026-10-30 le fixture golden (comando 1) sono state rigenerate e risultano **byte per
+byte identiche** a quelle del repository (confronto MD5); la CI lo verifica a ogni push. Il fuzz (comando 2) è stato rigenerato nella stessa data insieme alle correzioni. Il benchmark invece **non è riproducibile al bit**: dipende dalla macchina e dal carico. Il
 comando 4 esegue in sequenza il TS, il Rust nativo (`cargo bench`), le tre build WASM e l'unione dei risultati in `fixtures/BENCHMARK.md`. I dati grezzi
-sono in `desktop/fixtures/evidence/bench*.json`. Una guida di sintesi è in `desktop/README.md`; la storia delle divergenze in `desktop/fixtures/DIVERGENZE.md`.
+sono in `desktop/fixtures/evidence/bench*.json`. Una guida di sintesi è in `desktop/README.md`; la storia dei difetti in `desktop/fixtures/DIVERGENZE.md`.
 
 ## Cronologia delle revisioni
 
 - **2026-10.** Prima versione. Numeri letti da `desktop/fixtures/evidence/` e `BENCHMARK.md`; rigenerati fixture, fuzz, esito dei test, ripartizione del
   Go/No-Go per `goRatio` e controllo di sensibilità. Nessuna fonte bibliografica esterna citata.
+- **Revisione 2026-10-30.** Compilata la tabella dei risultati del §5 (era rimasto un segnaposto) da `BENCHMARK.md`; aggiornati
+  i valori del confine JSON del §5.3; precisato che il limite dei 30 ms vale per il Rust; chiarite le divergenze registrate nel fuzz;
+  limitata la spiegazione «1-2 ulp» alle due deviazioni analizzate; aggiunto il §4.8 (CSV).
